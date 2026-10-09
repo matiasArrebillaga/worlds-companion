@@ -1,0 +1,37 @@
+import { localDayKey } from './format';
+import type { Match } from './types';
+
+export interface DayGroup {
+  day: string | null;
+  matches: Match[];
+}
+
+// Día local del partido; si no tiene hora confirmada se usa la fecha del calendario
+export function dayKeyOf(m: Match, tz: string): string | null {
+  return m.start_utc ? localDayKey(m.start_utc, tz) : m.date;
+}
+
+export function groupByDay(matches: Match[], tz: string): DayGroup[] {
+  const byDay = new Map<string | null, Match[]>();
+  for (const m of matches) {
+    const key = dayKeyOf(m, tz);
+    byDay.set(key, [...(byDay.get(key) ?? []), m]);
+  }
+  return [...byDay.entries()]
+    .map(([day, list]) => ({ day, matches: list }))
+    .sort((a, b) => (a.day ?? '9999').localeCompare(b.day ?? '9999'));
+}
+
+// Una serie en curso tiene prioridad; si no, el próximo partido con hora confirmada
+export function featuredMatch(matches: Match[], now: Date): Match | null {
+  const live = matches.find((m) => m.status === 'live');
+  if (live) return live;
+  return matches.find((m) => m.status === 'upcoming' && m.start_utc !== null && new Date(m.start_utc) >= now) ?? null;
+}
+
+export function recentResults(matches: Match[], limit: number): Match[] {
+  return matches
+    .filter((m) => m.status === 'finished')
+    .sort((a, b) => (b.start_utc ?? b.date ?? '').localeCompare(a.start_utc ?? a.date ?? ''))
+    .slice(0, limit);
+}
