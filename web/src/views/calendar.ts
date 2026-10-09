@@ -42,9 +42,10 @@ export function renderCalendar(el: HTMLElement, matches: Match[], tz: string): (
     if (!button) return;
     current = button.dataset.filter as Filter;
     renderCalendar(el, matches, tz);
+    // Volver el foco al filtro elegido (el re-render reemplaza los botones)
+    el.querySelector<HTMLButtonElement>(`button[data-filter="${current}"]`)?.focus();
   });
 
-  // Al entrar, saltar al día de hoy si está en la lista
-  el.querySelector('#hoy')?.scrollIntoView({ block: 'start' });
+  // El salto al día de hoy (#hoy) lo hace main.ts solo al navegar, no en cada re-render
   return () => {};
 }

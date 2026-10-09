@@ -1,5 +1,5 @@
 import './styles.css';
-import { loadData, type SiteData } from './data';
+import { isNewer, loadData, loadMeta, type SiteData } from './data';
 import { localDayKey, resolveTimeZone } from './format';
 import { dayKeyOf } from './schedule';
 import { renderCalendar } from './views/calendar';
@@ -18,12 +18,36 @@ const view = document.getElementById('view') as HTMLElement;
 const tz = resolveTimeZone();
 let cleanup: () => void = () => {};
 
-function route(data: SiteData): void {
-  const hash = location.hash in ROUTES ? location.hash : '#/';
-  setActiveTab(hash);
+const REFRESH_EVERY_MS = 5 * 60_000;
+
+function currentHash(): string {
+  return location.hash in ROUTES ? location.hash : '#/';
+}
+
+function render(data: SiteData): void {
   cleanup();
-  window.scrollTo(0, 0);
-  cleanup = ROUTES[hash](view, data.schedule.matches, tz);
+  cleanup = ROUTES[currentHash()](view, data.schedule.matches, tz);
+}
+
+// Navegar: arriba de todo, o al día de hoy si la vista lo marca
+function route(data: SiteData): void {
+  setActiveTab(currentHash());
+  render(data);
+  const today = view.querySelector('#hoy');
+  if (today) today.scrollIntoView({ block: 'start' });
+  else window.scrollTo(0, 0);
+}
+
+// Con la página abierta, buscar datos nuevos cada 5 minutos y redibujar sin mover el scroll
+async function refreshIfNewer(data: SiteData): Promise<SiteData> {
+  try {
+    if (!isNewer(data.meta, await loadMeta())) return data;
+    const fresh = await loadData();
+    render(fresh);
+    return fresh;
+  } catch {
+    return data; // sin conexión: se sigue mostrando lo último que se cargó
+  }
 }
 
 function refreshUpdated(data: SiteData): void {
@@ -44,6 +68,10 @@ async function start(): Promise<void> {
   }
   refreshUpdated(data);
   window.setInterval(() => refreshUpdated(data), 60_000);
+  window.setInterval(async () => {
+    data = await refreshIfNewer(data);
+    refreshUpdated(data);
+  }, REFRESH_EVERY_MS);
   window.addEventListener('hashchange', () => route(data));
   route(data);
 }
