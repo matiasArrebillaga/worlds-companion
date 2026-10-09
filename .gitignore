@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.superpowers/
+data/processed/
+web/node_modules/
+web/dist/
+web/public/data/*.json
