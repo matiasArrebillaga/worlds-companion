@@ -2,6 +2,7 @@ import './styles.css';
 import { loadData, type SiteData } from './data';
 import { localDayKey, resolveTimeZone } from './format';
 import { dayKeyOf } from './schedule';
+import { renderCalendar } from './views/calendar';
 import { renderUpdated, setActiveTab } from './views/layout';
 import { renderToday } from './views/today';
 import type { Match } from './types';
@@ -10,6 +11,7 @@ type View = (el: HTMLElement, matches: Match[], tz: string) => () => void;
 
 const ROUTES: Record<string, View> = {
   '#/': renderToday,
+  '#/calendario': renderCalendar,
 };
 
 const view = document.getElementById('view') as HTMLElement;
@@ -20,8 +22,8 @@ function route(data: SiteData): void {
   const hash = location.hash in ROUTES ? location.hash : '#/';
   setActiveTab(hash);
   cleanup();
-  cleanup = ROUTES[hash](view, data.schedule.matches, tz);
   window.scrollTo(0, 0);
+  cleanup = ROUTES[hash](view, data.schedule.matches, tz);
 }
 
 function refreshUpdated(data: SiteData): void {
