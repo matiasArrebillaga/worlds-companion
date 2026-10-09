@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 
 from pipeline import leaguepedia, utc_now_iso
+from pipeline.schedule import UNDECIDED_TEAMS
 
 RAW_DIR = Path("data/raw")
 MATCHES_FILE = RAW_DIR / "worlds_2026_matches.json"
@@ -20,13 +21,12 @@ MATCH_FIELDS = ",".join([
     "DateTime_UTC=DateTimeUTC", "HasTime", "IsNullified",
 ])
 TEAM_FIELDS = "Name,Short"
-UNDECIDED_TEAM = "TBD"
 
 
 def team_names(matches: list[dict]) -> list[str]:
-    """Nombres de equipo únicos y ordenados, sin vacíos ni 'TBD'."""
-    names = {m.get(key, "") for m in matches for key in ("Team1", "Team2")}
-    return sorted(n for n in names if n and n != UNDECIDED_TEAM)
+    """Nombres de equipo únicos y ordenados, sin vacíos ni placeholders ('TBD', 'TBA')."""
+    names = {(m.get(key) or "").strip() for m in matches for key in ("Team1", "Team2")}
+    return sorted(n for n in names if n and n.lower() not in UNDECIDED_TEAMS)
 
 
 def teams_where(names: list[str]) -> str:

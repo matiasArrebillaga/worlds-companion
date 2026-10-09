@@ -31,6 +31,20 @@ def test_parse_start_without_confirmed_time_keeps_only_date():
     assert parse_start(row(HasTime="0")) == (None, "2026-10-23")
 
 
+def test_parse_start_blank_or_missing_has_time_is_unconfirmed():
+    # Si Leaguepedia no dice explícitamente que hay hora, no se inventa una
+    assert parse_start(row(HasTime="")) == (None, "2026-10-23")
+    no_flag = row()
+    del no_flag["HasTime"]
+    assert parse_start(no_flag) == (None, "2026-10-23")
+
+
+def test_placeholder_teams_are_undecided_case_insensitive():
+    [match] = build_schedule([row(Tab="Finals", Team1="tba", Team2=" TBD ")], SHORTS)
+    assert match["team1"] is None
+    assert match["team2"] is None
+
+
 def test_parse_start_without_date():
     assert parse_start(row(DateTimeUTC="")) == (None, None)
 

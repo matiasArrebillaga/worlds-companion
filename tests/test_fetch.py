@@ -8,6 +8,7 @@ def test_team_names_skips_tbd_and_blanks_and_dedupes():
         {"Team1": "T1", "Team2": "G2 Esports"},
         {"Team1": "T1", "Team2": "TBD"},
         {"Team1": "", "Team2": "Gen.G"},
+        {"Team1": "TBA", "Team2": "tbd"},
     ]
     assert fetch.team_names(matches) == ["G2 Esports", "Gen.G", "T1"]
 

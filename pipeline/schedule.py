@@ -1,7 +1,8 @@
 """Convierte filas crudas de MatchSchedule (Leaguepedia) al formato de schedule.json."""
 from datetime import datetime, timezone
 
-UNDECIDED_TEAM = "TBD"
+# Nombres que Leaguepedia usa para un cruce sin definir (se comparan en minúsculas)
+UNDECIDED_TEAMS = {"tbd", "tba"}
 KNOCKOUT_WORDS = ("quarterfinal", "semifinal", "final")
 WINNERS = {"1": "team1", "2": "team2"}
 
@@ -14,15 +15,15 @@ MATCH_KEYS = frozenset({
 def parse_start(row: dict) -> tuple[str | None, str | None]:
     """Devuelve (start_utc ISO, fecha 'YYYY-MM-DD').
 
-    Si Leaguepedia marca que la hora no está confirmada (HasTime = "0"),
-    se devuelve solo la fecha: nunca se inventa una hora.
+    Solo se confía en la hora si Leaguepedia la marca como confirmada (HasTime = "1");
+    si no, se devuelve solo la fecha: nunca se inventa una hora.
     """
     raw = (row.get("DateTimeUTC") or "").strip()
     if not raw:
         return None, None
     moment = datetime.strptime(raw, "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc)
     date = moment.date().isoformat()
-    if row.get("HasTime") == "0":
+    if row.get("HasTime") != "1":
         return None, date
     return moment.strftime("%Y-%m-%dT%H:%M:%SZ"), date
 
@@ -50,7 +51,8 @@ def status_of(row: dict) -> str:
 
 
 def _team(name: str | None, shorts: dict[str, str]) -> dict | None:
-    if not name or name == UNDECIDED_TEAM:
+    name = (name or "").strip()
+    if not name or name.lower() in UNDECIDED_TEAMS:
         return None
     return {"name": name, "short": shorts.get(name) or name}
 
