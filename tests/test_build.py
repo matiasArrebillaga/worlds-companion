@@ -60,7 +60,15 @@ def test_build_writes_contract_files(tmp_path):
     assert set(m) == MATCH_KEYS
     assert m["team2"]["short"] == "G2"
     assert m["prediction"]["frozen"] is False and 0 < m["prediction"]["p_team1_series"] < 1
-    assert meta == {"updated_at": NOW, "source_fetched_at": "2026-10-15T10:00:00Z", "match_count": 1}
+    assert {k: meta[k] for k in ("updated_at", "source_fetched_at", "match_count")} == {
+        "updated_at": NOW, "source_fetched_at": "2026-10-15T10:00:00Z", "match_count": 1}
+    assert set(meta) == {"updated_at", "source_fetched_at", "match_count", "worlds_patch", "guide_patch",
+                         "worlds_games", "samples"}
+    assert meta["worlds_games"] == 0 and meta["guide_patch"] == "16.18"
+    assert set(meta["samples"]["worlds"]) == {"games", "sides", "pace", "regions"}
+    champions = json.loads((tmp_path / "out" / "champions.json").read_text(encoding="utf-8"))
+    assert set(champions) == {"updated_at", "worlds_patch", "guide_patch", "samples"}
+    assert set(champions["samples"]) == {"worlds", "guide"}
     assert set(elo) == {"model_version", "updated_at", "params", "backtest", "role_form", "teams", "accuracy"}
     ratings = [t["rating"] for t in elo["teams"]]
     assert {t["name"] for t in elo["teams"]} == {"T1", "G2 Esports"}

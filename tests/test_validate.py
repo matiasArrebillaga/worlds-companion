@@ -80,3 +80,12 @@ def test_validate_stats_finds_duplicates_and_broken_links():
     assert any("duplicate player id faker" in e for e in errors)
     assert any("nope" in e for e in errors)
     assert validate_stats([{"id": "t1", "roster": ["faker"]}], [{"id": "faker", "team_id": "t1"}]) == []
+
+
+def test_validate_meta_flags_duplicates_and_out_of_range():
+    from pipeline.validate import validate_meta
+    ok = {"champion": "Azir", "presence": 0.5, "winrate": None, "first_rotation": 0.2}
+    assert validate_meta({"worlds": [ok]}) == []
+    errors = validate_meta({"worlds": [ok, ok], "guide": [{**ok, "presence": 1.5}]})
+    assert any("duplicate champion Azir" in e for e in errors)
+    assert any("presence out of range" in e for e in errors)

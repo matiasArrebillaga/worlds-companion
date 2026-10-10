@@ -14,10 +14,11 @@ from models.role_form import adjustment, load_model, norms_of, resolve_team
 from models.predictions import attach_predictions, evaluate, freeze, make_predictions, read_frozen, ready_to_freeze
 from pipeline import utc_now_iso
 from pipeline.history import CURRENT_YEAR, load_aliases, load_season_games
+from pipeline.meta import build_meta
 from pipeline.schedule import UNDECIDED_TEAMS, build_schedule, short_name
 from pipeline.stats import build_team_and_player_stats, elo_history, series_list
-from pipeline.validate import (validate_lineups, validate_predictions, validate_ratings, validate_schedule,
-                               validate_stats)
+from pipeline.validate import (validate_lineups, validate_meta, validate_predictions, validate_ratings,
+                               validate_schedule, validate_stats)
 
 RAW_DIR = Path("data/raw")
 OUT_DIR = Path("web/public/data")
@@ -89,7 +90,7 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
     errors = (validate_schedule(schedule) + validate_ratings(teams, run.games_played, aliases)
               + validate_lineups(teams, ups))
     # Estadísticas de equipos y jugadores (Oracle's Elixir) + historia del Elo y series (Leaguepedia)
-    teams_payload, players_payload = [], []
+    teams_payload, players_payload, meta_stats = [], [], None
     if not errors:
         oe_names = {t: resolve_team(t, ups) for t in teams}
         # Primer día de Worlds según el calendario: antes de eso no hay período "Worlds 2026"
@@ -106,6 +107,9 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
             })
         teams_payload.sort(key=lambda t: -t["rating"])
         errors += validate_stats(teams_payload, players_payload)
+        # Meta (campeones, lados, ritmo, regiones) con las partidas de Worlds y la guía del parche anterior
+        meta_stats = build_meta(oe_games, schedule, worlds_start)
+        errors += validate_meta(meta_stats["champions"])
     current = [] if errors else make_predictions(schedule, run.ratings, now, aliases, adjust)
     errors += validate_predictions(attach_predictions(schedule, [], current))
     if errors:
@@ -119,11 +123,16 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
 
     out_dir.mkdir(parents=True, exist_ok=True)
     _write(out_dir / "schedule.json", {"matches": schedule})
+    patches = {"worlds_patch": meta_stats["worlds_patch"], "guide_patch": meta_stats["guide_patch"]}
     _write(out_dir / "meta.json", {
         "updated_at": now,
         "source_fetched_at": matches_raw["fetched_at"],
         "match_count": len(schedule),
+        **patches,
+        "worlds_games": meta_stats["worlds_games"],
+        "samples": meta_stats["samples"],
     })
+    _write(out_dir / "champions.json", {"updated_at": now, **patches, "samples": meta_stats["champions"]})
     _write(out_dir / "elo.json", elo_payload(teams, run, regions, shorts, aliases, evaluate(schedule, frozen), now,
                                                 role_model, oe_fetched_at))
     _write(out_dir / "teams.json", {"updated_at": now, "stats_fetched_at": oe_fetched_at, "teams": teams_payload})
@@ -135,7 +144,7 @@ def main() -> None:
         build(RAW_DIR, OUT_DIR, utc_now_iso(), freeze_predictions="--freeze" in sys.argv)
     except ValueError as error:
         sys.exit(str(error))
-    print(f"wrote {OUT_DIR}/schedule.json, meta.json, elo.json, teams.json and players.json")
+    print(f"wrote {OUT_DIR}/schedule.json, meta.json, elo.json, teams.json, players.json and champions.json")
 
 
 if __name__ == "__main__":

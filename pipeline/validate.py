@@ -85,3 +85,17 @@ def validate_stats(teams: list[dict], players: list[dict]) -> list[str]:
             if pid not in known_players:
                 errors.append(f"team {t['id']}: roster has unknown player {pid}")
     return errors
+
+
+def validate_meta(champions: dict[str, list[dict]]) -> list[str]:
+    """Un campeón por muestra y porcentajes entre 0 y 1."""
+    errors = []
+    for sample, rows in champions.items():
+        for name, n in Counter(r["champion"] for r in rows).items():
+            if n > 1:
+                errors.append(f"{sample}: duplicate champion {name}")
+        for r in rows:
+            for key in ("presence", "winrate", "first_rotation"):
+                if r[key] is not None and not 0.0 <= r[key] <= 1.0:
+                    errors.append(f"{sample}: {r['champion']} {key} out of range: {r[key]}")
+    return errors
