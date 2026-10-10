@@ -42,12 +42,16 @@ def _rate(part: int, total: int) -> float | None:
 
 
 def champion_stats(games: list[dict]) -> list[dict]:
-    """Por campeón: picks, bans, presencia = (picks + bans) / partidas, winrate y prioridad de draft.
+    """Por campeón: picks, bans, presencia, winrate y prioridad de draft.
 
-    Presencia mide cuánto le importa el campeón al meta: uno baneado siempre tiene 0 picks y 100% de presencia.
-    Los picks salen del campeón de cada jugador (siempre está); el orden del draft, de pick1-5 (puede faltar).
+    Presencia = probabilidad de que el campeón aparezca en una partida (pickeado o baneado). Como en una partida
+    un campeón no puede ser las dos cosas, es % de picks + % de bans. Uno baneado siempre: 0 picks, 100%.
+    Cada parte usa como denominador solo las partidas donde ese dato existe: Oracle's Elixir a veces publica
+    partidas sin bans o sin orden de picks, y contarlas como "no apareció" bajaría los números (un dato faltante
+    no es un 0). Los picks salen del campeón de cada jugador (siempre está); el orden, de pick1-5.
     """
     count = defaultdict(lambda: {"picks": 0, "bans": 0, "wins": 0, "first": 0})
+    ban_games = draft_games = 0
     for g in games:
         for side in ("blue", "red"):
             for row in g["players"][side].values():
@@ -56,16 +60,25 @@ def champion_stats(games: list[dict]) -> list[dict]:
                     count[champ]["picks"] += 1
                     count[champ]["wins"] += g["winner"] == side
         picks, bans = draft_slots(g)
+        ban_games += bool(bans)
         for _, champ in bans:
             count[champ]["bans"] += 1
-        # Primera rotación: pickeado entre los 6 primeros o baneado en la primera fase (una vez por partida)
-        early = {c for slot, c in picks if slot <= FIRST_ROTATION} | {c for phase, c in bans if phase == 1}
-        for champ in early:
-            count[champ]["first"] += 1
+        if picks:
+            # Primera rotación: pickeado entre los 6 primeros o baneado en la primera fase (una vez por partida)
+            draft_games += 1
+            early = {c for slot, c in picks if slot <= FIRST_ROTATION} | {c for phase, c in bans if phase == 1}
+            for champ in early:
+                count[champ]["first"] += 1
     n = len(games)
-    rows = [{"champion": champ, "games": n, "picks": c["picks"], "bans": c["bans"],
-             "presence": _rate(c["picks"] + c["bans"], n), "wins": c["wins"],
-             "winrate": _rate(c["wins"], c["picks"]), "first_rotation": _rate(c["first"], n)}
+
+    def presence(c: dict) -> float | None:
+        if not n:
+            return None
+        share = c["picks"] / n + (c["bans"] / ban_games if ban_games else 0.0)
+        return round(min(share, 1.0), 4)  # muestras distintas pueden pasarse apenas de 1
+
+    rows = [{"champion": champ, "games": n, "picks": c["picks"], "bans": c["bans"], "presence": presence(c),
+             "wins": c["wins"], "winrate": _rate(c["wins"], c["picks"]), "first_rotation": _rate(c["first"], draft_games)}
             for champ, c in count.items()]
     return sorted(rows, key=lambda r: (-r["presence"], r["champion"]))
 

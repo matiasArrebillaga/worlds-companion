@@ -44,8 +44,14 @@ export function swissRounds(matches: Match[]): SwissRound[] {
   for (const [round, list] of byRound) {
     const groups = new Map<string, Match[]>();
     for (const m of list) {
-      const rec = m.team1 ? table.get(m.team1.name) ?? { wins: 0, losses: 0 } : null;
-      const key = m.team1 && m.team2 && rec ? `${rec.wins}-${rec.losses}` : PENDING;
+      // Récord de los dos equipos; si no coinciden, falta cargar algún resultado anterior: no se inventa uno
+      const recordOf = (name: string) => {
+        const r = table.get(name) ?? { wins: 0, losses: 0 };
+        return `${r.wins}-${r.losses}`;
+      };
+      const r1 = m.team1 ? recordOf(m.team1.name) : null;
+      const r2 = m.team2 ? recordOf(m.team2.name) : null;
+      const key = r1 !== null && r1 === r2 ? r1 : PENDING;
       groups.set(key, [...(groups.get(key) ?? []), m]);
     }
     // Más victorias primero; los cruces sin definir, al final

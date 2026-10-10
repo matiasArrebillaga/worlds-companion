@@ -38,3 +38,11 @@ describe('swissStandings', () => {
     expect(swissStandings([m('u', 'Round 1', 'C', 'D')]).get('C')).toEqual({ wins: 0, losses: 0, status: 'alive' });
   });
 });
+
+describe('swissRounds with results still missing', () => {
+  it('does not invent a record when the two teams do not share one yet', () => {
+    // La ronda 2 se publicó antes de cargar el resultado de C-D: A (1-0) contra C (0-0)
+    const rounds = swissRounds([m('r1a', 'Round 1', 'A', 'B', 'team1'), m('r1b', 'Round 1', 'C', 'D'), m('r2', 'Round 2', 'A', 'C')]);
+    expect(rounds[1].groups.map((g) => g.record)).toEqual(['a confirmar']);
+  });
+});

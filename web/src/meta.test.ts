@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { defaultSample, minutes, sampleOptions } from './meta';
+import { defaultSample, minutes, paceRows, sampleOptions } from './meta';
 import type { Meta } from './types';
 
 const base: Meta = { updated_at: 'x', source_fetched_at: 'x', match_count: 1 };
@@ -24,5 +24,16 @@ describe('minutes', () => {
   it('formats decimal minutes as m:ss and missing data as a dash', () => {
     expect(minutes(31.5)).toBe('31:30');
     expect(minutes(null)).toBe('—');
+  });
+});
+
+describe('paceRows', () => {
+  it('lists each phase with data in tournament order, with duration and kills per minute', () => {
+    const split = (games: number, m: number | null, k: number | null) => ({ games, median_minutes: m, kills_per_min: k });
+    const rows = paceRows({ knockout: split(4, 33.2, 0.7), 'play-in': split(6, 30.1, 0.9) });
+    expect(rows).toEqual([
+      { phase: 'play-in', label: 'Play-In', games: 6, duration: '30:06', kpm: '0.90' },
+      { phase: 'knockout', label: 'Eliminatorias', games: 4, duration: '33:12', kpm: '0.70' },
+    ]);
   });
 });

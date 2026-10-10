@@ -56,7 +56,20 @@ def test_missing_pick_order_still_counts_picks():
         for i in range(1, 6):
             g["teams"][side][f"pick{i}"] = ""
     stats = {c["champion"]: c for c in champion_stats([g])}
-    assert stats["Aatrox"]["picks"] == 1 and stats["Aatrox"]["first_rotation"] == 0.0
+    # Sin orden de draft la prioridad no se puede medir: es null, no 0
+    assert stats["Aatrox"]["picks"] == 1 and stats["Aatrox"]["first_rotation"] is None
+
+
+def test_games_without_draft_data_do_not_lower_priority_or_presence():
+    partial = game(blue_bans=("",) * 5, red_bans=("",) * 5)
+    for side in ("blue", "red"):
+        for i in range(1, 6):
+            partial["teams"][side][f"pick{i}"] = ""
+    stats = {c["champion"]: c for c in champion_stats([game(), partial])}
+    # Yone: baneado en la única partida con bans -> 100% de presencia y de prioridad, no 50%
+    assert stats["Yone"]["presence"] == 1.0 and stats["Yone"]["first_rotation"] == 1.0
+    # Aatrox: pickeado en las dos partidas -> presencia 100% (los picks siempre se conocen)
+    assert stats["Aatrox"]["presence"] == 1.0 and stats["Aatrox"]["picks"] == 2
 
 
 SCHEDULE = [{"phase": "play-in", "date": "2026-10-15"}, {"phase": "swiss", "date": "2026-10-20"},

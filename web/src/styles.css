@@ -254,3 +254,5 @@ h1 a { text-decoration: none; }
 /* Meta */
 .champ-cell { display: flex; align-items: center; gap: 10px; }
 .chart-box { position: relative; height: 240px; }
+/* Con 5 pestañas, en celulares angostos "Predicciones" no entra con el tamaño normal */
+@media (max-width: 400px) { .bottombar a { font-size: 9px; letter-spacing: 0; } }

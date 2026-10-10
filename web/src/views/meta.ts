@@ -2,14 +2,13 @@ import { drawBarChart } from '../charts/barChart';
 import type { SiteData } from '../data';
 import { PHASE_LABELS } from '../format';
 import { escapeHtml } from '../html';
-import { defaultSample, minutes, sampleOptions } from '../meta';
+import { defaultSample, minutes, paceRows, PHASES, sampleOptions } from '../meta';
 import { FEW_GAMES, fmt, pct, sortBy } from '../stats';
 import type { ChampionEntry, MetaSample, Phase, SampleId } from '../types';
 import { champHex } from './player';
 
 type Tab = 'campeones' | 'draft' | 'lados' | 'ritmo' | 'regiones';
 const TABS: [Tab, string][] = [['campeones', 'Campeones'], ['draft', 'Draft'], ['lados', 'Lados'], ['ritmo', 'Ritmo'], ['regiones', 'Regiones']];
-const PHASES: Phase[] = ['play-in', 'swiss', 'knockout'];
 
 // Estado mientras la página esté abierta; la muestra se elige la primera vez según los datos
 const state = { tab: 'campeones' as Tab, sample: null as SampleId | null, sort: 'presence' as keyof ChampionEntry, dir: 'desc' as 'asc' | 'desc' };
@@ -93,7 +92,9 @@ function pace(s: MetaSample): string {
       ${kpi('Duración mediana', minutes(t.median_minutes), `${t.games} partidas`)}
       ${kpi('Kills por minuto', fmt(t.kills_per_min, 2), 'entre los dos equipos')}
     </div>
-    ${phasesWithData(s.pace.by_phase).length ? '<div class="chart-box"><canvas id="meta-chart" role="img" aria-label="Duración mediana por fase"></canvas></div>' : ''}
+    ${phasesWithData(s.pace.by_phase).length ? `<div class="chart-box"><canvas id="meta-chart" role="img" aria-label="Duración mediana por fase"></canvas></div>
+    <div class="table-wrap"><table class="rank"><thead><tr><th>Fase</th><th class="num">PJ</th><th class="num">Duración mediana</th><th class="num">Kills/min</th></tr></thead>
+      <tbody>${paceRows(s.pace.by_phase).map((r) => `<tr><td>${r.label}</td><td class="num">${r.games}</td><td class="num">${r.duration}</td><td class="num">${r.kpm}</td></tr>`).join('')}</tbody></table></div>` : ''}
     <p class="note">Mediana y no promedio: es la partida "del medio". Una partida de 50 minutos tira el promedio para arriba; la mediana casi no se mueve.</p>`;
 }
 
