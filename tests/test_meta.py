@@ -1,4 +1,4 @@
-from pipeline.meta import (GUIDE_PATCH, GUIDE_UNTIL_GAMES, build_meta, champion_stats, draft_slots, pace_stats,
+from pipeline.meta import (GUIDE_LABEL, GUIDE_PATCHES, GUIDE_UNTIL_GAMES, build_meta, champion_stats, draft_slots, pace_stats,
                            phase_of, region_stats, side_stats)
 
 ROLES = ("top", "jng", "mid", "bot", "sup")
@@ -95,12 +95,14 @@ def test_regions_only_count_games_between_different_regions():
 
 
 def test_build_meta_keeps_the_guide_until_worlds_has_enough_games():
-    league = [game(page="LCK", region="KR", patch=GUIDE_PATCH, date="2026-10-05 10:00:00"),
-              game(page="LCK", region="KR", patch="16.17", date="2026-10-01 10:00:00")]
+    # La guía junta los últimos parches de las ligas principales (16.17 y 16.18); 16.16 queda afuera
+    league = [game(page="LCK", region="KR", patch=GUIDE_PATCHES[0], date="2026-10-05 10:00:00"),
+              game(page="VCS", region="VN", patch=GUIDE_PATCHES[1], date="2026-10-06 10:00:00"),
+              game(page="LCK", region="KR", patch="16.16", date="2026-10-01 10:00:00")]
     qualifier = [game(date="2026-09-10 10:00:00")]  # "WLDs" antes del torneo: clasificatorio regional
     before = build_meta(league + qualifier, SCHEDULE, "2026-10-15")
-    assert before["worlds_games"] == 0 and before["guide_patch"] == GUIDE_PATCH
-    assert before["samples"]["guide"]["games"] == 1 and before["samples"]["worlds"]["games"] == 0
+    assert before["worlds_games"] == 0 and before["guide_patch"] == GUIDE_LABEL
+    assert before["samples"]["guide"]["games"] == 2 and before["samples"]["worlds"]["games"] == 0
     assert set(before["champions"]) == {"worlds", "guide"}
 
     worlds = [game(date=f"2026-10-{15 + i % 5} 10:00:00") for i in range(GUIDE_UNTIL_GAMES)]

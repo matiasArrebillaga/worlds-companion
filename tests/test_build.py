@@ -64,7 +64,7 @@ def test_build_writes_contract_files(tmp_path):
         "updated_at": NOW, "source_fetched_at": "2026-10-15T10:00:00Z", "match_count": 1}
     assert set(meta) == {"updated_at", "source_fetched_at", "match_count", "worlds_patch", "guide_patch",
                          "worlds_games", "samples"}
-    assert meta["worlds_games"] == 0 and meta["guide_patch"] == "16.18"
+    assert meta["worlds_games"] == 0 and meta["guide_patch"] == "16.17–16.18"
     assert set(meta["samples"]["worlds"]) == {"games", "sides", "pace", "regions"}
     champions = json.loads((tmp_path / "out" / "champions.json").read_text(encoding="utf-8"))
     assert set(champions) == {"updated_at", "worlds_patch", "guide_patch", "samples"}
