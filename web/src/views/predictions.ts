@@ -50,6 +50,7 @@ function howItWorks(elo: Elo): string {
     .map(([region, v]) => `${escapeHtml(region)} ${v > 0 ? '+' : ''}${v}`)
     .join(' · ') || 'sin ajustes';
   const b = elo.backtest;
+  const r = elo.role_form;
   return `
     <div class="prose stack">
       <h2>Elo por partida</h2>
@@ -58,6 +59,9 @@ function howItWorks(elo: Elo): string {
       <p>Para un Bo3 o un Bo5 se suman todas las formas de llegar primero a 2 o 3 victorias. Con 57% por partida, el favorito gana el 60% de los Bo3 y el 63% de los Bo5: cuantas más partidas, menos pesa la suerte. Supone que cada partida es independiente de la anterior, lo que es solo una aproximación.</p>
       <h2>Regiones</h2>
       <p>Las ligas casi no se cruzan entre sí, así que cada equipo arranca la temporada con un ajuste según su región (${offsets}) y los torneos internacionales de 2026 corrigen el resto. K = ${elo.params.k}: cuánto se mueve el rating después de cada partida.</p>
+      <h2>Forma de los jugadores</h2>
+      <p>Encima del Elo se suma cómo viene jugando cada titular comparado con el promedio de su rol: diferencia de oro, experiencia y farmeo al minuto 15 contra su rival directo, participación en kills, muertes, % del daño del equipo y daño por cada unidad de oro recibido. La forma reciente pesa más (una partida de hace 10 pesa la mitad que la última) y un jugador nuevo arranca en el promedio. Se compara la forma de los dos jugadores de cada rol; el top y el mid son los que más mueven la predicción.</p>
+      <p>Se supone que cada equipo juega con su última alineación. Probado en el ${escapeHtml(r.test.tournament)}, que el modelo no había visto: el Brier score bajó de ${r.test.brier_elo.toFixed(3)} (solo Elo) a ${r.test.brier_model.toFixed(3)} en ${r.test.games} partidas. Datos de jugadores: <a href="https://oracleselixir.com" target="_blank" rel="noopener">Oracle's Elixir</a>.</p>
       <h2>¿Funciona?</h2>
       <p>Los valores se eligieron con la temporada ${b.calibration_year} y se probaron en ${b.validation_year}, que el modelo no había visto. En ${b.validation_games} partidas entre regiones distintas, el Brier score fue ${b.validation_brier.toFixed(3)} (tirar una moneda da 0.250; el Elo sin ajuste regional, ${b.baseline_brier.toFixed(3)}). En las ${b.worlds_series} series de Worlds ${b.validation_year} acertó el ${pct(b.worlds_accuracy)}.</p>
       <h2>Reglas</h2>

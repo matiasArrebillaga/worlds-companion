@@ -61,3 +61,11 @@ def test_aliases_are_followed_when_counting_history():
 def test_probabilities_must_be_between_0_and_1():
     bad = match(prediction={"p_team1_game": 1.2, "p_team1_series": 0.5, "model_version": "elo-1", "frozen": False})
     assert validate_predictions([match(), bad]) == ["m1: p_team1_game out of range: 1.2"]
+
+
+def test_every_team_needs_a_lineup_for_the_player_form():
+    from pipeline.validate import validate_lineups
+    lineups = {"T1": {"top": "top:Doran"}, "LYON": {"top": "top:Dhokla"}}
+    assert validate_lineups(["T1", "LYON (2024 American Team)"], lineups) == []
+    [error] = validate_lineups(["T1", "Nobody"], lineups)
+    assert "Nobody" in error

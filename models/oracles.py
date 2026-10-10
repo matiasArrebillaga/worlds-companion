@@ -5,6 +5,7 @@ Se arma un game con el mismo formato que usa models.elo.run_elo, más las filas 
 equipos y jugadores para calcular variables.
 """
 import csv
+import json
 from pathlib import Path
 
 ROLES = ("top", "jng", "mid", "bot", "sup")
@@ -64,3 +65,25 @@ def _assign_series(games: list[dict]) -> None:
 def load_season(path: Path) -> list[dict]:
     with path.open(encoding="utf-8", newline="") as f:
         return parse_rows(list(csv.DictReader(f)))
+
+
+# Columnas que necesita la forma por rol: el extracto que usa el sitio guarda solo estas
+EXTRACT_COLUMNS = ("gameid", "league", "date", "game", "side", "position", "teamname", "playername", "result",
+                   "golddiffat15", "xpdiffat15", "csdiffat15", "kills", "deaths", "assists", "teamkills",
+                   "damageshare", "earnedgoldshare")
+
+
+def write_extract(path: Path, rows: list[dict], fetched_at: str) -> None:
+    """Guarda las filas de las ligas principales con las columnas necesarias, en formato compacto
+    (encabezado + listas) para que el archivo commiteado pese pocos MB."""
+    kept = [[r.get(c, "") for c in EXTRACT_COLUMNS] for r in rows if r.get("league") in OE_LEAGUE_REGIONS]
+    payload = {"fetched_at": fetched_at, "columns": list(EXTRACT_COLUMNS), "rows": kept}
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+
+
+def read_extract(path: Path) -> tuple[list[dict], str]:
+    """(games, fecha de descarga) a partir del extracto."""
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    rows = [dict(zip(payload["columns"], values)) for values in payload["rows"]]
+    return parse_rows(rows), payload["fetched_at"]

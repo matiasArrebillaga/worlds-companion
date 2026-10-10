@@ -73,11 +73,17 @@ export interface Backtest {
   worlds_brier: number;
 }
 
+export interface RoleForm {
+  fetched_at: string;
+  test: { tournament: string; games: number; brier_elo: number; brier_model: number };
+}
+
 export interface Elo {
   model_version: string;
   updated_at: string;
-  params: { k: number; region_offsets: Record<string, number> };
+  params: { k: number; region_offsets: Record<string, number>; role_weights: Record<string, number> };
   backtest: Backtest;
+  role_form: RoleForm;
   teams: RatedTeam[];
   accuracy: Accuracy;
 }

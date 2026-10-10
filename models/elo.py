@@ -19,7 +19,8 @@ class Params:
 
 # Elegidos con notebooks/backtest.ipynb: calibrado con 2024, validado con 2025, ajuste final con ambos.
 # Los ajustes son relativos a las regiones sin ajuste propio (BR, APAC, VN, JP, LAT), que arrancan en 1500.
-MODEL_VERSION = "elo-1"
+# elo-2: Elo + forma de los jugadores por rol (models/role_form.py)
+MODEL_VERSION = "elo-2"
 PARAMS = Params(k=10.0, region_offsets={"KR": 300.0, "CN": 200.0, "EU": 100.0, "NA": 100.0})
 BACKTEST = {
     "calibration_year": 2024, "validation_year": 2025,

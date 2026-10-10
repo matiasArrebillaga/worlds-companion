@@ -38,6 +38,10 @@ jobs:
           LEAGUEPEDIA_USER: ${{ secrets.LEAGUEPEDIA_USER }}
           LEAGUEPEDIA_BOT_PASSWORD: ${{ secrets.LEAGUEPEDIA_BOT_PASSWORD }}
 
+      - name: Fetch player stats from Oracle's Elixir (at most once a day; on failure the cached extract is used)
+        run: python -m pipeline.fetch_oracles
+        continue-on-error: true
+
       - name: Build site data and freeze new predictions (fails on invalid data, so nothing is deployed)
         run: python -m pipeline.build --freeze
 

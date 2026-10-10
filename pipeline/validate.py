@@ -48,6 +48,13 @@ def validate_ratings(teams: list[str], games_played: Counter, aliases: dict[str,
     return errors
 
 
+def validate_lineups(teams: list[str], lineups: dict) -> list[str]:
+    """Cada equipo de Worlds tiene que aparecer en Oracle's Elixir; si no, su forma contaría como promedio."""
+    from models.role_form import resolve_team
+    return [f"{team}: no lineup in Oracle's Elixir data (different team name?)"
+            for team in teams if resolve_team(team, lineups) is None]
+
+
 def validate_predictions(matches: list[dict]) -> list[str]:
     errors = []
     for m in matches:

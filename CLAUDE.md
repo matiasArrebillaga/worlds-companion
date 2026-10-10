@@ -52,6 +52,8 @@ web/public/data/        # JSON que consume el sitio
 
 ```
 python -m pipeline.fetch        # descarga datos nuevos a data/raw/
+python -m pipeline.fetch_oracles  # extracto de Oracle's Elixir (como mucho una vez por día)
+python -m models.role_form      # reajusta los pesos de la forma por rol (necesita --history)
 python -m pipeline.build        # limpia, corre el Elo, calcula stats, valida y genera los JSON del sitio
 python -m models.elo            # recalcula ratings y predicciones (suelto, para experimentar)
 pytest                          # tests
@@ -61,12 +63,13 @@ cd web && npm run build         # build de producción
 
 ## Fuente de datos
 
-- Solo Leaguepedia (API Cargo): calendario, resultados, rosters, stats por partida y drafts.
+- Leaguepedia (API Cargo): calendario, resultados, rosters, stats por partida y drafts.
 - El rate limit llega como error dentro de una respuesta HTTP 200: revisar el body, no solo el status.
 - Cachear en `data/raw/` y no repetir descargas innecesarias. El historial de la temporada se baja una sola vez.
 - Guardar siempre la fecha de descarga junto a los datos.
 - Atribuir a Leaguepedia (CC-BY-SA).
-- Oracle's Elixir: solo en experimentos (`python -m pipeline.fetch_oracles` + notebooks), todavía no en el sitio.
+- Oracle's Elixir: forma de los jugadores del modelo elo-2 (extracto diario en `data/raw/oracles_2026.json`) y CSV
+  completos para los notebooks (`--history`, no se commitean). Atribuir en el footer.
 
 ## Secciones del sitio
 

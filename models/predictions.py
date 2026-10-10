@@ -5,7 +5,9 @@ Una predicción se identifica por (partido, versión del modelo, equipo 1, equip
 corrige un cruce, el cruce nuevo recibe su propia predicción y la vieja deja de usarse.
 """
 import json
+from collections.abc import Callable
 from datetime import datetime, timedelta
+from math import exp, log
 from pathlib import Path
 
 from models.elo import MODEL_VERSION, series_probability, win_probability
@@ -31,8 +33,12 @@ def _match_key(m: dict) -> tuple | None:
 
 
 def make_predictions(schedule: list[dict], ratings: dict[str, float], now_iso: str,
-                     aliases: dict[str, str] | None = None) -> list[dict]:
-    """Predicción actual para cada partido que no empezó y tiene los dos equipos definidos."""
+                     aliases: dict[str, str] | None = None,
+                     adjust: Callable[[str, str], float] | None = None) -> list[dict]:
+    """Predicción actual para cada partido que no empezó y tiene los dos equipos definidos.
+
+    `adjust(team1, team2)` suma a los log-odds del Elo (la forma de los jugadores, ver models/role_form.py).
+    """
     aliases = aliases or {}
     predictions = []
     for m in schedule:
@@ -44,6 +50,8 @@ def make_predictions(schedule: list[dict], ratings: dict[str, float], now_iso: s
             continue  # sin hora confirmada y de un día que ya pasó: puede haberse jugado
         t1, t2 = m["team1"]["name"], m["team2"]["name"]
         p_game = win_probability(ratings[aliases.get(t1, t1)], ratings[aliases.get(t2, t2)])
+        if adjust is not None:
+            p_game = 1.0 / (1.0 + exp(-(log(p_game / (1.0 - p_game)) + adjust(t1, t2))))
         predictions.append({
             "match_id": m["id"], "team1": t1, "team2": t2, "best_of": m["best_of"],
             "p_team1_game": round(p_game, 4),

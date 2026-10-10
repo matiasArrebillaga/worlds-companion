@@ -115,3 +115,10 @@ def test_only_matches_starting_soon_are_ready_to_freeze():
     schedule = [match("soon", start="2026-10-15T16:00:00Z"), match("later", start="2026-10-17T18:00:00Z"),
                 match("no-time", start=None), match("started", start="2026-10-15T09:00:00Z")]
     assert ready_to_freeze(schedule, NOW) == {"soon"}
+
+
+def test_adjustment_moves_the_game_probability():
+    [plain] = make_predictions([match()], RATINGS, NOW)
+    [adjusted] = make_predictions([match()], RATINGS, NOW, adjust=lambda t1, t2: 0.5 if t1 == "T1" else -0.5)
+    assert adjusted["p_team1_game"] > plain["p_team1_game"]
+    assert adjusted["p_team1_series"] > plain["p_team1_series"]

@@ -137,6 +137,29 @@ def build_dataset(records: list[dict], norms) -> list[dict]:
             raw = _team_raw(r["teams"][side])
             for name in STYLES:
                 styles[name].update(team, _z_mean(raw, STYLE_PARTS[name], "team", norms))
-            for role, prow in r["players"][side].items():
-                form.update(_player_key(r, side, role), _z_mean(_player_raw(prow), PLAYER_METRICS, role, norms))
+        _learn_forms(form, r, norms)
     return rows
+
+
+def _learn_forms(form: Ewma, record: dict, norms) -> None:
+    for side in ("blue", "red"):
+        for role, prow in record["players"][side].items():
+            form.update(_player_key(record, side, role), _z_mean(_player_raw(prow), PLAYER_METRICS, role, norms))
+
+
+def player_forms(records: list[dict], norms) -> dict[str, float]:
+    """Forma de cada jugador después de todos los games (clave 'rol:nombre'), para predecir lo que viene."""
+    form = Ewma()
+    for r in records:
+        _learn_forms(form, r, norms)
+    return form.values
+
+
+def lineups(records: list[dict]) -> dict[str, dict[str, str]]:
+    """Última alineación de cada equipo (rol → clave de jugador). Antes de un partido no se sabe quién
+    va a jugar: se supone que repite la última, que casi siempre es la titular."""
+    result: dict[str, dict[str, str]] = {}
+    for r in records:
+        for side in ("blue", "red"):
+            result[r[side]] = {role: _player_key(r, side, role) for role in r["players"][side]}
+    return result

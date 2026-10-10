@@ -8,16 +8,20 @@ import sys
 from pathlib import Path
 
 from models.elo import BACKTEST, MODEL_VERSION, PARAMS, run_elo, team_regions
+from models.features import lineups, player_forms
+from models.oracles import read_extract
+from models.role_form import adjustment, load_model, norms_of, resolve_team
 from models.predictions import attach_predictions, evaluate, freeze, make_predictions, read_frozen, ready_to_freeze
 from pipeline import utc_now_iso
 from pipeline.history import CURRENT_YEAR, load_aliases, load_season_games
 from pipeline.schedule import UNDECIDED_TEAMS, build_schedule, short_name
-from pipeline.validate import validate_predictions, validate_ratings, validate_schedule
+from pipeline.validate import validate_lineups, validate_predictions, validate_ratings, validate_schedule
 
 RAW_DIR = Path("data/raw")
 OUT_DIR = Path("web/public/data")
 PREDICTIONS_FILE = Path("data/predictions.jsonl")
 ALIASES_FILE = Path("data/teams.csv")
+OE_EXTRACT = "oracles_2026.json"  # extracto de Oracle's Elixir (pipeline/fetch_oracles.py)
 
 
 def _read(path: Path) -> dict:
@@ -39,7 +43,7 @@ def participants(schedule: list[dict], rosters: list[dict]) -> list[str]:
     return sorted(n for n in names if n and n.lower() not in UNDECIDED_TEAMS)
 
 
-def elo_payload(teams, run, regions, shorts, aliases, accuracy, now) -> dict:
+def elo_payload(teams, run, regions, shorts, aliases, accuracy, now, role_model, oe_fetched_at) -> dict:
     rated = []
     for name in teams:
         canonical = aliases.get(name, name)
@@ -49,8 +53,9 @@ def elo_payload(teams, run, regions, shorts, aliases, accuracy, now) -> dict:
     return {
         "model_version": MODEL_VERSION,
         "updated_at": now,
-        "params": {"k": PARAMS.k, "region_offsets": PARAMS.region_offsets},
+        "params": {"k": PARAMS.k, "region_offsets": PARAMS.region_offsets, "role_weights": role_model["weights"]},
         "backtest": BACKTEST,
+        "role_form": {"fetched_at": oe_fetched_at, "test": role_model["test"]},
         "teams": rated,
         "accuracy": accuracy,
     }
@@ -69,9 +74,19 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
     run = run_elo(games, PARAMS, regions)
     teams = participants(schedule, _rows_if_exists(raw_dir / "worlds_2026_rosters.json"))
 
+    # Forma de los jugadores con los datos de Oracle's Elixir de la temporada
+    role_model = load_model()
+    oe_games, oe_fetched_at = read_extract(raw_dir / OE_EXTRACT)
+    ups = lineups(oe_games)
+    forms = player_forms(oe_games, norms_of(role_model))
+
+    def adjust(team1: str, team2: str) -> float:
+        return adjustment(resolve_team(team1, ups), resolve_team(team2, ups), ups, forms, role_model)
+
     # Todo se valida antes de escribir nada (ni JSON ni predicciones congeladas)
-    errors = validate_schedule(schedule) + validate_ratings(teams, run.games_played, aliases)
-    current = [] if errors else make_predictions(schedule, run.ratings, now, aliases)
+    errors = (validate_schedule(schedule) + validate_ratings(teams, run.games_played, aliases)
+              + validate_lineups(teams, ups))
+    current = [] if errors else make_predictions(schedule, run.ratings, now, aliases, adjust)
     errors += validate_predictions(attach_predictions(schedule, [], current))
     if errors:
         raise ValueError("validation failed:\n- " + "\n- ".join(errors))
@@ -89,7 +104,8 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
         "source_fetched_at": matches_raw["fetched_at"],
         "match_count": len(schedule),
     })
-    _write(out_dir / "elo.json", elo_payload(teams, run, regions, shorts, aliases, evaluate(schedule, frozen), now))
+    _write(out_dir / "elo.json", elo_payload(teams, run, regions, shorts, aliases, evaluate(schedule, frozen), now,
+                                                role_model, oe_fetched_at))
 
 
 def main() -> None:

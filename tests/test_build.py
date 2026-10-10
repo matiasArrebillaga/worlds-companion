@@ -2,6 +2,7 @@ import json
 
 import pytest
 
+from models.oracles import write_extract
 from pipeline.build import build
 from pipeline.schedule import MATCH_KEYS
 
@@ -21,7 +22,7 @@ ROW = {
 }
 
 
-def write_raw(raw, rows=(ROW,), history_teams=("T1", "G2 Esports"), rosters=()):
+def write_raw(raw, rows=(ROW,), history_teams=("T1", "G2 Esports"), rosters=(), without_lineup=()):
     stamp = "2026-10-15T10:00:00Z"
     write(raw / "worlds_2026_matches.json", {"fetched_at": stamp, "rows": list(rows)})
     write(raw / "worlds_2026_rosters.json", {"fetched_at": stamp, "rows": [{"Team": t, "OverviewPage": "x"} for t in rosters]})
@@ -32,6 +33,16 @@ def write_raw(raw, rows=(ROW,), history_teams=("T1", "G2 Esports"), rosters=()):
               "Team1": history_teams[0], "Team2": history_teams[1], "Winner": "1" if i % 3 else "2",
               "DateTimeUTC": f"2026-02-{i + 1:02d} 08:00:00", "GameInMatch": "1"} for i in range(12)]
     write(raw / "history_2026_games.json", {"fetched_at": stamp, "rows": games})
+    write_oracles(raw, [t for t in history_teams if t not in without_lineup])
+
+
+def write_oracles(raw, teams):
+    """Extracto de Oracle's Elixir: un game entre cada par de equipos, para que todos tengan alineación."""
+    from tests.test_features import game_rows
+    rows = []
+    for i in range(0, len(teams) - 1, 2):
+        rows += game_rows(f"oe{i}", teams[i], teams[i + 1], 1, "2026-02-01 08:00:00")
+    write_extract(raw / "oracles_2026.json", rows, "2026-10-15T09:00:00Z")
 
 
 def run(tmp_path, freeze=False):
@@ -50,7 +61,7 @@ def test_build_writes_contract_files(tmp_path):
     assert m["team2"]["short"] == "G2"
     assert m["prediction"]["frozen"] is False and 0 < m["prediction"]["p_team1_series"] < 1
     assert meta == {"updated_at": NOW, "source_fetched_at": "2026-10-15T10:00:00Z", "match_count": 1}
-    assert set(elo) == {"model_version", "updated_at", "params", "backtest", "teams", "accuracy"}
+    assert set(elo) == {"model_version", "updated_at", "params", "backtest", "role_form", "teams", "accuracy"}
     ratings = [t["rating"] for t in elo["teams"]]
     assert {t["name"] for t in elo["teams"]} == {"T1", "G2 Esports"}
     assert ratings == sorted(ratings, reverse=True)
@@ -99,3 +110,17 @@ def test_build_does_not_freeze_matches_that_are_days_away(tmp_path):
     schedule, _, _ = run(tmp_path, freeze=True)
     assert schedule["matches"][0]["prediction"]["frozen"] is False  # se muestra, pero todavía no se congela
     assert not (tmp_path / "predictions.jsonl").exists()
+
+
+def test_build_uses_the_player_form_model(tmp_path):
+    write_raw(tmp_path / "raw")
+    _, _, elo = run(tmp_path)
+    assert elo["model_version"] == "elo-2"
+    assert set(elo["params"]["role_weights"]) == {"top", "jng", "mid", "bot", "sup"}
+    assert elo["role_form"]["fetched_at"] == "2026-10-15T09:00:00Z"
+
+
+def test_build_fails_when_a_team_has_no_lineup(tmp_path):
+    write_raw(tmp_path / "raw", without_lineup=("G2 Esports",))
+    with pytest.raises(ValueError, match="G2 Esports"):
+        run(tmp_path)
