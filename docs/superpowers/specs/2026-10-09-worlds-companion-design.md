@@ -42,7 +42,8 @@ Solo **Leaguepedia (API Cargo)**: calendario, resultados, rosters, stats por jug
 - Los wrappers de Python (`meeps`, `leaguepedia-parser`) no están verificados para 2026. Se decide en el plan
   si usar uno o consultas directas con `requests`.
 - Métricas no disponibles en esta fuente (ej. GD@15) quedan fuera.
-- Oracle's Elixir queda como mejora futura (habilitaría GD@15 y el modelo con más features).
+- Oracle's Elixir (agregado en las etapas 2 y 3): un extracto diario de 2026 alimenta la forma por rol del modelo
+  (`elo-2`) y las estadísticas de equipos y jugadores (`teams.json`, `players.json`).
 
 ## 4. Arquitectura y flujo de datos
 
@@ -217,8 +218,7 @@ Más la atribución a Leaguepedia (CC-BY-SA).
 
 ## 9. Fuera de alcance
 
-Login, pick'em con amigos, datos en vivo, internacionalización, modo claro, Oracle's Elixir (y por lo tanto
-GD@15), modelo con scikit-learn, retratos o arte oficial de campeones.
+Login, pick'em con amigos, datos en vivo, internacionalización, modo claro, retratos o arte oficial de campeones.
 
 ## 10. Orden de construcción sugerido
 

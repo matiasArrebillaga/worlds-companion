@@ -41,6 +41,7 @@ data/processed/         # datos limpios (no se commitea; se regenera)
 data/teams.csv          # alias de equipos → id canónico y región (a mano)
 data/predictions.jsonl  # predicciones congeladas, append-only
 pipeline/               # fetch, build (limpieza, stats, validación, export a JSON)
+                        #   stats.py: agregados de equipos y jugadores (Oracle's Elixir) + historia del Elo
 models/                 # Elo y modelos de predicción
 notebooks/              # exploración, aprendizaje y backtest
 tests/                  # pytest
