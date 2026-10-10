@@ -7,3 +7,6 @@ web/node_modules/
 web/dist/
 web/public/data/*.json
 data/raw/oracles_elixir/
+
+# grafo de graphify (se regenera con el hook de git)
+graphify-out/

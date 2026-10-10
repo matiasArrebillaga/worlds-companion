@@ -151,3 +151,13 @@ League of Legends y Riot Games son marcas registradas de Riot Games, Inc."
 - **Fase suiza:** los equipos con el mismo récord se enfrentan entre sí; 3 victorias clasifican, 3 derrotas eliminan.
 - **Elo:** rating que sube al ganar y baja al perder; la diferencia entre dos equipos da la probabilidad de victoria.
 - **Brier score:** error cuadrático medio de las probabilidades; 0 es perfecto, 0.25 es tirar una moneda.
+
+## graphify
+
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+Rules:
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Before any Glob or Grep, read graphify-out/GRAPH_REPORT.md first.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).

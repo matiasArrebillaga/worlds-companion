@@ -1,0 +1,16 @@
+node_modules/
+.next/
+dist/
+build/
+.venv/
+# datos pesados: CSV de Oracle's Elixir, extractos y JSON generados
+data/raw/
+data/processed/
+web/public/data/
+data/predictions.jsonl
+# salidas de notebooks y lockfiles
+*.ipynb
+package-lock.json
+.superpowers/
+graphify-out/
+web/public/icons/
