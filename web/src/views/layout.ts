@@ -3,9 +3,9 @@ import { escapeHtml } from '../html';
 import type { Meta } from '../types';
 
 // Marca la pestaña activa en la barra superior y en la inferior
-export function setActiveTab(hash: string): void {
+export function setActiveTab(tab: string | null): void {
   document.querySelectorAll<HTMLAnchorElement>('[data-tab]').forEach((link) => {
-    if (link.dataset.tab === hash) link.setAttribute('aria-current', 'page');
+    if (link.dataset.tab === tab) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   });
 }

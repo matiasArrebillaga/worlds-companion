@@ -3,16 +3,17 @@ import { isNewer, loadData, loadMeta, type SiteData } from './data';
 import { localDayKey, resolveTimeZone } from './format';
 import { dayKeyOf } from './schedule';
 import { renderCalendar } from './views/calendar';
+import { parseHash, tabFor } from './router';
 import { renderUpdated, setActiveTab } from './views/layout';
 import { renderPredictions } from './views/predictions';
 import { renderToday } from './views/today';
 
-type View = (el: HTMLElement, data: SiteData, tz: string) => () => void;
+type View = (el: HTMLElement, data: SiteData, tz: string, param: string | null) => () => void;
 
 const ROUTES: Record<string, View> = {
   '#/': (el, data, tz) => renderToday(el, data.schedule.matches, tz),
   '#/calendario': (el, data, tz) => renderCalendar(el, data.schedule.matches, tz),
-  '#/predicciones': renderPredictions,
+  '#/predicciones': (el, data, tz) => renderPredictions(el, data, tz),
 };
 
 const view = document.getElementById('view') as HTMLElement;
@@ -21,18 +22,20 @@ let cleanup: () => void = () => {};
 
 const REFRESH_EVERY_MS = 5 * 60_000;
 
-function currentHash(): string {
-  return location.hash in ROUTES ? location.hash : '#/';
+function currentRoute() {
+  const route = parseHash(location.hash);
+  return route.path in ROUTES ? route : { path: '#/', param: null };
 }
 
 function render(data: SiteData): void {
   cleanup();
-  cleanup = ROUTES[currentHash()](view, data, tz);
+  const { path, param } = currentRoute();
+  cleanup = ROUTES[path](view, data, tz, param);
 }
 
 // Navegar: arriba de todo, o al día de hoy si la vista lo marca
 function route(data: SiteData): void {
-  setActiveTab(currentHash());
+  setActiveTab(tabFor(currentRoute().path));
   render(data);
   const today = view.querySelector('#hoy');
   if (today) today.scrollIntoView({ block: 'start' });
