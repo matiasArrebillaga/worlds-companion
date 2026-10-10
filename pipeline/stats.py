@@ -164,3 +164,29 @@ def build_team_and_player_stats(oe_games: list[dict], oe_names: dict[str, str],
             "worlds": worlds_stats if worlds_stats["games"] else None,
         }
     return teams, players
+
+
+def elo_history(records: list[dict], team: str) -> list[list]:
+    """[[fecha, rating después de la partida]] de un equipo, en orden cronológico."""
+    history = []
+    for r in records:
+        for side in ("blue", "red"):
+            if r[side] == team:
+                history.append([r["date"][:10], round(r[f"rating_{side}"], 1)])
+    return history
+
+
+def series_list(records: list[dict], team: str) -> list[dict]:
+    """Series del equipo (una por match_id) con el resultado, de la más nueva a la más vieja."""
+    series: dict[str, dict] = {}
+    for r in records:
+        if team not in (r["blue"], r["red"]):
+            continue
+        side = "blue" if r["blue"] == team else "red"
+        s = series.setdefault(r["match_id"], {"date": r["date"][:10], "opponent": r["red" if side == "blue" else "blue"],
+                                              "page": r["page"], "wins": 0, "losses": 0})
+        if r["winner"] == side:
+            s["wins"] += 1
+        else:
+            s["losses"] += 1
+    return sorted(series.values(), key=lambda s: s["date"], reverse=True)

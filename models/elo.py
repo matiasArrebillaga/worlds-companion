@@ -88,7 +88,9 @@ def run_elo(games: list[dict], params: Params, regions: dict[str, str]) -> EloRu
         ratings[red] -= change
         played[blue] += 1
         played[red] += 1
-        records.append({**g, "p_blue": p_blue, "blue_won": blue_won})
+        # Rating de cada equipo DESPUÉS del game (para la evolución del Elo); p_blue es el de antes
+        records.append({**g, "p_blue": p_blue, "blue_won": blue_won,
+                        "rating_blue": ratings[blue], "rating_red": ratings[red]})
     return EloRun(ratings, played, records)
 
 

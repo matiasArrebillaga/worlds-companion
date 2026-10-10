@@ -1,7 +1,7 @@
 import pytest
 
 from models.oracles import parse_rows
-from pipeline.stats import build_team_and_player_stats, player_stats, slug, team_stats
+from pipeline.stats import build_team_and_player_stats, elo_history, player_stats, series_list, slug, team_stats
 from tests.test_features import game_rows
 
 
@@ -94,3 +94,23 @@ def test_player_ids_are_unique_even_with_the_same_name():
                                              {"Team A": "TA", "Team B": "TB"})
     ids = [p["id"] for p in players]
     assert len(ids) == len(set(ids)) == 10
+
+
+def rec(blue, red, winner, date, match_id, page="LCK/2026 Season/Cup", rb=1500.0, rr=1500.0):
+    return {"blue": blue, "red": red, "winner": winner, "date": date, "match_id": match_id, "page": page,
+            "rating_blue": rb, "rating_red": rr}
+
+
+def test_elo_history_follows_the_team_after_each_game():
+    records = [rec("A", "B", "blue", "2026-01-01 10:00:00", "m1", rb=1510, rr=1490),
+               rec("C", "A", "blue", "2026-01-05 10:00:00", "m2", rb=1508, rr=1502.4)]
+    assert elo_history(records, "A") == [["2026-01-01", 1510.0], ["2026-01-05", 1502.4]]
+
+
+def test_series_group_games_newest_first():
+    records = [rec("A", "B", "blue", "2026-01-01 10:00:00", "m1"), rec("B", "A", "blue", "2026-01-01 11:00:00", "m1"),
+               rec("A", "B", "blue", "2026-01-01 12:00:00", "m1"), rec("C", "A", "red", "2026-02-01 10:00:00", "m2")]
+    assert series_list(records, "A") == [
+        {"date": "2026-02-01", "opponent": "C", "page": "LCK/2026 Season/Cup", "wins": 1, "losses": 0},
+        {"date": "2026-01-01", "opponent": "B", "page": "LCK/2026 Season/Cup", "wins": 2, "losses": 1},
+    ]

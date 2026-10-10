@@ -74,3 +74,9 @@ def test_team_region_is_the_league_where_it_played_most():
     assert regions["A"] == "KR"
     assert regions["E"] == "NA"
     assert "D" not in regions  # solo jugó un torneo internacional
+
+
+def test_records_keep_the_ratings_after_the_game():
+    run = run_elo([game("A", "B")], Params(k=20), {})
+    assert run.records[0]["rating_blue"] == pytest.approx(1510)
+    assert run.records[0]["rating_red"] == pytest.approx(1490)
