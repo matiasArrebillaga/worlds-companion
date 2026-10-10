@@ -35,3 +35,8 @@ def test_write_if_changed_rewrites_on_change(tmp_path):
 
 def test_read_rows_missing_file_is_empty(tmp_path):
     assert fetch.read_rows(tmp_path / "nope.json") == []
+
+
+def test_roster_teams_skips_tbd_and_dedupes():
+    rosters = [{"Team": "T1"}, {"Team": "TBD"}, {"Team": "T1"}, {"Team": "G2 Esports"}, {"Team": ""}]
+    assert fetch.roster_teams(rosters) == ["G2 Esports", "T1"]

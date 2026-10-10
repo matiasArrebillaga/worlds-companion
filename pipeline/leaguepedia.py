@@ -94,3 +94,9 @@ def cargo_query(session, *, tables: str, fields: str, where: str = "", order_by:
         if len(page) < PAGE_SIZE:
             return rows
         offset += PAGE_SIZE
+
+
+def in_clause(field: str, values: list[str]) -> str:
+    """Cláusula WHERE de Cargo 'Campo IN ("a","b")' con las comillas escapadas."""
+    quoted = ",".join('"' + v.replace('"', '\\"') + '"' for v in values)
+    return f"{field} IN ({quoted})"

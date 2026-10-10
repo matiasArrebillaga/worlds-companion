@@ -7,11 +7,14 @@ import json
 from pathlib import Path
 
 from pipeline import leaguepedia, utc_now_iso
+from pipeline.history import GAME_FIELDS
 from pipeline.schedule import UNDECIDED_TEAMS
 
 RAW_DIR = Path("data/raw")
 MATCHES_FILE = RAW_DIR / "worlds_2026_matches.json"
 TEAMS_FILE = RAW_DIR / "worlds_2026_teams.json"
+GAMES_FILE = RAW_DIR / "worlds_2026_games.json"
+ROSTERS_FILE = RAW_DIR / "worlds_2026_rosters.json"
 TOURNAMENT_PREFIX = "2026 Season World Championship"
 
 # DateTime_UTC se renombra para que la clave no venga con espacios ("DateTime UTC")
@@ -31,8 +34,13 @@ def team_names(matches: list[dict]) -> list[str]:
 
 def teams_where(names: list[str]) -> str:
     """Cláusula WHERE de Cargo con los nombres entre comillas (escapadas)."""
-    quoted = ",".join('"' + n.replace('"', '\\"') + '"' for n in names)
-    return f"Name IN ({quoted})"
+    return leaguepedia.in_clause("Name", names)
+
+
+def roster_teams(rosters: list[dict]) -> list[str]:
+    """Equipos inscriptos en Worlds (sin placeholders ni repetidos)."""
+    names = {(r.get("Team") or "").strip() for r in rosters}
+    return sorted(n for n in names if n and n.lower() not in UNDECIDED_TEAMS)
 
 
 def read_rows(path: Path) -> list[dict]:
@@ -60,15 +68,31 @@ def main() -> None:
         tables="MatchSchedule",
         fields=MATCH_FIELDS,
         where=f'OverviewPage LIKE "{TOURNAMENT_PREFIX}%"',
-        order_by="DateTime_UTC",
+        order_by="DateTime_UTC,MatchId",
     )
     changed = write_if_changed(MATCHES_FILE, matches, now)
     print(f"matches: {len(matches)} ({'updated' if changed else 'unchanged'})")
 
+    games = leaguepedia.cargo_query(
+        session, tables="ScoreboardGames", fields=GAME_FIELDS,
+        where=f'OverviewPage LIKE "{TOURNAMENT_PREFIX}%"', order_by="DateTime_UTC,GameId",
+    )
+    changed = write_if_changed(GAMES_FILE, games, now)
+    print(f"games: {len(games)} ({'updated' if changed else 'unchanged'})")
+
+    rosters = leaguepedia.cargo_query(
+        session, tables="TournamentRosters", fields="Team,OverviewPage",
+        where=f'OverviewPage LIKE "{TOURNAMENT_PREFIX}%"', order_by="OverviewPage,Team",
+    )
+    write_if_changed(ROSTERS_FILE, rosters, now)
+    print(f"participants: {len(roster_teams(rosters))}")
+
     # Solo se piden los equipos que todavía no están en caché
     cached = read_rows(TEAMS_FILE)
     known = {t["Name"] for t in cached}
-    missing = [n for n in team_names(matches) if n not in known]
+    # Así se bajan las siglas de los inscriptos aunque los cruces sigan en TBD
+    wanted = sorted(set(team_names(matches)) | set(roster_teams(rosters)))
+    missing = [n for n in wanted if n not in known]
     if missing:
         fetched = leaguepedia.cargo_query(session, tables="Teams", fields=TEAM_FIELDS, where=teams_where(missing))
         teams = sorted(cached + fetched, key=lambda t: t["Name"])
