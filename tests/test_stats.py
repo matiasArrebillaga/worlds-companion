@@ -1,7 +1,7 @@
 import pytest
 
 from models.oracles import ROLES, parse_rows
-from pipeline.stats import build_team_and_player_stats, elo_history, player_stats, series_list, slug, team_stats
+from pipeline.stats import build_team_and_player_stats, elo_history, player_stats, series_list, slug, team_stats, wilson
 from tests.test_features import game_rows
 
 
@@ -28,6 +28,7 @@ def test_team_stats_aggregate_record_sides_and_rates():
                ("g2", "B", "A", 1, "2026-01-02 10:00:00", "LCK", {"blue_stats": TEAM, "red_stats": {**TEAM, "gamelength": "2400"}}))
     s = team_stats(gs, "A")
     assert (s["games"], s["wins"], s["winrate"]) == (2, 1, 0.5)
+    assert (s["winrate_low"], s["winrate_high"]) == wilson(1, 2)   # rango del 95%: con 2 partidas, enorme
     assert s["blue"] == {"games": 1, "wins": 1} and s["red"] == {"games": 1, "wins": 0}
     assert s["avg_minutes"] == 35.0          # (30 + 40) / 2
     assert s["first_blood"] == 1.0 and s["first_dragon"] == 0.0
@@ -135,3 +136,34 @@ def test_players_who_moved_only_count_for_their_current_team():
     tops = [p for p in players if p["name"] == "A-top"]
     assert [(p["id"], p["team_id"], p["season"]["games"]) for p in tops] == [("a-top", "team-a", 1)]
     assert teams["Team B"]["roster"] == ["b-jng", "b-mid", "b-bot", "b-sup"]
+
+
+def test_team_gd15_averages_only_games_with_data():
+    gs = games(("g1", "A", "B", 1, "2026-01-01 10:00:00", "LCK", {"blue_stats": {**TEAM, "golddiffat15": "1500"}}),
+               ("g2", "A", "B", 1, "2026-01-02 10:00:00", "LCK", {"blue_stats": {**TEAM, "golddiffat15": "-500"}}),
+               ("g3", "A", "B", 1, "2026-01-03 10:00:00", "LPL", {"blue_stats": {**TEAM, "golddiffat15": ""}}))
+    assert team_stats(gs, "A")["gd15"] == 500    # (1500 − 500) / 2: la partida sin dato no cuenta como 0
+    assert team_stats(gs[2:], "A")["gd15"] is None
+
+
+def test_vs_worlds_only_counts_games_against_other_qualified_teams():
+    gs = games(("g1", "A", "B", 1, "2026-01-01 10:00:00", "LCK", {}),
+               ("g2", "A", "C", 0, "2026-01-02 10:00:00", "LCK", {}),
+               ("g3", "C", "D", 1, "2026-01-03 10:00:00", "LCK", {}))
+    teams, _ = build_team_and_player_stats(gs, {"Team A": "A", "Team C": "C"}, {})
+    assert teams["Team A"]["season"]["games"] == 2
+    assert (teams["Team A"]["vs_worlds"]["games"], teams["Team A"]["vs_worlds"]["wins"]) == (1, 0)  # solo contra C
+    assert teams["Team C"]["vs_worlds"]["games"] == 1
+
+
+def test_team_without_games_against_qualified_teams_has_null_vs_worlds():
+    gs = games(("g1", "A", "B", 1, "2026-01-01 10:00:00", "LCK", {}))
+    teams, _ = build_team_and_player_stats(gs, {"Team A": "A"}, {})
+    assert teams["Team A"]["vs_worlds"] is None
+
+
+def test_players_get_the_model_form_by_role_and_name():
+    gs = games(("g1", "A", "B", 1, "2026-01-01 10:00:00", "LCK", {}))
+    _, players = build_team_and_player_stats(gs, {"Team A": "A"}, {}, forms={"mid:A-mid": 0.8312})
+    form = {p["name"]: p["form"] for p in players}
+    assert form["A-mid"] == 0.83 and form["A-top"] is None

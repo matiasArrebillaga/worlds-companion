@@ -95,11 +95,12 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
         oe_names = {t: resolve_team(t, ups) for t in teams}
         # Primer día de Worlds según el calendario: antes de eso no hay período "Worlds 2026"
         worlds_start = min((m["date"] for m in schedule if m["date"]), default=None)
-        team_stats_by_name, players_payload = build_team_and_player_stats(oe_games, oe_names, shorts, worlds_start)
+        team_stats_by_name, players_payload = build_team_and_player_stats(oe_games, oe_names, shorts, worlds_start,
+                                                                          forms)
         for name in teams:
             canonical = aliases.get(name, name)
             teams_payload.append({
-                **{k: team_stats_by_name[name][k] for k in ("id", "roster", "season", "worlds")},
+                **{k: team_stats_by_name[name][k] for k in ("id", "roster", "season", "worlds", "vs_worlds")},
                 "name": name, "short": short_name(name, shorts), "region": regions.get(canonical),
                 "rating": round(run.ratings[canonical], 1),
                 "elo_history": elo_history(run.records, canonical),
@@ -132,7 +133,8 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
         "worlds_games": meta_stats["worlds_games"],
         "samples": meta_stats["samples"],
     })
-    _write(out_dir / "champions.json", {"updated_at": now, **patches, "samples": meta_stats["champions"]})
+    _write(out_dir / "champions.json", {"updated_at": now, **patches, "prior_picks": meta_stats["prior_picks"],
+                                        "samples": meta_stats["champions"], "analysis": meta_stats["analysis"]})
     _write(out_dir / "elo.json", elo_payload(teams, run, regions, shorts, aliases, evaluate(schedule, frozen), now,
                                                 role_model, oe_fetched_at))
     _write(out_dir / "teams.json", {"updated_at": now, "stats_fetched_at": oe_fetched_at, "teams": teams_payload})

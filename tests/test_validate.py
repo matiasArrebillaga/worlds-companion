@@ -89,3 +89,4 @@ def test_validate_meta_flags_duplicates_and_out_of_range():
     errors = validate_meta({"worlds": [ok, ok], "guide": [{**ok, "presence": 1.5}]})
     assert any("duplicate champion Azir" in e for e in errors)
     assert any("presence out of range" in e for e in errors)
+    assert any("winrate_adj out of range" in e for e in validate_meta({"worlds": [{**ok, "winrate_adj": -0.1}]}))

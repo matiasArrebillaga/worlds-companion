@@ -95,7 +95,9 @@ def validate_meta(champions: dict[str, list[dict]]) -> list[str]:
             if n > 1:
                 errors.append(f"{sample}: duplicate champion {name}")
         for r in rows:
-            for key in ("presence", "winrate", "first_rotation"):
-                if r[key] is not None and not 0.0 <= r[key] <= 1.0:
-                    errors.append(f"{sample}: {r['champion']} {key} out of range: {r[key]}")
+            for key in ("presence", "pick_rate", "ban_rate", "winrate", "winrate_adj", "winrate_low", "winrate_high",
+                        "first_rotation", "kp", "guide_presence"):
+                value = r.get(key)
+                if value is not None and not 0.0 <= value <= 1.0:
+                    errors.append(f"{sample}: {r['champion']} {key} out of range: {value}")
     return errors
