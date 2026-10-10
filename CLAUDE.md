@@ -78,8 +78,9 @@ cd web && npm run build         # build de producción
 
 - **Hoy** (inicio): próximo partido con predicción, partidos del día, últimos resultados.
 - **Calendario**: lista por día | Suiza (tabla de récords) | Bracket.
-- **Estadísticas**: Equipos | Jugadores, con páginas por equipo y por jugador.
-- **Meta**: Campeones | Draft | Lados | Ritmo | Regiones.
+- **Estadísticas**: Equipos | Jugadores | Análisis (temporada vs. contra equipos de Worlds, forma del modelo), con páginas por
+  equipo y por jugador.
+- **Meta**: Campeones | Draft | Lados | Ritmo | Regiones | Análisis (ruido vs. señal, winrate ajustado, rangos, flex).
 - **Predicciones**: próximos partidos | cómo funciona | aciertos.
 - **Partido**: head-to-head.
 
@@ -146,7 +147,7 @@ League of Legends y Riot Games son marcas registradas de Riot Games, Inc."
 
 ## Glosario
 
-- **GD@15:** diferencia de oro al minuto 15 (requiere Oracle's Elixir; todavía no disponible).
+- **GD@15:** diferencia de oro al minuto 15 (Oracle's Elixir; a parte de la LPL le falta, se trata como dato faltante).
 - **DPM:** daño a campeones por minuto.
 - **KP:** participación en asesinatos del equipo.
 - **Bo1 / Bo3 / Bo5:** series al mejor de 1, 3 o 5 partidas.

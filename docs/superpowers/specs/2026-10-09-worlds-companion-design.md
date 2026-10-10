@@ -89,10 +89,10 @@ web/                       Vite + TS; lee solo web/public/data/*.json
 | Archivo | Contenido |
 |---|---|
 | `schedule.json` | Partidos: id, fecha UTC ISO 8601 o `null` si no está confirmada, fase (play-in / swiss / knockout), ronda, formato (Bo1/3/5), equipos, lado por game, resultado (si hay), predicción |
-| `teams.json` | Por equipo: id, sigla, nombre, región, roster, récord, stats agregadas (winrate, winrate por lado, duración media, % primera sangre, % primer dragón, oro/min) |
-| `players.json` | Por jugador: id, equipo, rol, KDA, CS/min, DPM, KP, campeones jugados, historial por partida |
-| `champions.json` | Por campeón y muestra (Worlds / guía de los últimos parches de las ligas): picks, bans, presencia, winrate, prioridad de draft (primera rotación) |
-| `meta.json` | Hora de última actualización (UTC), conteo de partidas, parches, partidas de Worlds y, por muestra: winrate por lado, ritmo (duración mediana, kills/min) por fase y winrate entre regiones |
+| `teams.json` | Por equipo: id, sigla, nombre, región, roster, récord, stats agregadas (winrate con rango del 95%, winrate por lado, duración media, % primera sangre, % primer dragón, oro/min, GD@15) por período: temporada, Worlds y vs. equipos de Worlds (`vs_worlds`) |
+| `players.json` | Por jugador: id, equipo, rol, forma del modelo elo-2 (`form`), KDA, CS/min, DPM, KP, campeones jugados, historial por partida |
+| `champions.json` | Por campeón y muestra (Worlds / guía de los últimos parches de las ligas): picks, bans, % pick, % ban, presencia, winrate (crudo, ajustado y rango del 95%), prioridad de draft (primera rotación), KDA, CS/min, DPM, KP, roles y presencia en la guía (filas de Worlds). Además `prior_picks` (k del ajuste) y, por muestra, `analysis` (cuánto de las diferencias de winrate es azar) |
+| `meta.json` | Hora de última actualización (UTC), conteo de partidas, parches, partidas de Worlds y, por muestra: winrate por lado (con rango, por fase y partida 1 vs. resto), ritmo (duración mediana, cuartiles, kills/min) por fase y winrate entre regiones con rango |
 | `elo.json` | Rating actual por equipo, historia de rating por partido, precisión del modelo (aciertos/total, Brier, calibración por tramos), `model_version` y parámetros (K, ajustes regionales) |
 
 Los tipos TypeScript del contrato se escriben a mano en `web/src/types.ts`. Un test de Python verifica
