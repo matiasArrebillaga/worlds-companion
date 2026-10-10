@@ -76,13 +76,16 @@ cd web && npm run build         # build de producción
 
 ## Secciones del sitio
 
-- **Hoy** (inicio): próximo partido con predicción, partidos del día, últimos resultados.
-- **Calendario**: lista por día | Suiza (tabla de récords) | Bracket.
-- **Estadísticas**: Equipos | Jugadores | Análisis (temporada vs. contra equipos de Worlds, forma del modelo), con páginas por
+- **Calendario** (inicio, `#/`): Lista | Suiza | Bracket | Predicciones.
+  - Lista: línea de tiempo (una tarjeta por fila) que abre en el próximo partido; arriba lo jugado, abajo lo que viene.
+    En PC, columna lateral con "Hoy, en tu hora" y "Últimos resultados". Cada tarjeta lleva su predicción.
+  - Suiza: estructura de lolesports (columna por ronda, cajas por récord con Bo1/Bo3, Clasificados/Eliminados).
+    En celular las rondas se apilan y la vista abre en la ronda en curso; nada se desliza de costado.
+  - Predicciones: Aciertos (Resumen | Partidos acertados/errados) | Cómo funciona.
+- **Equipos** (`#/equipos`): Equipos | Jugadores | Análisis (temporada vs. contra equipos de Worlds, forma del modelo), con páginas por
   equipo y por jugador.
 - **Meta**: Campeones (draft, rendimiento y resultado) | Panorama (lados, ritmo, regiones, ruido vs. señal, espejismos, flex,
   cambios del parche).
-- **Predicciones**: próximos partidos | cómo funciona | aciertos.
 - **Partido**: head-to-head.
 
 ## Reglas de fechas y horarios
@@ -106,24 +109,30 @@ Riot Games. Solo modo oscuro.
 
 | Token | Color | Uso |
 |---|---|---|
-| bg | `#0A0E1A` | Fondo principal |
-| sunken | `#070A13` | Pistas de barras, inputs |
-| card | `#131A2B` | Tarjetas |
-| raised | `#1A2338` | Hover, sub-pestaña activa |
-| line | `#24304A` | Divisores (solo decorativo) |
-| line-ctl | `#56658A` | Bordes de controles |
-| fg | `#E8ECF4` | Texto principal |
-| fg2 | `#8A95AD` | Texto secundario |
-| gold | `#C8A24A` | Importancia: favorito, pestaña activa, final |
-| cyan | `#3FC1C9` | Estado e interacción: en curso, foco |
-| win | `#4CAF7A` | Victoria |
-| loss | `#E0565B` | Derrota |
-| blue | `#4A8FE7` | Lado azul |
-| red | `#E8784F` | Lado rojo (coral, distinto de derrota) |
+| bg | `#05070E` | Fondo principal |
+| sunken | `#020309` | Pistas de barras, inputs |
+| card | `#111A2E` | Tarjetas |
+| raised | `#1C2842` | Hover, sub-pestaña activa, paneles laterales |
+| card-hi | `#24324F` | Tarjeta del próximo partido |
+| line | `#2A3858` | Divisores (solo decorativo) |
+| line-ctl | `#6A7AA3` | Bordes de controles |
+| fg | `#F5F7FC` | Texto principal |
+| fg2 | `#A6B1C8` | Texto secundario |
+| fg3 | `#6F7B96` | Texto terciario (conectores, vacíos) |
+| gold | `#D4AE52` | Importancia: favorito, pestaña activa, final |
+| cyan | `#45CCD4` | Estado e interacción: en curso, foco |
+| win | `#52C285` | Victoria |
+| loss | `#F0606A` | Derrota |
+| blue | `#4F95F0` | Lado azul |
+| red | `#F07F55` | Lado rojo (coral, distinto de derrota) |
+
+- Regiones (`--region-*`, rombito junto a la sigla): KR blanco `#F2F4F8`, CN rojo `#E8424F`, EU cian `#4DD9E8`,
+  NA azul `#4F7BFF`, BR verde `#3DDC84`, APAC violeta `#A57CFF`.
+- Tarjetas por estado: jugada apagada, próxima en card-hi con borde dorado, en curso con borde cian.
 
 - Todo como variables CSS en `:root`; nunca colores sueltos en componentes.
 - Contraste mínimo WCAG AA. No transmitir información solo con color: lado como chip AZUL/ROJO, resultado como V/D.
-- Colores por región definidos una sola vez en `web/src/theme/regions.ts`.
+- Colores por región: valores en `styles.css` (`--region-*`), elección por equipo en `web/src/theme/regions.ts`.
 - Tipografía (Google Fonts): Saira Condensed 600–700 para títulos (mayúsculas, leve espaciado),
   Plus Jakarta Sans para texto, JetBrains Mono con `tabular-nums` para números.
 - Tarjetas con esquinas cortadas (clip-path) y borde degradé dorado→cian sutil; panal de hexágonos muy tenue.
