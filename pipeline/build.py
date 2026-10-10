@@ -92,7 +92,9 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
     teams_payload, players_payload = [], []
     if not errors:
         oe_names = {t: resolve_team(t, ups) for t in teams}
-        team_stats_by_name, players_payload = build_team_and_player_stats(oe_games, oe_names, shorts)
+        # Primer día de Worlds según el calendario: antes de eso no hay período "Worlds 2026"
+        worlds_start = min((m["date"] for m in schedule if m["date"]), default=None)
+        team_stats_by_name, players_payload = build_team_and_player_stats(oe_games, oe_names, shorts, worlds_start)
         for name in teams:
             canonical = aliases.get(name, name)
             teams_payload.append({

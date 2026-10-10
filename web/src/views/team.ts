@@ -71,13 +71,16 @@ export function renderTeam(el: HTMLElement, data: SiteData, _tz: string, param: 
   if (canvas && team.elo_history.length) {
     drawEloChart(canvas, team.elo_history).then((d) => { if (alive) destroy = d; else d(); });
   }
+  const teardown = () => { alive = false; destroy(); el.onclick = null; };
+  // El cleanup que guarda main.ts es este; al cambiar de período apunta al de la nueva vista,
+  // así el gráfico que quede vivo siempre se destruye al salir de la página
+  let current = teardown;
   el.onclick = (event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-period]');
     if (!button) return;
     period = button.dataset.period as Period;
-    alive = false;
-    destroy();
-    renderTeam(el, data, _tz, param);
+    teardown();
+    current = renderTeam(el, data, _tz, param);
   };
-  return () => { alive = false; destroy(); el.onclick = null; };
+  return () => current();
 }

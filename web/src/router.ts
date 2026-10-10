@@ -7,7 +7,16 @@ export interface Route {
 export function parseHash(hash: string): Route {
   const parts = hash.replace(/^#/, '').split('/').filter(Boolean);
   if (parts.length === 0) return { path: '#/', param: null };
-  return { path: `#/${parts[0]}`, param: parts[1] ? decodeURIComponent(parts[1]) : null };
+  return { path: `#/${parts[0]}`, param: parts[1] ? decode(parts[1]) : null };
+}
+
+// Un link roto o escrito a mano ('100%') no puede romper la página: se usa tal cual
+function decode(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
 }
 
 // Qué pestaña se marca: las páginas de equipo y jugador cuelgan de Estadísticas

@@ -63,7 +63,7 @@ function teamsTable(data: SiteData): string {
   const sorted = sortBy(rows, (r) => column.value(r.t, r.s), state.dir);
   const body = sorted.map(({ t, s }) => `
     <tr class="${s.games < FEW_GAMES ? 'few' : ''}">
-      <td class="team"><a href="#/equipo/${encodeURIComponent(t.id)}"><b>${escapeHtml(t.short)}</b></a><span class="muted">${escapeHtml(t.region ?? '—')}</span></td>
+      <td class="team"><a href="#/equipo/${encodeURIComponent(t.id)}"><b>${escapeHtml(t.short)}</b></a><span class="muted">${escapeHtml(t.region ?? '—')}${s.games < FEW_GAMES ? ' · pocas partidas' : ''}</span></td>
       ${TEAM_COLUMNS.map((c) => `<td class="num">${c.show(t, s)}</td>`).join('')}
     </tr>`).join('');
   return `<div class="table-wrap"><table class="rank"><thead><tr><th>Equipo</th>${header(TEAM_COLUMNS)}</tr></thead><tbody>${body}</tbody></table></div>`;
@@ -80,7 +80,7 @@ function playersTable(data: SiteData): string {
   const sorted = sortBy(rows, (r) => column.value(r.p, r.s), state.dir);
   const body = sorted.map(({ p, s }) => `
     <tr class="${s.games < FEW_GAMES ? 'few' : ''}">
-      <td class="team"><a href="#/jugador/${encodeURIComponent(p.id)}"><b>${escapeHtml(p.name)}</b></a><span class="muted">${escapeHtml(shorts.get(p.team_id) ?? p.team)} · ${ROLE_LABELS[p.role]}</span></td>
+      <td class="team"><a href="#/jugador/${encodeURIComponent(p.id)}"><b>${escapeHtml(p.name)}</b></a><span class="muted">${escapeHtml(shorts.get(p.team_id) ?? p.team)} · ${ROLE_LABELS[p.role]}${s.games < FEW_GAMES ? ' · pocas partidas' : ''}</span></td>
       ${PLAYER_COLUMNS.map((c) => `<td class="num">${c.show(p, s)}</td>`).join('')}
     </tr>`).join('');
   return `<div class="table-wrap"><table class="rank"><thead><tr><th>Jugador</th>${header(PLAYER_COLUMNS)}</tr></thead><tbody>${body}</tbody></table></div>`;
@@ -95,7 +95,7 @@ export function renderStats(el: HTMLElement, data: SiteData): () => void {
       ${seg('tab', [['equipos', 'Equipos'], ['jugadores', 'Jugadores']], state.tab, 'Equipos o jugadores')}
       ${seg('period', PERIODS, state.period, 'Período')}
       ${state.tab === 'jugadores' ? seg('role', roles, state.role, 'Rol') : ''}
-      <p class="note">Las filas atenuadas tienen menos de ${FEW_GAMES} partidas: con tan pocas, los números dicen poco. "—" es un dato que la fuente no tiene.</p>
+      <p class="note">"Pocas partidas" = menos de ${FEW_GAMES}: con tan pocas, los números dicen poco. "—" es un dato que la fuente no tiene.</p>
     </section>
     <section class="stack">${state.tab === 'equipos' ? teamsTable(data) : playersTable(data)}</section>`;
 

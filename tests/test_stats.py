@@ -1,6 +1,6 @@
 import pytest
 
-from models.oracles import parse_rows
+from models.oracles import ROLES, parse_rows
 from pipeline.stats import build_team_and_player_stats, elo_history, player_stats, series_list, slug, team_stats
 from tests.test_features import game_rows
 
@@ -75,7 +75,7 @@ def test_team_without_worlds_games_has_null_worlds():
 def test_roster_is_the_last_lineup_in_role_order():
     gs = games(("g1", "A", "B", 1, "2026-01-01 10:00:00", "LCK", {}),
                ("g2", "A", "B", 1, "2026-01-02 10:00:00", "WLDs", {}))
-    teams, players = build_team_and_player_stats(gs, {"Team A": "A"}, {"Team A": "TA"})
+    teams, players = build_team_and_player_stats(gs, {"Team A": "A"}, {"Team A": "TA"}, worlds_start="2026-01-02")
     assert teams["Team A"]["id"] == "team-a"
     assert teams["Team A"]["roster"] == ["a-top", "a-jng", "a-mid", "a-bot", "a-sup"]
     top = next(p for p in players if p["id"] == "a-top")
@@ -87,9 +87,10 @@ def test_roster_is_the_last_lineup_in_role_order():
 def test_player_ids_are_unique_even_with_the_same_name():
     rows_a = games(("g1", "A", "C", 1, "2026-01-01 10:00:00", "LCK", {}))
     rows_b = games(("g2", "B", "C", 1, "2026-01-01 11:00:00", "LCK", {}))
+    shifted = dict(zip(ROLES, ROLES[1:] + ROLES[:1]))
     for g in rows_b:
         for role, row in g["players"]["blue"].items():
-            row["playername"] = f"A-{role}"   # mismos nombres que los jugadores de A
+            row["playername"] = f"A-{shifted[role]}"   # mismos nombres que los de A, en otro rol: otras personas
     _, players = build_team_and_player_stats(rows_a + rows_b, {"Team A": "A", "Team B": "B"},
                                              {"Team A": "TA", "Team B": "TB"})
     ids = [p["id"] for p in players]
@@ -114,3 +115,23 @@ def test_series_group_games_newest_first():
         {"date": "2026-02-01", "opponent": "C", "page": "LCK/2026 Season/Cup", "wins": 1, "losses": 0},
         {"date": "2026-01-01", "opponent": "B", "page": "LCK/2026 Season/Cup", "wins": 2, "losses": 1},
     ]
+
+
+def test_worlds_games_before_the_tournament_start_are_not_worlds():
+    # Oracle's Elixir usa "WLDs" también para clasificatorios regionales de septiembre
+    gs = games(("g1", "A", "B", 1, "2026-09-17 10:00:00", "WLDs", {}))
+    teams, players = build_team_and_player_stats(gs, {"Team A": "A"}, {"Team A": "TA"}, worlds_start="2026-10-15")
+    assert teams["Team A"]["worlds"] is None
+    assert all(p["worlds"] is None and not p["history"][0]["worlds"] for p in players)
+
+
+def test_players_who_moved_only_count_for_their_current_team():
+    gs = games(("g1", "B", "C", 1, "2026-01-01 10:00:00", "LCK", {}),
+               ("g2", "A", "C", 1, "2026-06-01 10:00:00", "LCK", {}))
+    for role, row in gs[0]["players"]["blue"].items():
+        if role == "top":
+            row["playername"] = "A-top"   # el top de A jugaba antes en B
+    teams, players = build_team_and_player_stats(gs, {"Team A": "A", "Team B": "B"}, {"Team A": "TA", "Team B": "TB"})
+    tops = [p for p in players if p["name"] == "A-top"]
+    assert [(p["id"], p["team_id"], p["season"]["games"]) for p in tops] == [("a-top", "team-a", 1)]
+    assert teams["Team B"]["roster"] == ["b-jng", "b-mid", "b-bot", "b-sup"]

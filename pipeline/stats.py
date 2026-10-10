@@ -9,7 +9,7 @@ from collections import Counter
 
 from models.oracles import ROLES
 
-WORLDS_PAGE = "WLDs"   # código de liga de Worlds en Oracle's Elixir
+WORLDS_PAGE = "WLDs"   # código de liga de Worlds en Oracle's Elixir (incluye clasificatorios regionales)
 HISTORY_GAMES = 20     # últimas partidas que se guardan por jugador
 FIRSTS = {"first_blood": "firstblood", "first_dragon": "firstdragon", "first_tower": "firsttower"}
 
@@ -104,23 +104,37 @@ def player_stats(entries: list[tuple[dict, str, dict]]) -> dict:
     }
 
 
-def _game_line(g: dict, side: str, row: dict) -> dict:
+def _is_worlds(g: dict, worlds_start: str | None) -> bool:
+    """Partida del Worlds en sí: Oracle's Elixir usa "WLDs" también para clasificatorios regionales
+    (ej. el de la LPL en septiembre), así que además tiene que ser desde el primer día del torneo."""
+    return g["page"] == WORLDS_PAGE and worlds_start is not None and g["date"][:10] >= worlds_start[:10]
+
+
+def _game_line(g: dict, side: str, row: dict, worlds_start: str | None) -> dict:
     """Una partida del historial de un jugador."""
     one = player_stats([(g, side, row)])
     other = "red" if side == "blue" else "blue"
     return {"date": g["date"][:10], "opponent": g[other], "champion": row.get("champion") or "",
             "won": g["winner"] == side, "kills": one["kills"], "deaths": one["deaths"], "assists": one["assists"],
-            "cs_min": one["cs_min"], "dpm": one["dpm"], "worlds": g["page"] == WORLDS_PAGE}
+            "cs_min": one["cs_min"], "dpm": one["dpm"], "worlds": _is_worlds(g, worlds_start)}
 
 
-def build_team_and_player_stats(oe_games: list[dict], oe_names: dict[str, str],
-                                shorts: dict[str, str]) -> tuple[dict[str, dict], list[dict]]:
+def build_team_and_player_stats(oe_games: list[dict], oe_names: dict[str, str], shorts: dict[str, str],
+                                worlds_start: str | None = None) -> tuple[dict[str, dict], list[dict]]:
     """Stats de cada equipo de Worlds y de cada jugador que jugó para ellos en 2026.
 
-    oe_names: nombre de Leaguepedia → nombre en Oracle's Elixir. Un jugador que cambió de equipo
-    cuenta solo las partidas con su equipo actual.
+    oe_names: nombre de Leaguepedia → nombre en Oracle's Elixir. worlds_start: primer día del torneo
+    (sin él, todavía no hay período Worlds). Un jugador que cambió de equipo aparece solo en su equipo
+    actual (el de su última partida) y cuenta solo las partidas con ese equipo.
     """
-    worlds = [g for g in oe_games if g["page"] == WORLDS_PAGE]
+    worlds = [g for g in oe_games if _is_worlds(g, worlds_start)]
+    # Equipo actual de cada jugador (nombre + rol: dos personas distintas con el mismo nombre suelen jugar otro rol)
+    current_team: dict[tuple[str, str], str] = {}
+    for g in oe_games:
+        for side in ("blue", "red"):
+            for role, row in g["players"][side].items():
+                if row.get("playername"):
+                    current_team[(row["playername"], role)] = g[side]
     teams: dict[str, dict] = {}
     players: list[dict] = []
     used_ids: set[str] = set()
@@ -135,8 +149,9 @@ def build_team_and_player_stats(oe_games: list[dict], oe_names: dict[str, str],
                     continue
                 for role in ROLES:
                     row = g["players"][side].get(role)
-                    if row and row.get("playername"):
+                    if row and row.get("playername") and current_team[(row["playername"], role)] == oe_name:
                         entries.setdefault(row["playername"], []).append((g, side, row))
+                    if row and row.get("playername"):
                         last_lineup[role] = row["playername"]
         ids: dict[str, str] = {}
         for name in entries:
@@ -147,19 +162,20 @@ def build_team_and_player_stats(oe_games: list[dict], oe_names: dict[str, str],
             ids[name] = pid
         for name, mine in entries.items():
             role = Counter(row["position"] for _, _, row in mine).most_common(1)[0][0]
-            in_worlds = [e for e in mine if e[0]["page"] == WORLDS_PAGE]
+            in_worlds = [e for e in mine if _is_worlds(e[0], worlds_start)]
             players.append({
                 "id": ids[name], "name": name, "team_id": team_id, "team": lp_name, "role": role,
                 "starter": last_lineup.get(role) == name,
                 "season": player_stats(mine),
                 "worlds": player_stats(in_worlds) if in_worlds else None,
-                "history": [_game_line(*e) for e in reversed(mine[-HISTORY_GAMES:])],
+                "history": [_game_line(*e, worlds_start) for e in reversed(mine[-HISTORY_GAMES:])],
             })
         season = team_stats(oe_games, oe_name)
         worlds_stats = team_stats(worlds, oe_name)
         teams[lp_name] = {
             "id": team_id,
-            "roster": [ids[last_lineup[r]] for r in ROLES if r in last_lineup],
+            # Si un titular de la última partida ya se fue a otro equipo, no figura en el plantel
+            "roster": [ids[last_lineup[r]] for r in ROLES if last_lineup.get(r) in ids],
             "season": season,
             "worlds": worlds_stats if worlds_stats["games"] else None,
         }

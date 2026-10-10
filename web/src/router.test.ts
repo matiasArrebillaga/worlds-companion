@@ -26,3 +26,9 @@ describe('parseHash with match ids', () => {
     expect(parseHash(`#/partido/${encodeURIComponent(id)}`)).toEqual({ path: '#/partido', param: id });
   });
 });
+
+describe('parseHash with a broken link', () => {
+  it('does not throw on a malformed percent sign', () => {
+    expect(parseHash('#/equipo/100%')).toEqual({ path: '#/equipo', param: '100%' });
+  });
+});
