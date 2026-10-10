@@ -1,29 +1,26 @@
 import './styles.css';
 import { isNewer, loadData, loadMeta, type SiteData } from './data';
+import { setRegions } from './theme/regions';
 import { localDayKey, resolveTimeZone } from './format';
 import { dayKeyOf } from './schedule';
 import { renderCalendar } from './views/calendar';
 import { parseHash, tabFor } from './router';
 import { renderUpdated, setActiveTab } from './views/layout';
-import { renderPredictions } from './views/predictions';
 import { renderMatch } from './views/match';
 import { renderMeta } from './views/meta';
 import { renderPlayer } from './views/player';
 import { renderStats } from './views/stats';
 import { renderTeam } from './views/team';
-import { renderToday } from './views/today';
 
 type View = (el: HTMLElement, data: SiteData, tz: string, param: string | null) => () => void;
 
 const ROUTES: Record<string, View> = {
-  '#/': (el, data, tz) => renderToday(el, data.schedule.matches, tz),
-  '#/calendario': (el, data, tz) => renderCalendar(el, data.schedule.matches, tz),
-  '#/estadisticas': (el, data) => renderStats(el, data),
+  '#/': renderCalendar,
+  '#/equipos': (el, data) => renderStats(el, data),
   '#/equipo': renderTeam,
   '#/jugador': renderPlayer,
   '#/partido': renderMatch,
   '#/meta': (el, data) => renderMeta(el, data),
-  '#/predicciones': (el, data, tz) => renderPredictions(el, data, tz),
 };
 
 const view = document.getElementById('view') as HTMLElement;
@@ -38,12 +35,13 @@ function currentRoute() {
 }
 
 function render(data: SiteData): void {
+  setRegions(data.elo.teams);
   cleanup();
   const { path, param } = currentRoute();
   cleanup = ROUTES[path](view, data, tz, param);
 }
 
-// Navegar: arriba de todo, o al día de hoy si la vista lo marca
+// Navegar: arriba de todo, o a lo de hoy (próximo partido o ronda en curso) si la vista lo marca
 function route(data: SiteData): void {
   setActiveTab(tabFor(currentRoute().path));
   render(data);

@@ -4,10 +4,18 @@ export interface Route {
   param: string | null;
 }
 
+// Links viejos (guardados o compartidos) que ahora viven en otra ruta
+const ALIASES: Record<string, string> = {
+  '#/calendario': '#/',
+  '#/predicciones': '#/',
+  '#/estadisticas': '#/equipos',
+};
+
 export function parseHash(hash: string): Route {
   const parts = hash.replace(/^#/, '').split('/').filter(Boolean);
   if (parts.length === 0) return { path: '#/', param: null };
-  return { path: `#/${parts[0]}`, param: parts[1] ? decode(parts[1]) : null };
+  const path = `#/${parts[0]}`;
+  return { path: ALIASES[path] ?? path, param: parts[1] ? decode(parts[1]) : null };
 }
 
 // Un link roto o escrito a mano ('100%') no puede romper la página: se usa tal cual
@@ -19,10 +27,10 @@ function decode(value: string): string {
   }
 }
 
-// Qué pestaña se marca: las páginas de equipo y jugador cuelgan de Estadísticas
+// Qué pestaña se marca: las páginas de equipo y jugador cuelgan de Equipos
 const TAB_OF: Record<string, string | null> = {
-  '#/equipo': '#/estadisticas',
-  '#/jugador': '#/estadisticas',
+  '#/equipo': '#/equipos',
+  '#/jugador': '#/equipos',
   '#/partido': null,
 };
 

@@ -163,7 +163,7 @@ export function renderStats(el: HTMLElement, data: SiteData): () => void {
   el.innerHTML = `
     <section class="stack">
       <span class="eyebrow">Datos de Oracle's Elixir</span>
-      <h1>Estadísticas</h1>
+      <h1>Equipos</h1>
       <div class="subhead">${subtabs('tab', TABS, state.tab, 'Secciones de estadísticas')}
         ${state.tab === 'analisis' ? '' : `<div class="seg small" role="group" aria-label="Período">${periods}</div>`}</div>
     </section>

@@ -1,7 +1,8 @@
 import { formatPercent, formatTime, PHASE_LABELS, roundLabel } from '../format';
 import { escapeHtml } from '../html';
 import { favorite, gameOdds, verdict } from '../predictions';
-import type { Match } from '../types';
+import { teamRegionColor } from '../theme/regions';
+import type { Match, Team } from '../types';
 
 type Side = 'team1' | 'team2';
 
@@ -12,11 +13,14 @@ function result(m: Match, side: Side): string {
     : '<span class="res l" title="Derrota">D</span>';
 }
 
+// Sigla del equipo con el rombito del color de su región
+export function teamTag(team: Team | null): string {
+  if (!team) return '<span class="tag tbd">Por definir</span>';
+  return `<span class="tag" title="${escapeHtml(team.name)}" style="--rc:${teamRegionColor(team.name)}"><i class="rg" aria-hidden="true"></i>${escapeHtml(team.short)}</span>`;
+}
+
 function teamSide(m: Match, side: Side): string {
-  const team = m[side];
-  const name = team
-    ? `<span class="tag" title="${escapeHtml(team.name)}">${escapeHtml(team.short)}</span>`
-    : '<span class="tag tbd">Por definir</span>';
+  const name = teamTag(m[side]);
   const lost = m.winner && m.winner !== side ? ' lost' : '';
   const cls = side === 'team2' ? `team r${lost}` : `team${lost}`;
   // El resultado (V/D) va del lado de afuera de cada equipo
@@ -60,7 +64,7 @@ export function matchCard(m: Match, tz: string): string {
   const middle = m.score ? `<span class="score">${m.score[0]}–${m.score[1]}</span>` : '<span class="vs">VS</span>';
   const footRight = m.status === 'live' ? 'Se actualiza cada hora' : escapeHtml(time);
   return `
-    <article class="bezel${m.status === 'live' ? ' live' : ''}">
+    <article class="bezel${m.status === 'live' ? ' live' : m.status === 'finished' ? ' done' : ''}">
       <div class="core match">
         <div class="match-head">${head(m, time)}<span class="label">${escapeHtml(roundLabel(m.round))} · Bo${m.best_of}</span></div>
         <div class="teams">${teamSide(m, 'team1')}${middle}${teamSide(m, 'team2')}</div>

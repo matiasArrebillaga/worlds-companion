@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { favorite, gameOdds, upcomingPredicted, verdict } from './predictions';
+import { favorite, gameOdds, verdict } from './predictions';
 import type { Match, Prediction } from './types';
 
 const pred = (p: number, frozen = true): Prediction => ({ p_team1_game: p, p_team1_series: p, model_version: 'elo-1', frozen });
@@ -31,17 +31,6 @@ describe('verdict', () => {
   it('ignores unfinished matches and predictions that were not frozen', () => {
     expect(verdict(match({ prediction: pred(0.7) }))).toBeNull();
     expect(verdict(match({ status: 'finished', winner: 'team1', prediction: pred(0.7, false) }))).toBeNull();
-  });
-});
-
-describe('upcomingPredicted', () => {
-  it('keeps upcoming matches that have a prediction', () => {
-    const list = upcomingPredicted([
-      match({ id: 'a', prediction: pred(0.6) }),
-      match({ id: 'b' }),
-      match({ id: 'c', status: 'finished', winner: 'team1', prediction: pred(0.6) }),
-    ]);
-    expect(list.map((m) => m.id)).toEqual(['a']);
   });
 });
 

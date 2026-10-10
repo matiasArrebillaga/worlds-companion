@@ -14,11 +14,6 @@ export function verdict(m: Match): 'hit' | 'miss' | null {
   return favorite(m) === m.winner ? 'hit' : 'miss';
 }
 
-// Próximos partidos con predicción, en el orden del calendario
-export function upcomingPredicted(matches: Match[]): Match[] {
-  return matches.filter((m) => m.status === 'upcoming' && m.prediction !== null);
-}
-
 // En los Bo5, la chance del favorito de la serie en cada partida: muestra que un 90% de serie
 // suele ser "solo" un 75% por partida (ganar al mejor de 5 amplifica la ventaja)
 export function gameOdds(m: Match): { short: string; p: number } | null {

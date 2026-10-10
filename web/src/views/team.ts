@@ -7,7 +7,7 @@ import type { TeamEntry, TeamStats } from '../types';
 let period: Period = 'season';
 
 export function notFound(what: string): string {
-  return `<div class="state"><b>No encontramos ${what}</b><span><a href="#/estadisticas">Volver a Estadísticas</a></span></div>`;
+  return `<div class="state"><b>No encontramos ${what}</b><span><a href="#/equipos">Volver a Equipos</a></span></div>`;
 }
 
 // KPIs de un equipo (también los usa la página de partido)

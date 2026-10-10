@@ -1,25 +1,35 @@
 :root {
   color-scheme: dark;
-  --bg: #0A0E1A;
-  --sunken: #070A13;
-  --card: #131A2B;
-  --raised: #1A2338;
-  --line: #24304A;
-  --line-ctl: #56658A;
-  --fg: #E8ECF4;
-  --fg2: #8A95AD;
-  --gold: #C8A24A;
-  --gold-soft: rgba(200, 162, 74, .13);
-  --cyan: #3FC1C9;
-  --cyan-soft: rgba(63, 193, 201, .12);
-  --win: #4CAF7A;
-  --loss: #E0565B;
-  --blue: #4A8FE7;
-  --blue-soft: rgba(74, 143, 231, .16);
-  --red: #E8784F;
-  --red-soft: rgba(232, 120, 79, .16);
-  --bezel-a: rgba(200, 162, 74, .22);
-  --bezel-b: rgba(63, 193, 201, .12);
+  --bg: #05070E;
+  --sunken: #020309;
+  --card: #111A2E;
+  --raised: #1C2842;
+  --card-hi: #24324F;
+  --line: #2A3858;
+  --line-ctl: #6A7AA3;
+  --fg: #F5F7FC;
+  --fg2: #A6B1C8;
+  --fg3: #6F7B96;
+  --gold: #D4AE52;
+  --gold-soft: rgba(212, 174, 82, .14);
+  --cyan: #45CCD4;
+  --cyan-soft: rgba(69, 204, 212, .13);
+  --win: #52C285;
+  --loss: #F0606A;
+  --blue: #4F95F0;
+  --blue-soft: rgba(79, 149, 240, .18);
+  --red: #F07F55;
+  --red-soft: rgba(240, 127, 85, .17);
+  --bezel-a: rgba(212, 174, 82, .24);
+  --bezel-b: rgba(69, 204, 212, .14);
+  /* Regiones (las usa theme/regions.ts) */
+  --region-kr: #F2F4F8;
+  --region-cn: #E8424F;
+  --region-eu: #4DD9E8;
+  --region-na: #4F7BFF;
+  --region-br: #3DDC84;
+  --region-apac: #A57CFF;
+  --region-other: #6F7B96;
   --f-display: "Saira Condensed", "Arial Narrow", sans-serif;
   --f-body: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
   --f-data: "JetBrains Mono", ui-monospace, Consolas, monospace;
@@ -78,7 +88,7 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 .core {
   background: var(--card);
   clip-path: polygon(var(--c) 0, 100% 0, 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, 0 100%, 0 var(--c));
-  box-shadow: inset 0 1px 0 rgba(232, 236, 244, .06);
+  box-shadow: inset 0 1px 0 rgba(245, 247, 252, .07);
   padding: 18px;
   height: 100%;
   min-width: 0;
@@ -89,7 +99,7 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
   position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
   display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
   max-width: 1180px; margin: 12px auto 0; padding: 10px 18px;
-  background: rgba(19, 26, 43, .82); backdrop-filter: blur(12px);
+  background: rgba(17, 26, 46, .85); backdrop-filter: blur(12px);
   border: 1px solid var(--line);
   clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
 }
@@ -107,7 +117,7 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 /* Barra inferior (celular) */
 .bottombar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-  display: grid; grid-template-columns: repeat(5, 1fr);
+  display: grid; grid-template-columns: repeat(3, 1fr);
   background: var(--card); border-top: 1px solid var(--line);
   padding: 8px 4px calc(10px + env(safe-area-inset-bottom, 0px));
 }
@@ -123,9 +133,9 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 .pill.cyan { color: var(--cyan); background: var(--cyan-soft); border-color: transparent; }
 .res { font: 700 12px/1 var(--f-data); width: 24px; height: 24px; display: inline-grid; place-items: center; flex: none; }
 .res.w { color: var(--bg); background: var(--win); }
-.res.l { color: var(--loss); border: 1px solid var(--loss); }
+.res.l { color: var(--bg); background: var(--loss); }
 .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); animation: pulse 2.4s var(--ease) infinite; }
-@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(63,193,201,.6); } 70% { box-shadow: 0 0 0 8px rgba(63,193,201,0); } 100% { box-shadow: 0 0 0 0 rgba(63,193,201,0); } }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(69,204,212,.6); } 70% { box-shadow: 0 0 0 8px rgba(69,204,212,0); } 100% { box-shadow: 0 0 0 0 rgba(69,204,212,0); } }
 
 /* Tarjeta de partido */
 .match { display: grid; gap: 14px; }
@@ -140,10 +150,8 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 .score { font: 700 1.8rem/1 var(--f-display); font-variant-numeric: tabular-nums; }
 .foot { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font: 12px var(--f-data); color: var(--fg2); }
 
-/* Hoy */
-.feature .core { padding: 24px; display: grid; gap: 20px; background:
-  radial-gradient(120% 90% at 0% 0%, var(--blue-soft), transparent 55%),
-  radial-gradient(120% 90% at 100% 100%, var(--red-soft), transparent 55%), var(--card); }
+/* Próximo partido (tarjeta destacada) */
+.feature .core { padding: 24px; display: grid; gap: 20px; }
 .feature .tag { font-size: clamp(2.2rem, 8vw, 3.4rem); }
 .countdown { display: flex; gap: 18px; justify-content: center; }
 .countdown div { display: grid; justify-items: center; }
@@ -240,16 +248,12 @@ h1 a { text-decoration: none; }
 /* Calendario: Suiza y Bracket */
 .pill.win { color: var(--win); border-color: var(--win); }
 .pill.loss { color: var(--loss); border-color: var(--loss); }
-.swiss, .bracket { display: grid; gap: 24px; }
+.bracket { display: grid; gap: 24px; }
 @media (min-width: 860px) {
-  .swiss { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: start; }
   .bracket { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: center; }
 }
-.swiss-round h3 { margin: 8px 0 0; }
 
 .chart-box { position: relative; height: 240px; }
-/* Con 5 pestañas, en celulares angostos "Predicciones" no entra con el tamaño normal */
-@media (max-width: 400px) { .bottombar a { font-size: 9px; letter-spacing: 0; } }
 
 /* ================= Estadísticas y Meta =================
    PC: tabla aireada (filas de 60 px, la columna que ordena resaltada) y tablero de módulos.
@@ -455,4 +459,102 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
   .lrow:not(.head), .formrow { min-height: 58px; padding: 8px 12px; border-bottom: 0; background: var(--sunken); }
   .lrow:not(.head) + .lrow, .formrow + .formrow { margin-top: 6px; }
   .lrow.head { padding: 0 12px 4px; }
+}
+
+/* ================= Calendario (inicio) =================
+   PC: línea de tiempo (una tarjeta por fila) + columna lateral fija con lo de hoy.
+   Celular: solo la línea de tiempo. La vista abre en #hoy (próximo partido o ronda en curso). */
+
+#hoy { scroll-margin-top: 84px; }
+/* Que se vea también el título del día, arriba de la tarjeta */
+#hoy.feature { scroll-margin-top: 128px; }
+.mu.tbd { color: var(--fg2); font-size: 13px; }
+.cal { display: grid; gap: 28px; align-items: start; }
+@media (min-width: 960px) { .cal { grid-template-columns: minmax(0, 1fr) 300px; } }
+@media (max-width: 959px) { .cal-aside { display: none; } }
+.cal-aside { position: sticky; top: 84px; display: grid; gap: 14px; }
+.panel { background: var(--raised); padding: 16px; display: grid; gap: 2px;
+  clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut)); }
+.panel h2 { margin-bottom: 6px; }
+.panel .row .m em { font-style: normal; color: var(--fg3); }
+.timeline { gap: 28px; }
+.day-list { display: grid; gap: 12px; }
+
+/* Sigla con el rombito del color de la región */
+.tag, .tm { --rc: var(--region-other); }
+.tag { display: inline-flex; align-items: center; gap: 8px; }
+.rg { width: 7px; height: 7px; background: var(--rc); transform: rotate(45deg); flex: none; }
+
+/* Tonos de tarjeta según el estado: jugado (apagado), próximo (más claro, borde dorado), en curso (cian) */
+.bezel.done .core { background: color-mix(in oklab, var(--card) 70%, var(--bg)); }
+.bezel.done .tag, .bezel.done .score { color: var(--fg2); }
+.feature { --c: 14px; background: linear-gradient(135deg, var(--gold), var(--line) 35%, var(--line) 65%, var(--cyan)); }
+.feature .core { background:
+  radial-gradient(110% 90% at 0% 0%, var(--blue-soft), transparent 55%),
+  radial-gradient(110% 90% at 100% 100%, var(--red-soft), transparent 55%), var(--card-hi); }
+.feature.live { background: linear-gradient(135deg, var(--cyan), var(--line) 35%, var(--line) 65%, var(--cyan)); }
+@media (max-width: 859px) {
+  /* En celular el próximo partido se destaca igual, pero ocupa menos pantalla */
+  .feature .core { padding: 16px; gap: 14px; }
+  .feature .tag { font-size: 1.9rem; }
+  .countdown b { font-size: 1.15rem; }
+}
+
+/* ================= Suiza (estructura de lolesports) =================
+   PC: una columna por ronda, lado a lado. Celular: rondas apiladas, cruces de a dos por fila. Nada se desliza de costado. */
+
+.sw-cols { display: grid; gap: 18px; }
+@media (min-width: 860px) { .sw-cols { grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); align-items: start; } }
+.sw-col { display: grid; gap: 12px; align-content: start; min-width: 0; }
+.grp { background: var(--card); border: 1px solid var(--line); }
+.grp-h { --tint: var(--raised); --amt: 0%; display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 7px 10px;
+  font: 700 13px/1 var(--f-data); font-variant-numeric: tabular-nums;
+  background: color-mix(in oklab, var(--tint) var(--amt), var(--raised)); }
+.grp-h small { font: 700 10px/1 var(--f-data); letter-spacing: .1em; border: 1px solid currentColor; padding: 3px 5px; }
+.mu { padding: 6px 10px; border-top: 1px solid var(--line); display: grid; gap: 3px; }
+.mu .vs { display: none; }
+.ln { display: grid; grid-template-columns: 20px 1fr auto; gap: 8px; align-items: center; }
+.ln .res { width: 20px; height: 20px; font-size: 11px; }
+.res-slot { width: 20px; height: 20px; }
+.ln.lose { opacity: .55; }
+.ln .s { font: 700 13px var(--f-data); font-variant-numeric: tabular-nums; }
+.ln.hl { background: var(--gold-soft); box-shadow: inset 2px 0 0 var(--gold); }
+.tm { font: 700 1.05rem/1 var(--f-display); letter-spacing: .04em; text-transform: uppercase; display: inline-flex; gap: 7px; align-items: center;
+  background: none; border: 0; color: var(--fg); padding: 4px 0; cursor: pointer; min-width: 0; }
+.tm.hl { color: var(--gold); }
+.grp.end .grp-h { justify-content: flex-start; }
+.grp.end.q .grp-h { --tint: var(--win); --amt: 60%; }
+.grp.end.e .grp-h { --tint: var(--loss); --amt: 60%; }
+.slot { padding: 8px 10px; border-top: 1px solid var(--line); display: flex; gap: 6px 12px; align-items: center; flex-wrap: wrap; min-height: 40px; }
+.slot b { font: 700 13px var(--f-data); width: 30px; }
+@media (max-width: 859px) {
+  .grp:not(.end) { display: grid; grid-template-columns: 1fr 1fr; }
+  .grp:not(.end) .grp-h { grid-column: 1 / -1; }
+  .mu { padding: 6px 8px; }
+  /* El encabezado también es un div: los cruces de la columna derecha quedan en posiciones impares */
+  .mu:nth-of-type(odd) { border-left: 1px solid var(--line); }
+  .mu:nth-of-type(even):last-child { grid-column: 1 / -1; }
+  .ln { grid-template-columns: 20px 1fr auto; gap: 6px; }
+  .tm { font-size: .95rem; }
+  /* Cruce por jugar: una sola línea "GEN VS BLG" */
+  .mu.up { display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .mu.up .vs { display: inline; font-size: 10px; }
+  .mu.up .ln { display: block; }
+  .mu.up .res-slot, .mu.up .s { display: none; }
+}
+
+/* ================= Predicciones: lista de aciertos ================= */
+.hits { display: grid; }
+.hit-row { display: grid; grid-template-columns: 64px 1fr auto auto; gap: 12px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
+.hit-row:first-child { border-top: 0; }
+.hit-row .d { font: 12px var(--f-data); color: var(--fg2); }
+.hit-row .m { font: 600 1.05rem/1.2 var(--f-display); letter-spacing: .04em; text-transform: uppercase; min-width: 0; }
+.hit-row .m small { display: block; font: 500 11.5px/1.3 var(--f-data); letter-spacing: 0; text-transform: none; color: var(--fg2); }
+.hit-row .s { font: 700 14px var(--f-data); font-variant-numeric: tabular-nums; }
+.mark { font: 700 11px/1 var(--f-data); letter-spacing: .06em; text-transform: uppercase; padding: 6px 8px; border: 1px solid; white-space: nowrap; }
+.mark.hit { color: var(--win); }
+.mark.miss { color: var(--loss); }
+@media (max-width: 480px) {
+  .hit-row { grid-template-columns: 1fr auto; }
+  .hit-row .d { grid-column: 1 / -1; }
 }

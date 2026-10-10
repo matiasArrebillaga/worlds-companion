@@ -1,16 +1,23 @@
 import type { SiteData } from '../data';
+import { formatDayShort, formatPercent, roundLabel } from '../format';
 import { escapeHtml } from '../html';
-import { upcomingPredicted } from '../predictions';
-import type { CalibrationBucket, Elo } from '../types';
-import { matchCard } from './matchCard';
+import { favorite, verdict } from '../predictions';
+import { dayKeyOf } from '../schedule';
+import type { CalibrationBucket, Elo, Match } from '../types';
 
-type Tab = 'proximos' | 'ranking' | 'como' | 'aciertos';
-const TABS: [Tab, string][] = [['proximos', 'Próximos'], ['ranking', 'Ranking'], ['como', 'Cómo funciona'], ['aciertos', 'Aciertos']];
+// Sub-vista Predicciones del calendario: Aciertos (Resumen | Partidos) y Cómo funciona.
+// Los próximos partidos ya muestran su probabilidad en el calendario y el Elo está en Equipos.
+type Tab = 'aciertos' | 'como';
+type HitsTab = 'resumen' | 'partidos';
+type Filter = 'all' | 'hit' | 'miss';
+const TABS: [Tab, string][] = [['aciertos', 'Aciertos'], ['como', 'Cómo funciona']];
+const HITS_TABS: [HitsTab, string][] = [['resumen', 'Resumen'], ['partidos', 'Partidos']];
+const FILTERS: [Filter, string][] = [['all', 'Todos'], ['hit', 'Acertados'], ['miss', 'Errados']];
 
-// La sub-vista se recuerda mientras la página esté abierta
-let current: Tab = 'proximos';
+// Lo elegido se recuerda mientras la página esté abierta
+const state: { tab: Tab; hits: HitsTab; filter: Filter } = { tab: 'aciertos', hits: 'resumen', filter: 'all' };
 
-const BO1_NOTE = '<p class="note">Los Bo1 tienen alta varianza: una sola partida decide la serie, así que un favorito al 65% pierde una de cada tres. Mirá el porcentaje, no solo quién es el favorito.</p>';
+export const BO1_NOTE = '<p class="note">Los Bo1 tienen alta varianza: una sola partida decide la serie, así que un favorito al 65% pierde una de cada tres. Mirá el porcentaje, no solo quién es el favorito.</p>';
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 
@@ -18,31 +25,10 @@ function empty(title: string, detail: string): string {
   return `<div class="state"><b>${title}</b><span>${detail}</span></div>`;
 }
 
-function upcoming(data: SiteData, tz: string): string {
-  const list = upcomingPredicted(data.schedule.matches);
-  const body = list.length
-    ? `<div class="grid g3">${list.map((m) => matchCard(m, tz)).join('')}</div>`
-    : empty('Todavía no hay cruces definidos', 'Las predicciones aparecen cuando Leaguepedia confirma qué equipos juegan cada partido. Mientras tanto, mirá el ranking.');
-  return `${BO1_NOTE}${body}`;
-}
-
-function ranking(elo: Elo): string {
-  if (!elo.teams.length) return empty('Sin equipos todavía', 'El ranking aparece cuando se conozcan los clasificados.');
-  const rows = elo.teams.map((t, i) => `
-    <tr>
-      <td class="num">${i + 1}</td>
-      <td class="team"><b>${escapeHtml(t.short)}</b><span class="muted">${escapeHtml(t.name)}</span></td>
-      <td>${escapeHtml(t.region ?? '—')}</td>
-      <td class="num">${Math.round(t.rating)}</td>
-      <td class="num">${t.games}</td>
-    </tr>`).join('');
-  return `
-    <p class="muted">Rating Elo de los clasificados, calculado con todas las partidas de 2026 (ligas e internacionales). 100 puntos de diferencia ≈ 64% de ganar una partida.</p>
-    <p class="note">El ranking muestra solo el Elo. Las predicciones además suman la forma reciente de los jugadores de cada rol, así que un equipo puede estar más abajo en el ranking y aun así ser favorito.</p>
-    <div class="table-wrap"><table class="rank">
-      <thead><tr><th class="num">#</th><th>Equipo</th><th>Región</th><th class="num">Elo</th><th class="num">Partidas</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table></div>`;
+function seg(group: string, options: [string, string][], selected: string, label: string, small = false): string {
+  const buttons = options.map(([id, text]) =>
+    `<button type="button" data-${group}="${id}" aria-pressed="${id === selected}">${escapeHtml(text)}</button>`).join('');
+  return `<div class="seg${small ? ' small' : ''}" role="group" aria-label="${label}">${buttons}</div>`;
 }
 
 function howItWorks(elo: Elo): string {
@@ -83,7 +69,7 @@ function calibrationRow(c: CalibrationBucket): string {
     </div>`;
 }
 
-function hits(elo: Elo): string {
+function summary(elo: Elo): string {
   const a = elo.accuracy;
   if (!a.n || a.accuracy === null || a.brier === null) {
     return empty('Todavía no hay partidos evaluados', 'Cada predicción se evalúa cuando termina su partido. Solo cuentan las que se guardaron antes de empezar.');
@@ -98,29 +84,53 @@ function hits(elo: Elo): string {
     <div class="calib">${a.calibration.map(calibrationRow).join('')}</div>`;
 }
 
-export function renderPredictions(el: HTMLElement, data: SiteData, tz: string): () => void {
-  const body = current === 'proximos' ? upcoming(data, tz)
-    : current === 'ranking' ? ranking(data.elo)
-    : current === 'como' ? howItWorks(data.elo)
-    : hits(data.elo);
-  const buttons = TABS.map(
-    ([id, label]) => `<button type="button" data-sub="${id}" aria-pressed="${id === current}">${label}</button>`,
-  ).join('');
+// Una fila por partido evaluado: quién era favorito, cómo terminó y si el modelo acertó
+function hitRow(m: Match, tz: string): string {
+  const fav = favorite(m);
+  if (!m.team1 || !m.team2 || !m.prediction || !fav) return '';
+  const p = fav === 'team1' ? m.prediction.p_team1_series : 1 - m.prediction.p_team1_series;
+  const day = dayKeyOf(m, tz);
+  const v = verdict(m);
+  return `
+    <div class="hit-row">
+      <span class="d">${day ? escapeHtml(formatDayShort(day)) : '—'}</span>
+      <span class="m">${escapeHtml(m.team1.short)} vs ${escapeHtml(m.team2.short)}<small>Favorito: ${escapeHtml(m[fav]!.short)} ${formatPercent(p)} · ${escapeHtml(roundLabel(m.round))} · Bo${m.best_of}</small></span>
+      <span class="s">${m.score ? `${m.score[0]}–${m.score[1]}` : ''}</span>
+      <span class="mark ${v}">${v === 'hit' ? '✓ Acertó' : '✗ Falló'}</span>
+    </div>`;
+}
 
-  el.innerHTML = `
+function matchList(matches: Match[], tz: string): string {
+  // Más recientes primero
+  const judged = matches.filter((m) => verdict(m) !== null).reverse();
+  if (!judged.length) {
+    return empty('Todavía no hay partidos evaluados', 'Cuando termine un partido con predicción guardada, aparece acá con su resultado.');
+  }
+  const visible = state.filter === 'all' ? judged : judged.filter((m) => verdict(m) === state.filter);
+  const rows = visible.map((m) => hitRow(m, tz)).join('');
+  return `
+    ${seg('pfilter', FILTERS, state.filter, 'Filtrar partidos', true)}
+    ${rows ? `<div class="hits">${rows}</div>` : empty('No hay partidos con este filtro', 'Probá con "Todos".')}`;
+}
+
+export function predictionsView(data: SiteData, tz: string): string {
+  const body = state.tab === 'como' ? howItWorks(data.elo)
+    : `${seg('phits', HITS_TABS, state.hits, 'Aciertos', true)}
+       ${state.hits === 'resumen' ? summary(data.elo) : matchList(data.schedule.matches, tz)}`;
+  return `
     <section class="stack">
       <span class="eyebrow">Modelo ${escapeHtml(data.elo.model_version)}</span>
-      <h1>Predicciones</h1>
-      <div class="seg" role="group" aria-label="Secciones de predicciones">${buttons}</div>
-    </section>
-    <section class="stack">${body}</section>`;
+      ${seg('ptab', TABS, state.tab, 'Secciones de predicciones')}
+      ${body}
+    </section>`;
+}
 
-  el.querySelector('.seg')?.addEventListener('click', (event) => {
-    const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button[data-sub]');
-    if (!button) return;
-    current = button.dataset.sub as Tab;
-    renderPredictions(el, data, tz);
-    el.querySelector<HTMLButtonElement>(`button[data-sub="${current}"]`)?.focus();
-  });
-  return () => {};
+// Botones propios de esta sub-vista; devuelve true si cambió algo y hay que redibujar
+export function handlePredictionsClick(button: HTMLButtonElement): boolean {
+  const d = button.dataset;
+  if (d.ptab) state.tab = d.ptab as Tab;
+  else if (d.phits) state.hits = d.phits as HitsTab;
+  else if (d.pfilter) state.filter = d.pfilter as Filter;
+  else return false;
+  return true;
 }

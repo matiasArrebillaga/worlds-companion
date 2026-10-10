@@ -4,7 +4,7 @@ import { parseHash, tabFor } from './router';
 describe('parseHash', () => {
   it('splits the section and the id', () => {
     expect(parseHash('#/equipo/gen-g')).toEqual({ path: '#/equipo', param: 'gen-g' });
-    expect(parseHash('#/estadisticas')).toEqual({ path: '#/estadisticas', param: null });
+    expect(parseHash('#/equipos')).toEqual({ path: '#/equipos', param: null });
     expect(parseHash('')).toEqual({ path: '#/', param: null });
     expect(parseHash('#/')).toEqual({ path: '#/', param: null });
     expect(parseHash('#/jugador/k%C3%ADin')).toEqual({ path: '#/jugador', param: 'kíin' });
@@ -12,11 +12,19 @@ describe('parseHash', () => {
 });
 
 describe('tabFor', () => {
-  it('lights the Estadísticas tab on team and player pages', () => {
-    expect(tabFor('#/equipo')).toBe('#/estadisticas');
-    expect(tabFor('#/jugador')).toBe('#/estadisticas');
-    expect(tabFor('#/calendario')).toBe('#/calendario');
+  it('lights the Equipos tab on team and player pages', () => {
+    expect(tabFor('#/equipo')).toBe('#/equipos');
+    expect(tabFor('#/jugador')).toBe('#/equipos');
+    expect(tabFor('#/')).toBe('#/');
     expect(tabFor('#/partido')).toBeNull();
+  });
+});
+
+describe('parseHash with old links', () => {
+  it('sends the removed sections to their new place', () => {
+    expect(parseHash('#/calendario')).toEqual({ path: '#/', param: null });
+    expect(parseHash('#/predicciones')).toEqual({ path: '#/', param: null });
+    expect(parseHash('#/estadisticas')).toEqual({ path: '#/equipos', param: null });
   });
 });
 

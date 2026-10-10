@@ -51,6 +51,12 @@ export function formatDayHeading(dayKey: string): string {
     .format(new Date(`${dayKey}T12:00:00Z`));
 }
 
+// "17 oct": para listas donde el día largo no entra
+export function formatDayShort(dayKey: string): string {
+  return new Intl.DateTimeFormat(LOCALE, { day: 'numeric', month: 'short', timeZone: 'UTC' })
+    .format(new Date(`${dayKey}T12:00:00Z`)).replace('.', '');
+}
+
 export function relativeTime(fromIso: string, now: Date): string {
   const minutes = Math.floor((now.getTime() - new Date(fromIso).getTime()) / 60_000);
   if (minutes < 1) return 'hace un momento';
