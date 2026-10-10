@@ -181,6 +181,7 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 .bar i { display: block; height: 100%; background: var(--cyan); transform-origin: left; animation: grow .7s var(--ease); }
 .bar.gold i { background: var(--gold); }
 @keyframes grow { from { transform: scaleX(0); } }
+.pred-game { margin: 0; font: 500 12px/1.2 var(--f-data); color: var(--fg2); font-variant-numeric: tabular-nums; }
 .verdict { font: 600 12px/1 var(--f-data); letter-spacing: .06em; text-transform: uppercase; }
 .verdict.hit { color: var(--win); }
 .verdict.miss { color: var(--loss); }

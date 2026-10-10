@@ -1,6 +1,6 @@
 import { formatPercent, formatTime, PHASE_LABELS, roundLabel } from '../format';
 import { escapeHtml } from '../html';
-import { favorite, verdict } from '../predictions';
+import { favorite, gameOdds, verdict } from '../predictions';
 import type { Match } from '../types';
 
 type Side = 'team1' | 'team2';
@@ -43,12 +43,16 @@ export function predictionBlock(m: Match): string {
     ? '<span class="verdict hit">✓ El modelo acertó</span>'
     : v === 'miss' ? '<span class="verdict miss">✗ El modelo falló</span>' : '';
   const label = `Probabilidad de ganar la serie: ${escapeHtml(m.team1.short)} ${p1}, ${escapeHtml(m.team2.short)} ${p2}`;
+  const odds = gameOdds(m);
+  const oddsHtml = odds
+    ? `<p class="pred-game">Por partida: ${escapeHtml(odds.short)} ${formatPercent(odds.p)}</p>`
+    : '';
   return `
     <div class="pred" role="img" aria-label="${label}">
       <span class="pct${fav === 'team1' ? ' fav' : ''}">${p1}</span>
       <span class="bar" aria-hidden="true"><i style="width:${(p.p_team1_series * 100).toFixed(1)}%"></i></span>
       <span class="pct${fav === 'team2' ? ' fav' : ''}">${p2}</span>
-    </div>${verdictHtml}`;
+    </div>${oddsHtml}${verdictHtml}`;
 }
 
 export function matchCard(m: Match, tz: string): string {

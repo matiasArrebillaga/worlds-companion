@@ -18,3 +18,13 @@ export function verdict(m: Match): 'hit' | 'miss' | null {
 export function upcomingPredicted(matches: Match[]): Match[] {
   return matches.filter((m) => m.status === 'upcoming' && m.prediction !== null);
 }
+
+// En los Bo5, la chance del favorito de la serie en cada partida: muestra que un 90% de serie
+// suele ser "solo" un 75% por partida (ganar al mejor de 5 amplifica la ventaja)
+export function gameOdds(m: Match): { short: string; p: number } | null {
+  const p = m.prediction;
+  if (m.best_of !== 5 || !p || !m.team1 || !m.team2) return null;
+  return favorite(m) === 'team1'
+    ? { short: m.team1.short, p: p.p_team1_game }
+    : { short: m.team2.short, p: 1 - p.p_team1_game };
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { favorite, upcomingPredicted, verdict } from './predictions';
+import { favorite, gameOdds, upcomingPredicted, verdict } from './predictions';
 import type { Match, Prediction } from './types';
 
 const pred = (p: number, frozen = true): Prediction => ({ p_team1_game: p, p_team1_series: p, model_version: 'elo-1', frozen });
@@ -42,5 +42,20 @@ describe('upcomingPredicted', () => {
       match({ id: 'c', status: 'finished', winner: 'team1', prediction: pred(0.6) }),
     ]);
     expect(list.map((m) => m.id)).toEqual(['a']);
+  });
+});
+
+describe('gameOdds', () => {
+  const bo5 = (pGame: number, pSeries: number) =>
+    match({ best_of: 5, prediction: { p_team1_game: pGame, p_team1_series: pSeries, model_version: 'elo-2', frozen: false } });
+
+  it('shows the per-game chance of the series favorite in a Bo5', () => {
+    expect(gameOdds(bo5(0.75, 0.9))).toEqual({ short: 'T1', p: 0.75 });
+    expect(gameOdds(bo5(0.3, 0.1))).toEqual({ short: 'G2', p: 0.7 });
+  });
+
+  it('is only for Bo5 with both teams and a prediction', () => {
+    expect(gameOdds(match({ best_of: 3, prediction: pred(0.6) }))).toBeNull();
+    expect(gameOdds(match({ best_of: 5 }))).toBeNull();
   });
 });
