@@ -83,8 +83,8 @@ export function axis(ticks: number[], min: number, max: number, format: (v: numb
 }
 
 // Notas largas plegadas: la explicación está, pero no compite con los datos
-export function how(text: string): string {
-  return `<details class="how"><summary>¿Cómo se lee?</summary><p>${text}</p></details>`;
+export function how(text: string, question = '¿Cómo se lee?'): string {
+  return `<details class="how"><summary>${question}</summary><p>${text}</p></details>`;
 }
 
 // Pestañas de sección (subrayadas) y filtros (chips que bajan de línea, nunca se deslizan)

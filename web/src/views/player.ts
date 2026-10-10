@@ -3,6 +3,7 @@ import { escapeHtml } from '../html';
 import { FEW_GAMES, findById, fmt, PERIODS, pct, periodOf, ROLE_LABELS, signed, type Period } from '../stats';
 import type { PlayerEntry, PlayerStats } from '../types';
 import { notFound } from './team';
+import { how } from './ui';
 
 let period: Period = 'season';
 
@@ -58,7 +59,7 @@ export function renderPlayer(el: HTMLElement, data: SiteData, tz: string, param:
       <h1>${escapeHtml(p.name)}</h1>
       ${p.form != null ? `<p class="muted">Forma según el modelo: <b>${signed(p.form, 2)}</b> desvíos sobre el promedio de su rol (<a href="#/equipos">ver ranking en Equipos › Análisis</a>)</p>` : ''}
       <div class="seg" role="group" aria-label="Período">${buttons}</div>
-      ${s && s.games < FEW_GAMES ? `<p class="note">Solo ${s.games} partidas: con tan pocas, estos números dicen poco.</p>` : ''}
+      ${s && s.games < FEW_GAMES ? how(`Solo ${s.games} partidas: con tan pocas, estos números dicen poco.`, '¿Cuánto confiar en estos números?') : ''}
       ${s ? kpis(s) : '<div class="state"><b>Todavía no jugó en Worlds 2026</b></div>'}
     </section>
     ${s ? `<section class="stack"><h2>Campeones</h2>${champions(s)}</section>` : ''}

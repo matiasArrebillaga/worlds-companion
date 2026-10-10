@@ -4,6 +4,7 @@ import { escapeHtml } from '../html';
 import { favorite, verdict } from '../predictions';
 import { dayKeyOf } from '../schedule';
 import type { CalibrationBucket, Elo, Match } from '../types';
+import { how } from './ui';
 
 // Sub-vista Predicciones del calendario: Aciertos (Resumen | Partidos) y Cómo funciona.
 // Los próximos partidos ya muestran su probabilidad en el calendario y el Elo está en Equipos.
@@ -17,7 +18,8 @@ const FILTERS: [Filter, string][] = [['all', 'Todos'], ['hit', 'Acertados'], ['m
 // Lo elegido se recuerda mientras la página esté abierta
 const state: { tab: Tab; hits: HitsTab; filter: Filter } = { tab: 'aciertos', hits: 'resumen', filter: 'all' };
 
-export const BO1_NOTE = '<p class="note">Los Bo1 tienen alta varianza: una sola partida decide la serie, así que un favorito al 65% pierde una de cada tres. Mirá el porcentaje, no solo quién es el favorito.</p>';
+// Plegado como el resto de las explicaciones: está, pero solo se abre si el usuario quiere
+export const BO1_NOTE = how('Los Bo1 tienen alta varianza: una sola partida decide la serie, así que un favorito al 65% pierde una de cada tres. Mirá el porcentaje, no solo quién es el favorito.', '¿Por qué el favorito puede perder un Bo1?');
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 

@@ -193,7 +193,6 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 .verdict { font: 600 12px/1 var(--f-data); letter-spacing: .06em; text-transform: uppercase; }
 .verdict.hit { color: var(--win); }
 .verdict.miss { color: var(--loss); }
-.note { margin: 0; border-left: 2px solid var(--gold); padding: 10px 14px; background: var(--gold-soft); font-size: 14px; }
 .prose h2 { margin: 8px 0 0; }
 .prose p { margin: 0; max-width: 70ch; }
 
