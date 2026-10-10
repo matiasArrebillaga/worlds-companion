@@ -80,7 +80,8 @@ cd web && npm run build         # build de producción
 - **Calendario**: lista por día | Suiza (tabla de récords) | Bracket.
 - **Estadísticas**: Equipos | Jugadores | Análisis (temporada vs. contra equipos de Worlds, forma del modelo), con páginas por
   equipo y por jugador.
-- **Meta**: Campeones | Draft | Lados | Ritmo | Regiones | Análisis (ruido vs. señal, winrate ajustado, rangos, flex).
+- **Meta**: Campeones (draft, rendimiento y resultado) | Panorama (lados, ritmo, regiones, ruido vs. señal, espejismos, flex,
+  cambios del parche).
 - **Predicciones**: próximos partidos | cómo funciona | aciertos.
 - **Partido**: head-to-head.
 
