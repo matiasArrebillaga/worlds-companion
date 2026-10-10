@@ -78,6 +78,7 @@ def test_finished_match_shape():
         "score": [1, 0],
         "winner": "team1",
         "status": "finished",
+        "prediction": None,
     }
 
 
@@ -95,6 +96,11 @@ def test_tbd_team_becomes_none():
 def test_unknown_short_falls_back_to_name():
     [match] = build_schedule([row(Team2="New Team")], SHORTS)
     assert match["team2"] == {"name": "New Team", "short": "New Team"}
+
+
+def test_unknown_short_drops_disambiguation_in_parentheses():
+    [match] = build_schedule([row(Team2="LYON (2024 American Team)")], SHORTS)
+    assert match["team2"] == {"name": "LYON (2024 American Team)", "short": "LYON"}
 
 
 def test_nullified_matches_are_dropped():

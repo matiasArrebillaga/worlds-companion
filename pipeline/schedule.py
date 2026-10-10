@@ -1,4 +1,5 @@
 """Convierte filas crudas de MatchSchedule (Leaguepedia) al formato de schedule.json."""
+import re
 from datetime import datetime, timezone
 
 # Nombres que Leaguepedia usa para un cruce sin definir (se comparan en minúsculas)
@@ -8,7 +9,7 @@ WINNERS = {"1": "team1", "2": "team2"}
 
 MATCH_KEYS = frozenset({
     "id", "phase", "round", "best_of", "start_utc", "date",
-    "team1", "team2", "score", "winner", "status",
+    "team1", "team2", "score", "winner", "status", "prediction",
 })
 
 
@@ -50,11 +51,17 @@ def status_of(row: dict) -> str:
     return "upcoming"
 
 
+def short_name(name: str, shorts: dict[str, str]) -> str:
+    """Sigla del equipo; si Leaguepedia no la tiene, el nombre sin la aclaración entre paréntesis
+    (ej. "LYON (2024 American Team)" → "LYON")."""
+    return shorts.get(name) or re.sub(r"\s*\(.*\)$", "", name) or name
+
+
 def _team(name: str | None, shorts: dict[str, str]) -> dict | None:
     name = (name or "").strip()
     if not name or name.lower() in UNDECIDED_TEAMS:
         return None
-    return {"name": name, "short": shorts.get(name) or name}
+    return {"name": name, "short": short_name(name, shorts)}
 
 
 def to_match(row: dict, shorts: dict[str, str]) -> dict:
@@ -73,6 +80,7 @@ def to_match(row: dict, shorts: dict[str, str]) -> dict:
         "score": score,
         "winner": WINNERS.get(row.get("Winner") or ""),
         "status": status,
+        "prediction": None,  # la agrega el build con el Elo
     }
 
 
