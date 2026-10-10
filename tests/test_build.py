@@ -91,3 +91,11 @@ def test_build_refuses_invalid_data_and_writes_nothing(tmp_path):
     with pytest.raises(ValueError, match="schedule is empty"):
         run(tmp_path)
     assert not (tmp_path / "out" / "schedule.json").exists()
+
+
+def test_build_does_not_freeze_matches_that_are_days_away(tmp_path):
+    far = {**ROW, "DateTimeUTC": "2026-10-18 18:00:00"}
+    write_raw(tmp_path / "raw", rows=[far])
+    schedule, _, _ = run(tmp_path, freeze=True)
+    assert schedule["matches"][0]["prediction"]["frozen"] is False  # se muestra, pero todavía no se congela
+    assert not (tmp_path / "predictions.jsonl").exists()

@@ -5,10 +5,15 @@ Una predicción se identifica por (partido, versión del modelo, equipo 1, equip
 corrige un cruce, el cruce nuevo recibe su propia predicción y la vieja deja de usarse.
 """
 import json
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from models.elo import MODEL_VERSION, series_probability, win_probability
 from models.metrics import summarize
+
+# Se congela recién cuando falta poco para el partido: así la predicción usa los ratings con los
+# resultados más recientes (Leaguepedia publica el cruce antes de cargar los games de la ronda anterior).
+FREEZE_WINDOW = timedelta(hours=8)
 
 
 def _key(match_id: str, version: str, team1: str, team2: str) -> tuple:
@@ -35,6 +40,8 @@ def make_predictions(schedule: list[dict], ratings: dict[str, float], now_iso: s
             continue
         if m["start_utc"] and m["start_utc"] <= now_iso:
             continue  # ya tendría que haber empezado: no se predice después de la hora
+        if not m["start_utc"] and (not m["date"] or m["date"] < now_iso[:10]):
+            continue  # sin hora confirmada y de un día que ya pasó: puede haberse jugado
         t1, t2 = m["team1"]["name"], m["team2"]["name"]
         p_game = win_probability(ratings[aliases.get(t1, t1)], ratings[aliases.get(t2, t2)])
         predictions.append({
@@ -44,6 +51,18 @@ def make_predictions(schedule: list[dict], ratings: dict[str, float], now_iso: s
             "created_at": now_iso, "model_version": MODEL_VERSION,
         })
     return predictions
+
+
+def _parse(iso: str) -> datetime:
+    return datetime.strptime(iso, "%Y-%m-%dT%H:%M:%SZ")
+
+
+def ready_to_freeze(schedule: list[dict], now_iso: str) -> set[str]:
+    """Ids de los partidos que empiezan dentro de FREEZE_WINDOW. Los que no tienen hora confirmada
+    no se congelan: no hay forma de saber si ya empezaron."""
+    now = _parse(now_iso)
+    return {m["id"] for m in schedule
+            if m["start_utc"] and now < _parse(m["start_utc"]) <= now + FREEZE_WINDOW}
 
 
 def read_frozen(path: Path) -> list[dict]:

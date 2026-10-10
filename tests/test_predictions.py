@@ -3,17 +3,18 @@ import json
 import pytest
 
 from models.elo import MODEL_VERSION
-from models.predictions import attach_predictions, evaluate, freeze, make_predictions, read_frozen
+from models.predictions import attach_predictions, evaluate, freeze, make_predictions, read_frozen, ready_to_freeze
 
 NOW = "2026-10-15T10:00:00Z"
 RATINGS = {"T1": 1600.0, "G2 Esports": 1500.0, "Fnatic": 1450.0}
 
 
-def match(mid="m1", status="upcoming", start="2026-10-15T18:00:00Z", t1="T1", t2="G2 Esports", bo=3, winner=None):
+def match(mid="m1", status="upcoming", start="2026-10-15T18:00:00Z", t1="T1", t2="G2 Esports", bo=3, winner=None,
+          date="2026-10-15"):
     def team(name):
         return {"name": name, "short": name} if name else None
     return {"id": mid, "phase": "swiss", "round": "Round 1", "best_of": bo, "start_utc": start,
-            "date": "2026-10-15", "team1": team(t1), "team2": team(t2), "score": None,
+            "date": date, "team1": team(t1), "team2": team(t2), "score": None,
             "winner": winner, "status": status, "prediction": None}
 
 
@@ -104,3 +105,13 @@ def test_evaluate_scores_only_finished_matches_with_frozen_predictions():
                 match("c", status="finished", winner="team2")]
     result = evaluate(schedule, frozen)
     assert result["n"] == 1 and result["correct"] == 1
+
+
+def test_unconfirmed_time_on_a_past_day_gets_no_prediction():
+    assert make_predictions([match(start=None, date="2026-10-14")], RATINGS, NOW) == []
+
+
+def test_only_matches_starting_soon_are_ready_to_freeze():
+    schedule = [match("soon", start="2026-10-15T16:00:00Z"), match("later", start="2026-10-17T18:00:00Z"),
+                match("no-time", start=None), match("started", start="2026-10-15T09:00:00Z")]
+    assert ready_to_freeze(schedule, NOW) == {"soon"}

@@ -8,7 +8,7 @@ import sys
 from pathlib import Path
 
 from models.elo import BACKTEST, MODEL_VERSION, PARAMS, run_elo, team_regions
-from models.predictions import attach_predictions, evaluate, freeze, make_predictions, read_frozen
+from models.predictions import attach_predictions, evaluate, freeze, make_predictions, read_frozen, ready_to_freeze
 from pipeline import utc_now_iso
 from pipeline.history import CURRENT_YEAR, load_aliases, load_season_games
 from pipeline.schedule import UNDECIDED_TEAMS, build_schedule, short_name
@@ -78,7 +78,8 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
 
     frozen = read_frozen(predictions_file)
     if freeze_predictions:
-        frozen += freeze(predictions_file, current, frozen)
+        ready = ready_to_freeze(schedule, now)
+        frozen += freeze(predictions_file, [p for p in current if p["match_id"] in ready], frozen)
     schedule = attach_predictions(schedule, frozen, current)
 
     out_dir.mkdir(parents=True, exist_ok=True)
