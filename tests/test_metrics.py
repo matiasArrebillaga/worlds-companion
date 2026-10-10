@@ -36,3 +36,28 @@ def test_summarize():
     assert s["n"] == 2 and s["correct"] == 1 and s["accuracy"] == 0.5
     assert s["brier"] == pytest.approx((0.09 + 0.36) / 2)
     assert len(s["calibration"]) == 3
+
+
+def test_log_loss_of_a_coin_is_log_two():
+    from math import log
+
+    from models.metrics import log_loss
+    assert log_loss([0.5, 0.5], [1.0, 0.0]) == pytest.approx(log(2))
+
+
+def test_bootstrap_with_identical_models_gives_zero_interval():
+    from models.metrics import bootstrap_brier_diff
+    probs = [0.6, 0.7, 0.4, 0.55]
+    result = bootstrap_brier_diff(probs, probs, [1.0, 0.0, 0.0, 1.0], ["a", "a", "b", "c"], reps=200)
+    assert result == {"diff": 0.0, "low": 0.0, "high": 0.0}
+
+
+def test_bootstrap_detects_a_clearly_better_model():
+    from models.metrics import bootstrap_brier_diff
+    outcomes = [1.0, 0.0] * 50
+    good = [0.9, 0.1] * 50
+    coin = [0.5] * 100
+    clusters = [str(i // 2) for i in range(100)]
+    result = bootstrap_brier_diff(good, coin, outcomes, clusters, reps=200)
+    # diff = Brier(a) − Brier(b): negativo = el primero es mejor
+    assert result["high"] < 0

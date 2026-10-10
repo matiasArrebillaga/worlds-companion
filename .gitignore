@@ -6,3 +6,4 @@ data/processed/
 web/node_modules/
 web/dist/
 web/public/data/*.json
+data/raw/oracles_elixir/

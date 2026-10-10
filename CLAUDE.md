@@ -66,7 +66,7 @@ cd web && npm run build         # build de producción
 - Cachear en `data/raw/` y no repetir descargas innecesarias. El historial de la temporada se baja una sola vez.
 - Guardar siempre la fecha de descarga junto a los datos.
 - Atribuir a Leaguepedia (CC-BY-SA).
-- Oracle's Elixir es una mejora futura (no usar todavía).
+- Oracle's Elixir: solo en experimentos (`python -m pipeline.fetch_oracles` + notebooks), todavía no en el sitio.
 
 ## Secciones del sitio
 

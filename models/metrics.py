@@ -54,3 +54,38 @@ def summarize(probs: list[float], outcomes: list[float]) -> dict:
         "brier": round(brier, 4) if brier is not None else None,
         "calibration": calibration(probs, outcomes),
     }
+
+
+def log_loss(probs: list[float], outcomes: list[float]) -> float | None:
+    """Pérdida logarítmica: castiga mucho más que el Brier equivocarse con mucha confianza. Moneda = 0.693."""
+    from math import log
+    if not probs:
+        return None
+    eps = 1e-9
+    return -sum(o * log(max(p, eps)) + (1 - o) * log(max(1 - p, eps)) for p, o in zip(probs, outcomes)) / len(probs)
+
+
+def bootstrap_brier_diff(probs_a: list[float], probs_b: list[float], outcomes: list[float],
+                         clusters: list[str], reps: int = 2000, seed: int = 0) -> dict:
+    """Diferencia de Brier (A − B; negativo = A es mejor) con intervalo de confianza del 95%.
+
+    Bootstrap por grupos: se sortean series enteras con reposición, porque los games de una misma
+    serie no son independientes (mismos equipos, mismo día). Si el intervalo no incluye el 0,
+    la diferencia difícilmente sea suerte.
+    """
+    import random
+    # Por cada serie: suma de (error² de A − error² de B) y cantidad de games
+    groups: dict[str, list[float]] = {}
+    for pa, pb, o, c in zip(probs_a, probs_b, outcomes, clusters):
+        total, n = groups.get(c, [0.0, 0])
+        groups[c] = [total + (pa - o) ** 2 - (pb - o) ** 2, n + 1]
+    sums = list(groups.values())
+    rng = random.Random(seed)
+    diffs = []
+    for _ in range(reps):
+        sample = [sums[rng.randrange(len(sums))] for _ in sums]
+        diffs.append(sum(s for s, _ in sample) / sum(n for _, n in sample))
+    diffs.sort()
+    point = sum(s for s, _ in sums) / sum(n for _, n in sums)
+    return {"diff": round(point, 6), "low": round(diffs[int(0.025 * reps)], 6),
+            "high": round(diffs[int(0.975 * reps) - 1], 6)}
