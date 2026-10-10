@@ -104,7 +104,7 @@ cd web && npm run build         # build de producción
 
 ## Estilo visual
 
-Estética "hextech de transmisión", oscura y elegante, original. No usar logos, arte oficial, fuentes ni assets de
+Estética "hextech de transmisión", oscura y elegante, original. 
 Riot Games. Solo modo oscuro.
 
 | Token | Color | Uso |
