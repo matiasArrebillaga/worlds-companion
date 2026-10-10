@@ -67,10 +67,12 @@ def load_season(path: Path) -> list[dict]:
         return parse_rows(list(csv.DictReader(f)))
 
 
-# Columnas que necesita la forma por rol: el extracto que usa el sitio guarda solo estas
+# Columnas que guarda el extracto que usa el sitio: forma por rol (modelo) + estadísticas
 EXTRACT_COLUMNS = ("gameid", "league", "date", "game", "side", "position", "teamname", "playername", "result",
                    "golddiffat15", "xpdiffat15", "csdiffat15", "kills", "deaths", "assists", "teamkills",
-                   "damageshare", "earnedgoldshare")
+                   "damageshare", "earnedgoldshare",
+                   "champion", "gamelength", "total cs", "damagetochampions",
+                   "firstblood", "firstdragon", "firsttower", "totalgold")
 
 
 def write_extract(path: Path, rows: list[dict], fetched_at: str) -> None:

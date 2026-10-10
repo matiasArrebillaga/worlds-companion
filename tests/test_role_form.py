@@ -51,3 +51,16 @@ def test_resolve_team_drops_leaguepedia_disambiguation():
     assert resolve_team("LYON (2024 American Team)", ups) == "LYON"
     assert resolve_team("T1", ups) == "T1"
     assert resolve_team("Nobody", ups) is None
+
+
+def test_extract_keeps_the_columns_for_stats(tmp_path):
+    rows = game_rows("g1", "A", "B", 1, "2026-01-01 10:00:00",
+                     blue_stats={"gamelength": "1800", "totalgold": "60000", "firstdragon": "1"},
+                     blue_player={"champion": "Ahri", "total cs": "300", "damagetochampions": "20000"})
+    path = tmp_path / "oe.json"
+    write_extract(path, rows, "2026-10-10T00:00:00Z")
+    [game], _ = read_extract(path)
+    assert game["players"]["blue"]["mid"]["champion"] == "Ahri"
+    assert game["players"]["blue"]["mid"]["total cs"] == "300"
+    assert game["teams"]["blue"]["gamelength"] == "1800"
+    assert game["teams"]["blue"]["totalgold"] == "60000"
