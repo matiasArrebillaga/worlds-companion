@@ -38,6 +38,7 @@ function ranking(elo: Elo): string {
     </tr>`).join('');
   return `
     <p class="muted">Rating Elo de los clasificados, calculado con todas las partidas de 2026 (ligas e internacionales). 100 puntos de diferencia ≈ 64% de ganar una partida.</p>
+    <p class="note">El ranking muestra solo el Elo. Las predicciones además suman la forma reciente de los jugadores de cada rol, así que un equipo puede estar más abajo en el ranking y aun así ser favorito.</p>
     <div class="table-wrap"><table class="rank">
       <thead><tr><th class="num">#</th><th>Equipo</th><th>Región</th><th class="num">Elo</th><th class="num">Partidas</th></tr></thead>
       <tbody>${rows}</tbody>
