@@ -9,7 +9,7 @@ function match(overrides: Partial<Match>): Match {
     id: 'm', phase: 'swiss', round: 'Round 1', best_of: 1,
     start_utc: '2026-10-24T17:00:00Z', date: '2026-10-24',
     team1: { name: 'T1', short: 'T1' }, team2: { name: 'G2 Esports', short: 'G2' },
-    score: null, winner: null, status: 'upcoming',
+    score: null, winner: null, status: 'upcoming', prediction: null,
     ...overrides,
   };
 }

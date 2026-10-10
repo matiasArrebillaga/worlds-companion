@@ -80,3 +80,8 @@ export function countdownParts(ms: number): { h: number; m: number; s: number } 
 export function pad2(n: number): string {
   return String(n).padStart(2, '0');
 }
+
+// Probabilidad como porcentaje entero. Nunca 0% ni 100%: el modelo nunca está seguro
+export function formatPercent(p: number): string {
+  return `${Math.min(99, Math.max(1, Math.round(p * 100)))}%`;
+}

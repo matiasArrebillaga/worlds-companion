@@ -1,5 +1,6 @@
-import { formatTime, PHASE_LABELS, roundLabel } from '../format';
+import { formatPercent, formatTime, PHASE_LABELS, roundLabel } from '../format';
 import { escapeHtml } from '../html';
+import { favorite, verdict } from '../predictions';
 import type { Match } from '../types';
 
 type Side = 'team1' | 'team2';
@@ -30,6 +31,26 @@ function head(m: Match, time: string): string {
   return `<span class="pill">${escapeHtml(time)}</span>`;
 }
 
+// Probabilidad de ganar la serie + si el modelo acertó (con texto, no solo color)
+export function predictionBlock(m: Match): string {
+  const p = m.prediction;
+  if (!p || !m.team1 || !m.team2) return '';
+  const fav = favorite(m);
+  const p1 = formatPercent(p.p_team1_series);
+  const p2 = formatPercent(1 - p.p_team1_series);
+  const v = verdict(m);
+  const verdictHtml = v === 'hit'
+    ? '<span class="verdict hit">✓ El modelo acertó</span>'
+    : v === 'miss' ? '<span class="verdict miss">✗ El modelo falló</span>' : '';
+  const label = `Probabilidad de ganar la serie: ${escapeHtml(m.team1.short)} ${p1}, ${escapeHtml(m.team2.short)} ${p2}`;
+  return `
+    <div class="pred" role="img" aria-label="${label}">
+      <span class="pct${fav === 'team1' ? ' fav' : ''}">${p1}</span>
+      <span class="bar" aria-hidden="true"><i style="width:${(p.p_team1_series * 100).toFixed(1)}%"></i></span>
+      <span class="pct${fav === 'team2' ? ' fav' : ''}">${p2}</span>
+    </div>${verdictHtml}`;
+}
+
 export function matchCard(m: Match, tz: string): string {
   const time = formatTime(m.start_utc, tz);
   const middle = m.score ? `<span class="score">${m.score[0]}–${m.score[1]}</span>` : '<span class="vs">VS</span>';
@@ -39,6 +60,7 @@ export function matchCard(m: Match, tz: string): string {
       <div class="core match">
         <div class="match-head">${head(m, time)}<span class="label">${escapeHtml(roundLabel(m.round))} · Bo${m.best_of}</span></div>
         <div class="teams">${teamSide(m, 'team1')}${middle}${teamSide(m, 'team2')}</div>
+        ${predictionBlock(m)}
         <div class="foot"><span>${PHASE_LABELS[m.phase]}</span><span>${footRight}</span></div>
       </div>
     </article>`;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  countdownParts, formatDayHeading, formatTime, isStale, localDayKey, relativeTime, roundLabel,
+  countdownParts, formatDayHeading, formatPercent, formatTime, isStale, localDayKey, relativeTime, roundLabel,
 } from './format';
 
 const BA = 'America/Argentina/Buenos_Aires';
@@ -64,5 +64,16 @@ describe('countdownParts', () => {
   it('splits milliseconds and never goes negative', () => {
     expect(countdownParts((2 * 3600 + 14 * 60 + 36) * 1000)).toEqual({ h: 2, m: 14, s: 36 });
     expect(countdownParts(-5000)).toEqual({ h: 0, m: 0, s: 0 });
+  });
+});
+
+describe('formatPercent', () => {
+  it('rounds to a whole percent', () => {
+    expect(formatPercent(0.6407)).toBe('64%');
+    expect(formatPercent(0.5)).toBe('50%');
+  });
+  it('never shows certainty', () => {
+    expect(formatPercent(0.999)).toBe('99%');
+    expect(formatPercent(0.002)).toBe('1%');
   });
 });

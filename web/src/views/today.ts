@@ -2,7 +2,7 @@ import { countdownParts, formatDateTimeLong, formatTime, localDayKey, pad2, PHAS
 import { escapeHtml } from '../html';
 import { dayKeyOf, featuredMatch, recentResults } from '../schedule';
 import type { Match } from '../types';
-import { matchCard } from './matchCard';
+import { matchCard, predictionBlock } from './matchCard';
 
 function emptyState(title: string, detail: string): string {
   return `<div class="state"><b>${title}</b><span>${detail}</span></div>`;
@@ -27,6 +27,7 @@ function featureCard(m: Match, tz: string): string {
           ${middle}
           <div class="team r"><span class="tag">${short(m, 'team2')}</span></div>
         </div>
+        ${predictionBlock(m)}
         ${m.status === 'upcoming' ? '<div class="countdown" data-countdown aria-label="Cuenta regresiva"></div>' : ''}
       </div>
     </article>`;

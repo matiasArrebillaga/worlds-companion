@@ -1,8 +1,9 @@
-import type { Meta, Schedule } from './types';
+import type { Elo, Meta, Schedule } from './types';
 
 export interface SiteData {
   schedule: Schedule;
   meta: Meta;
+  elo: Elo;
 }
 
 async function getJson<T>(file: string): Promise<T> {
@@ -21,6 +22,10 @@ export function loadMeta(): Promise<Meta> {
 }
 
 export async function loadData(): Promise<SiteData> {
-  const [schedule, meta] = await Promise.all([getJson<Schedule>('schedule.json'), getJson<Meta>('meta.json')]);
-  return { schedule, meta };
+  const [schedule, meta, elo] = await Promise.all([
+    getJson<Schedule>('schedule.json'),
+    getJson<Meta>('meta.json'),
+    getJson<Elo>('elo.json'),
+  ]);
+  return { schedule, meta, elo };
 }

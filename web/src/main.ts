@@ -4,14 +4,15 @@ import { localDayKey, resolveTimeZone } from './format';
 import { dayKeyOf } from './schedule';
 import { renderCalendar } from './views/calendar';
 import { renderUpdated, setActiveTab } from './views/layout';
+import { renderPredictions } from './views/predictions';
 import { renderToday } from './views/today';
-import type { Match } from './types';
 
-type View = (el: HTMLElement, matches: Match[], tz: string) => () => void;
+type View = (el: HTMLElement, data: SiteData, tz: string) => () => void;
 
 const ROUTES: Record<string, View> = {
-  '#/': renderToday,
-  '#/calendario': renderCalendar,
+  '#/': (el, data, tz) => renderToday(el, data.schedule.matches, tz),
+  '#/calendario': (el, data, tz) => renderCalendar(el, data.schedule.matches, tz),
+  '#/predicciones': renderPredictions,
 };
 
 const view = document.getElementById('view') as HTMLElement;
@@ -26,7 +27,7 @@ function currentHash(): string {
 
 function render(data: SiteData): void {
   cleanup();
-  cleanup = ROUTES[currentHash()](view, data.schedule.matches, tz);
+  cleanup = ROUTES[currentHash()](view, data, tz);
 }
 
 // Navegar: arriba de todo, o al día de hoy si la vista lo marca
