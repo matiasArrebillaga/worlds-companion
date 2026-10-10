@@ -223,3 +223,11 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 .roster li { display: grid; gap: 4px; padding: 12px; background: var(--card); border: 1px solid var(--line); }
 .roster a { font: 700 1.2rem/1 var(--f-display); text-transform: uppercase; text-decoration: none; }
 .roster a:hover { color: var(--gold); }
+
+.champ { width: 34px; height: 38px; display: inline-grid; place-items: center; flex: none;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: var(--raised); color: var(--gold); font: 700 13px/1 var(--f-display); letter-spacing: .04em; }
+.champs { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+.champs li { display: flex; gap: 10px; align-items: center; }
+.champs li > span { display: grid; gap: 3px; }
+.eyebrow a { color: inherit; }
