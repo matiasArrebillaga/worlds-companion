@@ -2,8 +2,9 @@
 from models.elo import Params, run_elo, series_probability
 from models.metrics import brier_score
 
-K_GRID = (10, 15, 20, 25, 30, 40, 50)
-OFFSET_GRID = (-100, -50, 0, 50, 100, 150, 200, 250, 300)
+# Si el mejor valor cae en un borde de la grilla, el óptimo real puede estar más allá: hay que ampliarla
+K_GRID = (4, 6, 8, 10, 12, 15, 20, 25, 30, 40)
+OFFSET_GRID = tuple(range(-100, 601, 50))
 # Regiones con ajuste propio. El resto (BR, APAC, VN, JP, LAT) queda en 0 y sirve de referencia:
 # solo importan las diferencias, así que una región tiene que quedar fija.
 TUNED_REGIONS = ("KR", "CN", "EU", "NA")

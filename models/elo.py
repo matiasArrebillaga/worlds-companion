@@ -17,10 +17,15 @@ class Params:
     region_offsets: dict[str, float] = field(default_factory=dict)
 
 
-# Valores provisorios: la Task 4 los reemplaza por los que elige notebooks/backtest.ipynb
+# Elegidos con notebooks/backtest.ipynb: calibrado con 2024, validado con 2025, ajuste final con ambos.
+# Los ajustes son relativos a las regiones sin ajuste propio (BR, APAC, VN, JP, LAT), que arrancan en 1500.
 MODEL_VERSION = "elo-1"
-PARAMS = Params(k=20.0, region_offsets={})
-BACKTEST: dict = {}
+PARAMS = Params(k=10.0, region_offsets={"KR": 300.0, "CN": 200.0, "EU": 100.0, "NA": 100.0})
+BACKTEST = {
+    "calibration_year": 2024, "validation_year": 2025,
+    "validation_games": 217, "validation_brier": 0.2216, "baseline_brier": 0.2349,
+    "worlds_series": 41, "worlds_accuracy": 0.7073, "worlds_brier": 0.1871,
+}
 
 
 def win_probability(rating_a: float, rating_b: float) -> float:
