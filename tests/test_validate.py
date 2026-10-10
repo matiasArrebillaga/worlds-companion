@@ -69,3 +69,14 @@ def test_every_team_needs_a_lineup_for_the_player_form():
     assert validate_lineups(["T1", "LYON (2024 American Team)"], lineups) == []
     [error] = validate_lineups(["T1", "Nobody"], lineups)
     assert "Nobody" in error
+
+
+def test_validate_stats_finds_duplicates_and_broken_links():
+    from pipeline.validate import validate_stats
+    teams = [{"id": "t1", "roster": ["faker"]}, {"id": "t1", "roster": []}]
+    players = [{"id": "faker", "team_id": "t1"}, {"id": "faker", "team_id": "nope"}]
+    errors = validate_stats(teams, players)
+    assert any("duplicate team id t1" in e for e in errors)
+    assert any("duplicate player id faker" in e for e in errors)
+    assert any("nope" in e for e in errors)
+    assert validate_stats([{"id": "t1", "roster": ["faker"]}], [{"id": "faker", "team_id": "t1"}]) == []

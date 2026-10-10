@@ -65,3 +65,23 @@ def validate_predictions(matches: list[dict]) -> list[str]:
             if not 0.0 <= p[key] <= 1.0:
                 errors.append(f"{m['id']}: {key} out of range: {p[key]}")
     return errors
+
+
+def validate_stats(teams: list[dict], players: list[dict]) -> list[str]:
+    """Ids únicos y referencias válidas entre teams.json y players.json (los links del sitio dependen de esto)."""
+    errors = []
+    team_ids = [t["id"] for t in teams]
+    player_ids = [p["id"] for p in players]
+    for kind, ids in (("team", team_ids), ("player", player_ids)):
+        for value, n in Counter(ids).items():
+            if n > 1:
+                errors.append(f"duplicate {kind} id {value}")
+    known_teams, known_players = set(team_ids), set(player_ids)
+    for p in players:
+        if p["team_id"] not in known_teams:
+            errors.append(f"player {p['id']}: unknown team {p['team_id']}")
+    for t in teams:
+        for pid in t["roster"]:
+            if pid not in known_players:
+                errors.append(f"team {t['id']}: roster has unknown player {pid}")
+    return errors

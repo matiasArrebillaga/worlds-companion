@@ -124,3 +124,16 @@ def test_build_fails_when_a_team_has_no_lineup(tmp_path):
     write_raw(tmp_path / "raw", without_lineup=("G2 Esports",))
     with pytest.raises(ValueError, match="G2 Esports"):
         run(tmp_path)
+
+
+def test_build_writes_team_and_player_stats(tmp_path):
+    write_raw(tmp_path / "raw")
+    run(tmp_path)
+    read = lambda name: json.loads((tmp_path / "out" / name).read_text(encoding="utf-8"))
+    teams, players = read("teams.json"), read("players.json")
+    assert set(teams) == {"updated_at", "stats_fetched_at", "teams"}
+    t1 = next(t for t in teams["teams"] if t["name"] == "T1")
+    assert set(t1) == {"id", "name", "short", "region", "rating", "roster", "season", "worlds", "elo_history", "series"}
+    assert t1["id"] == "t1" and len(t1["elo_history"]) == 12 and t1["series"]
+    assert len(t1["roster"]) == 5 and t1["worlds"] is None
+    assert {p["team_id"] for p in players["players"]} == {"t1", "g2-esports"}

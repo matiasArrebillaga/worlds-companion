@@ -15,7 +15,9 @@ from models.predictions import attach_predictions, evaluate, freeze, make_predic
 from pipeline import utc_now_iso
 from pipeline.history import CURRENT_YEAR, load_aliases, load_season_games
 from pipeline.schedule import UNDECIDED_TEAMS, build_schedule, short_name
-from pipeline.validate import validate_lineups, validate_predictions, validate_ratings, validate_schedule
+from pipeline.stats import build_team_and_player_stats, elo_history, series_list
+from pipeline.validate import (validate_lineups, validate_predictions, validate_ratings, validate_schedule,
+                               validate_stats)
 
 RAW_DIR = Path("data/raw")
 OUT_DIR = Path("web/public/data")
@@ -86,6 +88,22 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
     # Todo se valida antes de escribir nada (ni JSON ni predicciones congeladas)
     errors = (validate_schedule(schedule) + validate_ratings(teams, run.games_played, aliases)
               + validate_lineups(teams, ups))
+    # Estadísticas de equipos y jugadores (Oracle's Elixir) + historia del Elo y series (Leaguepedia)
+    teams_payload, players_payload = [], []
+    if not errors:
+        oe_names = {t: resolve_team(t, ups) for t in teams}
+        team_stats_by_name, players_payload = build_team_and_player_stats(oe_games, oe_names, shorts)
+        for name in teams:
+            canonical = aliases.get(name, name)
+            teams_payload.append({
+                **{k: team_stats_by_name[name][k] for k in ("id", "roster", "season", "worlds")},
+                "name": name, "short": short_name(name, shorts), "region": regions.get(canonical),
+                "rating": round(run.ratings[canonical], 1),
+                "elo_history": elo_history(run.records, canonical),
+                "series": series_list(run.records, canonical),
+            })
+        teams_payload.sort(key=lambda t: -t["rating"])
+        errors += validate_stats(teams_payload, players_payload)
     current = [] if errors else make_predictions(schedule, run.ratings, now, aliases, adjust)
     errors += validate_predictions(attach_predictions(schedule, [], current))
     if errors:
@@ -106,6 +124,8 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
     })
     _write(out_dir / "elo.json", elo_payload(teams, run, regions, shorts, aliases, evaluate(schedule, frozen), now,
                                                 role_model, oe_fetched_at))
+    _write(out_dir / "teams.json", {"updated_at": now, "stats_fetched_at": oe_fetched_at, "teams": teams_payload})
+    _write(out_dir / "players.json", {"players": players_payload})
 
 
 def main() -> None:
@@ -113,7 +133,7 @@ def main() -> None:
         build(RAW_DIR, OUT_DIR, utc_now_iso(), freeze_predictions="--freeze" in sys.argv)
     except ValueError as error:
         sys.exit(str(error))
-    print(f"wrote {OUT_DIR}/schedule.json, meta.json and elo.json")
+    print(f"wrote {OUT_DIR}/schedule.json, meta.json, elo.json, teams.json and players.json")
 
 
 if __name__ == "__main__":
