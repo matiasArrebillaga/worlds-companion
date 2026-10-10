@@ -107,7 +107,7 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 /* Barra inferior (celular) */
 .bottombar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-  display: grid; grid-template-columns: repeat(4, 1fr);
+  display: grid; grid-template-columns: repeat(5, 1fr);
   background: var(--card); border-top: 1px solid var(--line);
   padding: 8px 4px calc(10px + env(safe-area-inset-bottom, 0px));
 }
@@ -250,3 +250,7 @@ h1 a { text-decoration: none; }
   .bracket { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: center; }
 }
 .swiss-round h3 { margin: 8px 0 0; }
+
+/* Meta */
+.champ-cell { display: flex; align-items: center; gap: 10px; }
+.chart-box { position: relative; height: 240px; }
