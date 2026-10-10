@@ -226,5 +226,12 @@ GD@15), modelo con scikit-learn, retratos o arte oficial de campeones.
 2. Historial + Elo + predicciones congeladas + backtest; Predicciones y la predicción en las tarjetas.
 3. Stats: Estadísticas, páginas de equipo y jugador, head-to-head.
 4. Meta, vistas Suiza y Bracket.
+5. Estilos de juego (no transitividad, "piedra, papel o tijera"): el Elo usa un solo número por equipo y no
+   puede representar que A > B > C > A. Primero se mide en un notebook si los errores del Elo se explican por
+   diferencias de estilo (duración media, % primera sangre, % primer dragón/torre; datos de Leaguepedia), con
+   el efecto encontrado en 2024 y confirmado en 2025. Solo si aparece, se agrega como interacción de estilos en
+   un modelo nuevo (regresión logística o Elo multidimensional) que reemplaza al Elo únicamente si le gana en
+   el mismo backtest. Cuidado: pocos cruces por par de equipos, riesgo de ver patrones en el ruido, el estilo
+   cambia con el parche.
 
 Cada etapa deja el sitio desplegado y usable.
