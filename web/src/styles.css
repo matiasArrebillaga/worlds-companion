@@ -107,7 +107,7 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 /* Barra inferior (celular) */
 .bottombar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
-  display: grid; grid-template-columns: repeat(3, 1fr);
+  display: grid; grid-template-columns: repeat(4, 1fr);
   background: var(--card); border-top: 1px solid var(--line);
   padding: 8px 4px calc(10px + env(safe-area-inset-bottom, 0px));
 }
@@ -209,3 +209,11 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 @media (prefers-reduced-motion: reduce) {
   .bar i { animation: none; }
 }
+
+/* Estadísticas */
+.sort { all: unset; cursor: pointer; font: inherit; letter-spacing: inherit; text-transform: inherit; }
+.sort:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.rank tr.few td { opacity: .55; }
+.rank .team a { text-decoration: none; }
+.rank .team a:hover b { color: var(--gold); }
+.rank .team span { display: block; font-size: 12px; }
