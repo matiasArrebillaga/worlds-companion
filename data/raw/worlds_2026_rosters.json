@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-10T04:17:53Z",
+ "fetched_at": "2026-10-10T23:42:05Z",
  "rows": [
   {
    "Team": "Anyone's Legend",
@@ -34,6 +34,10 @@
    "OverviewPage": "2026 Season World Championship/Main Event"
   },
   {
+   "Team": "LØS",
+   "OverviewPage": "2026 Season World Championship/Main Event"
+  },
+  {
    "Team": "LYON (2024 American Team)",
    "OverviewPage": "2026 Season World Championship/Main Event"
   },
@@ -43,10 +47,6 @@
   },
   {
    "Team": "T1",
-   "OverviewPage": "2026 Season World Championship/Main Event"
-  },
-  {
-   "Team": "TBD",
    "OverviewPage": "2026 Season World Championship/Main Event"
   },
   {
@@ -70,15 +70,15 @@
    "OverviewPage": "2026 Season World Championship/Play-In"
   },
   {
+   "Team": "FURIA",
+   "OverviewPage": "2026 Season World Championship/Play-In"
+  },
+  {
    "Team": "Karmine Corp",
    "OverviewPage": "2026 Season World Championship/Play-In"
   },
   {
    "Team": "MVK Esports",
-   "OverviewPage": "2026 Season World Championship/Play-In"
-  },
-  {
-   "Team": "TBD",
    "OverviewPage": "2026 Season World Championship/Play-In"
   }
  ]

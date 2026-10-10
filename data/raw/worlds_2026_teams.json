@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-10T04:17:53Z",
+ "fetched_at": "2026-10-10T23:42:05Z",
  "rows": [
   {
    "Name": "Anyone's Legend",
@@ -22,6 +22,10 @@
    "Short": "DK"
   },
   {
+   "Name": "FURIA",
+   "Short": "FUR"
+  },
+  {
    "Name": "G2 Esports",
    "Short": "G2"
   },
@@ -40,6 +44,10 @@
   {
    "Name": "Karmine Corp",
    "Short": "KC"
+  },
+  {
+   "Name": "LØS",
+   "Short": "LOS"
   },
   {
    "Name": "MVK Esports",
