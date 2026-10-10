@@ -37,3 +37,13 @@ export function fmt(value: number | null, digits = 0): string {
 export function pct(value: number | null): string {
   return value === null ? '—' : `${Math.round(value * 100)}%`;
 }
+
+// Equipo de una tarjeta de partido (el calendario usa el nombre de Leaguepedia, igual que teams.json)
+export function teamByName<T extends { name: string }>(teams: T[], name: string): T | undefined {
+  return teams.find((t) => t.name === name);
+}
+
+// Titular de un rol: el jugador de la última alineación que juega ese rol
+export function starterByRole<P extends { id: string; role: Role }>(team: { roster: string[] }, players: P[], role: Role): P | undefined {
+  return players.find((p) => team.roster.includes(p.id) && p.role === role);
+}

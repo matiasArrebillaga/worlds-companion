@@ -19,3 +19,10 @@ describe('tabFor', () => {
     expect(tabFor('#/partido')).toBeNull();
   });
 });
+
+describe('parseHash with match ids', () => {
+  it('keeps ids that contain slashes and spaces when they are encoded', () => {
+    const id = '2026 Season World Championship/Play-In_Round 1_1';
+    expect(parseHash(`#/partido/${encodeURIComponent(id)}`)).toEqual({ path: '#/partido', param: id });
+  });
+});

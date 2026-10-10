@@ -6,6 +6,7 @@ import { renderCalendar } from './views/calendar';
 import { parseHash, tabFor } from './router';
 import { renderUpdated, setActiveTab } from './views/layout';
 import { renderPredictions } from './views/predictions';
+import { renderMatch } from './views/match';
 import { renderPlayer } from './views/player';
 import { renderStats } from './views/stats';
 import { renderTeam } from './views/team';
@@ -19,6 +20,7 @@ const ROUTES: Record<string, View> = {
   '#/estadisticas': (el, data) => renderStats(el, data),
   '#/equipo': renderTeam,
   '#/jugador': renderPlayer,
+  '#/partido': renderMatch,
   '#/predicciones': (el, data, tz) => renderPredictions(el, data, tz),
 };
 

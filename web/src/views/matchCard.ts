@@ -65,7 +65,7 @@ export function matchCard(m: Match, tz: string): string {
         <div class="match-head">${head(m, time)}<span class="label">${escapeHtml(roundLabel(m.round))} · Bo${m.best_of}</span></div>
         <div class="teams">${teamSide(m, 'team1')}${middle}${teamSide(m, 'team2')}</div>
         ${predictionBlock(m)}
-        <div class="foot"><span>${PHASE_LABELS[m.phase]}</span><span>${footRight}</span></div>
+        <div class="foot"><span>${PHASE_LABELS[m.phase]}${m.team1 && m.team2 ? ` · <a href="#/partido/${encodeURIComponent(m.id)}">Cara a cara</a>` : ''}</span><span>${footRight}</span></div>
       </div>
     </article>`;
 }

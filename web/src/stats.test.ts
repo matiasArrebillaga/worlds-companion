@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findById, fmt, pct, periodOf, sortBy } from './stats';
+import { findById, fmt, pct, periodOf, sortBy, starterByRole, teamByName } from './stats';
 
 describe('periodOf', () => {
   it('returns null when there are no Worlds games yet', () => {
@@ -31,5 +31,16 @@ describe('fmt / pct', () => {
     expect(fmt(4.256, 1)).toBe('4.3');
     expect(pct(null)).toBe('—');
     expect(pct(0.625)).toBe('63%');
+  });
+});
+
+describe('teamByName / starterByRole', () => {
+  const teams = [{ id: 't1', name: 'T1', roster: ['faker'] }];
+  const players = [{ id: 'faker', role: 'mid' as const }, { id: 'sub', role: 'mid' as const }];
+  it('finds the team of a match and its starter for a role', () => {
+    expect(teamByName(teams, 'T1')?.id).toBe('t1');
+    expect(teamByName(teams, 'Nope')).toBeUndefined();
+    expect(starterByRole(teams[0], players, 'mid')?.id).toBe('faker');
+    expect(starterByRole(teams[0], players, 'top')).toBeUndefined();
   });
 });
