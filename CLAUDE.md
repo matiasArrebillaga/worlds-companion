@@ -42,6 +42,7 @@ data/teams.csv          # alias de equipos → id canónico y región (a mano)
 data/predictions.jsonl  # predicciones congeladas, append-only
 pipeline/               # fetch, build (limpieza, stats, validación, export a JSON)
                         #   stats.py: agregados de equipos y jugadores (Oracle's Elixir) + historia del Elo
+                        #   meta.py: campeones, draft, lados, ritmo y regiones (Oracle's Elixir)
 models/                 # Elo y modelos de predicción
 notebooks/              # exploración, aprendizaje y backtest
 tests/                  # pytest
@@ -69,8 +70,9 @@ cd web && npm run build         # build de producción
 - Cachear en `data/raw/` y no repetir descargas innecesarias. El historial de la temporada se baja una sola vez.
 - Guardar siempre la fecha de descarga junto a los datos.
 - Atribuir a Leaguepedia (CC-BY-SA).
-- Oracle's Elixir: forma de los jugadores del modelo elo-2 (extracto diario en `data/raw/oracles_2026.json`) y CSV
-  completos para los notebooks (`--history`, no se commitean). Atribuir en el footer.
+- Oracle's Elixir: forma de los jugadores del modelo elo-2 y meta (parche de Worlds 16.20; guía 16.17–16.18 hasta
+  que Worlds tenga 10 partidas), con un extracto diario en `data/raw/oracles_2026.json`; CSV completos para los
+  notebooks (`--history`, no se commitean). Atribuir en el footer.
 
 ## Secciones del sitio
 

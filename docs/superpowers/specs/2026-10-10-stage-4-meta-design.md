@@ -12,10 +12,11 @@ Amplía el spec general (`2026-10-09-worlds-companion-design.md`, §4 contrato d
 - **Parche de Worlds: 16.20, fijo** (constante `WORLDS_PATCH` en `pipeline/meta.py`).
 - **Muestra "Worlds":** partidas de Oracle's Elixir con liga `WLDs` y fecha ≥ `worlds_start` (la fecha del primer
   partido del calendario, igual que en la Etapa 3; deja afuera los clasificatorios regionales de septiembre).
-- **Muestra "Guía 16.18":** todas las partidas de las ligas en el parche anterior presente en los datos
-  (`GUIDE_PATCH = "16.18"`; no hay partidas en 16.19). Sirve de orientación antes de que Worlds tenga datos.
+- **Muestra "Guía 16.17–16.18":** todas las partidas de las ligas principales en los últimos parches que jugaron
+  (`GUIDE_PATCHES = ("16.17", "16.18")`). No hay partidas en 16.19 y en 16.18 solo jugó la VCS (16 partidas), así
+  que se suma 16.17 (último parche de LPL, LEC, LCS, CBLOL): ~305 partidas. Sirve de orientación antes de Worlds.
 - **La guía desaparece cuando Worlds tiene 10 partidas o más** (`GUIDE_UNTIL_GAMES = 10`). Mientras exista, el
-  selector muestra Worlds | Guía 16.18 y arranca en Guía si Worlds tiene menos de 10 partidas. Después solo queda
+  selector muestra Worlds | Guía 16.17–16.18 y arranca en Guía si Worlds tiene menos de 10 partidas. Después solo queda
   Worlds. La regla se aplica en el pipeline: con 10+ partidas de Worlds, la guía no se exporta.
 
 ## Datos (pipeline)
@@ -70,7 +71,7 @@ Sin JSON nuevo: `schedule.json` ya trae fase, ronda, equipos, ganador y predicci
 
 - Nueva pestaña en la barra (5 en total) y ruta `#/meta`.
 - Sub-pestañas Campeones | Draft | Lados | Ritmo | Regiones; selector de muestra mientras exista la guía, con aviso
-  "Guía: partidas de ligas en el parche 16.18, no de Worlds".
+  "Guía: partidas de las ligas en los parches 16.17–16.18, no de Worlds".
 - **Campeones:** tabla ordenable (presencia por defecto), monograma en hexágono. Menos de 5 partidas jugadas →
   etiqueta "pocas partidas" en el winrate.
 - **Draft:** ranking por `first_rotation`, con picks y bans.

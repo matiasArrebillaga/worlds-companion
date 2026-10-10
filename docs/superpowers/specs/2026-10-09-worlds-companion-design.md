@@ -91,8 +91,8 @@ web/                       Vite + TS; lee solo web/public/data/*.json
 | `schedule.json` | Partidos: id, fecha UTC ISO 8601 o `null` si no está confirmada, fase (play-in / swiss / knockout), ronda, formato (Bo1/3/5), equipos, lado por game, resultado (si hay), predicción |
 | `teams.json` | Por equipo: id, sigla, nombre, región, roster, récord, stats agregadas (winrate, winrate por lado, duración media, % primera sangre, % primer dragón, oro/min) |
 | `players.json` | Por jugador: id, equipo, rol, KDA, CS/min, DPM, KP, campeones jugados, historial por partida |
-| `champions.json` | Por campeón: picks, bans, presencia, winrate, prioridad de draft |
-| `meta.json` | Hora de última actualización (UTC), agregados del meta (winrate por lado, duración por fase, por región), conteo de partidas |
+| `champions.json` | Por campeón y muestra (Worlds / guía de los últimos parches de las ligas): picks, bans, presencia, winrate, prioridad de draft (primera rotación) |
+| `meta.json` | Hora de última actualización (UTC), conteo de partidas, parches, partidas de Worlds y, por muestra: winrate por lado, ritmo (duración mediana, kills/min) por fase y winrate entre regiones |
 | `elo.json` | Rating actual por equipo, historia de rating por partido, precisión del modelo (aciertos/total, Brier, calibración por tramos), `model_version` y parámetros (K, ajustes regionales) |
 
 Los tipos TypeScript del contrato se escriben a mano en `web/src/types.ts`. Un test de Python verifica
