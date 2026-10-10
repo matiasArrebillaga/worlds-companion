@@ -1,7 +1,7 @@
 import { drawEloChart } from '../charts/eloChart';
 import type { SiteData } from '../data';
 import { escapeHtml } from '../html';
-import { findById, fmt, PERIODS, pct, periodOf, ROLE_LABELS, type Period } from '../stats';
+import { findById, fmt, PERIODS, pct, periodOf, ROLE_LABELS, signed, type Period } from '../stats';
 import type { TeamEntry, TeamStats } from '../types';
 
 let period: Period = 'season';
@@ -20,6 +20,7 @@ export function teamKpis(s: TeamStats): string {
     ${kpi('Lado rojo', `${s.red.wins}-${s.red.games - s.red.wins}`, 'ROJO')}
     ${kpi('Duración', fmt(s.avg_minutes, 1), 'minutos')}
     ${kpi('Oro/min', fmt(s.gold_per_min))}
+    ${kpi('GD@15', signed(s.gd15 ?? null), 'oro de ventaja al min 15')}
     ${kpi('1ª sangre', pct(s.first_blood))}
     ${kpi('1er dragón', pct(s.first_dragon))}
     ${kpi('1ª torre', pct(s.first_tower))}

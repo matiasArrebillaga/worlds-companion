@@ -1,6 +1,6 @@
 import type { SiteData } from '../data';
 import { escapeHtml } from '../html';
-import { FEW_GAMES, findById, fmt, PERIODS, pct, periodOf, ROLE_LABELS, type Period } from '../stats';
+import { FEW_GAMES, findById, fmt, PERIODS, pct, periodOf, ROLE_LABELS, signed, type Period } from '../stats';
 import type { PlayerEntry, PlayerStats } from '../types';
 import { notFound } from './team';
 
@@ -56,6 +56,7 @@ export function renderPlayer(el: HTMLElement, data: SiteData, tz: string, param:
     <section class="stack">
       <span class="eyebrow">${ROLE_LABELS[p.role]} · <a href="#/equipo/${encodeURIComponent(p.team_id)}">${escapeHtml(team?.short ?? p.team)}</a>${p.starter ? '' : ' · suplente'}</span>
       <h1>${escapeHtml(p.name)}</h1>
+      ${p.form != null ? `<p class="muted">Forma según el modelo: <b>${signed(p.form, 2)}</b> desvíos sobre el promedio de su rol (<a href="#/estadisticas">ver ranking en Estadísticas › Análisis</a>)</p>` : ''}
       <div class="seg" role="group" aria-label="Período">${buttons}</div>
       ${s && s.games < FEW_GAMES ? `<p class="note">Solo ${s.games} partidas: con tan pocas, estos números dicen poco.</p>` : ''}
       ${s ? kpis(s) : '<div class="state"><b>Todavía no jugó en Worlds 2026</b></div>'}

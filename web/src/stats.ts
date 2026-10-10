@@ -1,4 +1,4 @@
-import type { Role } from './types';
+import type { PlayerEntry, Role, TeamEntry, TeamStats } from './types';
 
 export type Period = 'season' | 'worlds';
 export const PERIODS: [Period, string][] = [['season', 'Temporada 2026'], ['worlds', 'Worlds 2026']];
@@ -36,6 +36,27 @@ export function fmt(value: number | null, digits = 0): string {
 
 export function pct(value: number | null): string {
   return value === null ? '—' : `${Math.round(value * 100)}%`;
+}
+
+// Desvío con signo siempre visible: "+0.32", "−0.10"
+export function signed(value: number | null | undefined, digits = 0): string {
+  if (value == null) return '—';
+  return `${value < 0 ? '−' : '+'}${Math.abs(value).toFixed(digits)}`;
+}
+
+// Temporada contra "solo vs. equipos de Worlds": el que más baja es el que inflaba sus números con rivales débiles
+export function vsWorldsRows(teams: TeamEntry[]): { team: TeamEntry; season: TeamStats; vs: TeamStats; diff: number | null }[] {
+  const rows = teams.flatMap((team) => (team.vs_worlds ? [{
+    team, season: team.season, vs: team.vs_worlds,
+    diff: team.vs_worlds.winrate === null || team.season.winrate === null ? null : team.vs_worlds.winrate - team.season.winrate,
+  }] : []));
+  return sortBy(rows, (r) => r.diff, 'asc');
+}
+
+// Ranking de forma del modelo: solo titulares (los suplentes casi no juegan y su forma dice poco)
+export function formRanking(players: PlayerEntry[], role: Role | 'all'): PlayerEntry[] {
+  const rows = players.filter((p) => p.starter && p.form != null && (role === 'all' || p.role === role));
+  return sortBy(rows, (p) => p.form ?? null, 'desc');
 }
 
 // Equipo de una tarjeta de partido (el calendario usa el nombre de Leaguepedia, igual que teams.json)

@@ -104,6 +104,8 @@ export interface TeamStats {
   games: number;
   wins: number;
   winrate: number | null;
+  winrate_low: number | null; // rango del 95% (Wilson)
+  winrate_high: number | null;
   blue: SideRecord;
   red: SideRecord;
   avg_minutes: number | null;
@@ -111,6 +113,7 @@ export interface TeamStats {
   first_blood: number | null;
   first_dragon: number | null;
   first_tower: number | null;
+  gd15: number | null; // diferencia de oro al minuto 15
 }
 
 export interface SeriesResult {
@@ -130,6 +133,7 @@ export interface TeamEntry {
   roster: string[]; // ids de jugadores de la última alineación, en orden de rol
   season: TeamStats;
   worlds: TeamStats | null; // null hasta que juegue en Worlds
+  vs_worlds?: TeamStats | null; // solo partidas de 2026 contra otros equipos clasificados
   elo_history: [string, number][];
   series: SeriesResult[];
 }
@@ -173,6 +177,7 @@ export interface PlayerEntry {
   team: string;
   role: Role;
   starter: boolean;
+  form?: number | null; // forma del modelo elo-2: desvíos sobre el promedio del rol
   season: PlayerStats;
   worlds: PlayerStats | null;
   history: GameLine[]; // últimas 20, la más nueva primero
@@ -196,12 +201,16 @@ export interface SideSplit {
   blue_wins: number;
   blue_winrate: number | null;
   red_winrate: number | null;
+  low?: number | null; // rango del 95% del % del azul
+  high?: number | null;
 }
 
 export interface PaceSplit {
   games: number;
   median_minutes: number | null;
   kills_per_min: number | null;
+  p25_minutes?: number | null; // la mitad de las partidas dura entre p25 y p75
+  p75_minutes?: number | null;
 }
 
 export interface RegionEntry {
@@ -209,11 +218,13 @@ export interface RegionEntry {
   games: number;
   wins: number;
   winrate: number | null;
+  low?: number | null;
+  high?: number | null;
 }
 
 export interface MetaSample {
   games: number;
-  sides: { total: SideSplit; by_phase: Partial<Record<Phase, SideSplit>> };
+  sides: { total: SideSplit; by_phase: Partial<Record<Phase, SideSplit>>; by_game?: { first: SideSplit; rest: SideSplit } };
   pace: { total: PaceSplit; by_phase: Partial<Record<Phase, PaceSplit>> };
   regions: RegionEntry[];
 }
@@ -224,14 +235,37 @@ export interface ChampionEntry {
   picks: number;
   bans: number;
   presence: number | null;
+  pick_rate?: number | null;
+  ban_rate?: number | null;
   wins: number;
   winrate: number | null;
+  winrate_adj?: number | null; // encogido hacia 50% (promedio bayesiano)
+  winrate_low?: number | null; // rango del 95% (Wilson)
+  winrate_high?: number | null;
   first_rotation: number | null;
+  kda?: number | null;
+  cs_min?: number | null;
+  dpm?: number | null;
+  kp?: number | null;
+  roles?: Partial<Record<Role, number>>;
+  guide_presence?: number | null; // presencia en la guía (solo filas de Worlds)
+}
+
+// Cuánto de la diferencia de % de victorias entre campeones es azar
+export interface WinrateNoise {
+  champions: number;
+  picks: number;
+  observed_var: number;
+  noise_var: number;
+  noise_share: number;
+  true_var: number;
 }
 
 export interface ChampionsFile {
   updated_at: string;
   worlds_patch: string;
   guide_patch: string | null;
+  prior_picks?: number;
   samples: Partial<Record<SampleId, ChampionEntry[]>>;
+  analysis?: Partial<Record<SampleId, WinrateNoise | null>>;
 }

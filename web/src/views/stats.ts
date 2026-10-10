@@ -1,9 +1,10 @@
 import type { SiteData } from '../data';
 import { escapeHtml } from '../html';
-import { FEW_GAMES, fmt, PERIODS, pct, periodOf, ROLE_LABELS, sortBy, type Period } from '../stats';
+import { range } from '../meta';
+import { FEW_GAMES, fmt, formRanking, PERIODS, pct, periodOf, ROLE_LABELS, signed, sortBy, vsWorldsRows, type Period } from '../stats';
 import type { PlayerEntry, PlayerStats, Role, TeamEntry, TeamStats } from '../types';
 
-type Tab = 'equipos' | 'jugadores';
+type Tab = 'equipos' | 'jugadores' | 'analisis';
 type Dir = 'asc' | 'desc';
 
 interface Column<T, S> {
@@ -22,6 +23,7 @@ const TEAM_COLUMNS: Column<TeamEntry, TeamStats>[] = [
   { id: 'rating', label: 'Elo', value: (t) => t.rating, show: (t) => fmt(t.rating) },
   { id: 'avg_minutes', label: 'Duración', value: (_, s) => s.avg_minutes, show: (_, s) => fmt(s.avg_minutes, 1) },
   { id: 'gold_per_min', label: 'Oro/min', value: (_, s) => s.gold_per_min, show: (_, s) => fmt(s.gold_per_min) },
+  { id: 'gd15', label: 'GD@15', value: (_, s) => s.gd15 ?? null, show: (_, s) => signed(s.gd15 ?? null) },
   { id: 'first_blood', label: '1ª sangre', value: (_, s) => s.first_blood, show: (_, s) => pct(s.first_blood) },
   { id: 'first_dragon', label: '1er dragón', value: (_, s) => s.first_dragon, show: (_, s) => pct(s.first_dragon) },
   { id: 'first_tower', label: '1ª torre', value: (_, s) => s.first_tower, show: (_, s) => pct(s.first_tower) },
@@ -86,18 +88,49 @@ function playersTable(data: SiteData): string {
   return `<div class="table-wrap"><table class="rank"><thead><tr><th>Jugador</th>${header(PLAYER_COLUMNS)}</tr></thead><tbody>${body}</tbody></table></div>`;
 }
 
+// ---- Sub-pestaña Análisis ----
+
+function vsWorldsTable(data: SiteData): string {
+  const rows = vsWorldsRows(data.teams.teams);
+  if (!rows.length) return '<div class="state"><b>Sin partidas entre clasificados todavía</b></div>';
+  const body = rows.map(({ team, season, vs, diff }) => `
+    <tr><td class="team"><a href="#/equipo/${encodeURIComponent(team.id)}"><b>${escapeHtml(team.short)}</b></a><span class="muted">${escapeHtml(team.region ?? '—')}</span></td>
+      <td class="num">${pct(season.winrate)}</td><td class="num">${pct(vs.winrate)} <span class="muted">${vs.games} PJ</span></td>
+      <td class="num">${range(vs.winrate_low, vs.winrate_high)}</td><td class="num">${diff === null ? '—' : `${signed(diff * 100)} pts`}</td>
+      <td class="num">${signed(vs.gd15 ?? null)}</td></tr>`).join('');
+  return `<h2>Equipos: temporada vs. contra equipos de Worlds</h2>
+    <p class="note">El % de victorias de la temporada mezcla rivales muy distintos: ganar el 75% en una liga débil no es lo mismo que en la LCK. Acá se cuentan solo las partidas de 2026 contra otros clasificados (ligas e internacionales), así todos se miden con la misma vara. Arriba, los que más bajan: sus números de temporada estaban inflados por el nivel de sus rivales. GD@15 = oro de ventaja al minuto 15 contra clasificados.</p>
+    <div class="table-wrap"><table class="rank"><thead><tr><th>Equipo</th><th class="num">Temporada</th><th class="num">vs. Worlds</th><th class="num">Rango</th><th class="num">Diferencia</th><th class="num">GD@15</th></tr></thead><tbody>${body}</tbody></table></div>`;
+}
+
+function formTable(data: SiteData): string {
+  const shorts = new Map(data.teams.teams.map((t) => [t.id, t.short]));
+  const rows = formRanking(data.players.players, state.role);
+  if (!rows.length) return '<div class="state"><b>Sin datos de forma todavía</b></div>';
+  const body = rows.map((p, i) => `
+    <tr><td class="num">${i + 1}</td>
+      <td class="team"><a href="#/jugador/${encodeURIComponent(p.id)}"><b>${escapeHtml(p.name)}</b></a><span class="muted">${escapeHtml(shorts.get(p.team_id) ?? p.team)} · ${ROLE_LABELS[p.role]}</span></td>
+      <td class="num"><b>${signed(p.form ?? null, 2)}</b></td></tr>`).join('');
+  return `<h2>Jugadores: forma según el modelo</h2>
+    <p class="note">La forma que usa el modelo de predicción (elo-2): en cada partida se compara al jugador con el promedio de su rol (oro, experiencia y CS al minuto 15, participación en kills, muertes, daño y eficiencia), en desvíos estándar (z-score), y se hace una media móvil que pesa más las partidas recientes. +0.30 = 0,3 desvíos por encima del pro promedio del rol. Ojo: el promedio mezcla todas las ligas, así que no corrige por el nivel de la liga.</p>
+    <div class="table-wrap"><table class="rank"><thead><tr><th class="num">#</th><th>Jugador</th><th class="num">Forma</th></tr></thead><tbody>${body}</tbody></table></div>`;
+}
+
 export function renderStats(el: HTMLElement, data: SiteData): () => void {
   const roles: [string, string][] = [['all', 'Todos'], ...(Object.entries(ROLE_LABELS) as [string, string][])];
+  const body = state.tab === 'equipos' ? teamsTable(data)
+    : state.tab === 'jugadores' ? playersTable(data)
+    : vsWorldsTable(data) + seg('role', roles, state.role, 'Rol') + formTable(data);
   el.innerHTML = `
     <section class="stack">
       <span class="eyebrow">Datos de Oracle's Elixir</span>
       <h1>Estadísticas</h1>
-      ${seg('tab', [['equipos', 'Equipos'], ['jugadores', 'Jugadores']], state.tab, 'Equipos o jugadores')}
-      ${seg('period', PERIODS, state.period, 'Período')}
+      ${seg('tab', [['equipos', 'Equipos'], ['jugadores', 'Jugadores'], ['analisis', 'Análisis']], state.tab, 'Secciones de estadísticas')}
+      ${state.tab === 'analisis' ? '' : seg('period', PERIODS, state.period, 'Período')}
       ${state.tab === 'jugadores' ? seg('role', roles, state.role, 'Rol') : ''}
       <p class="note">"Pocas partidas" = menos de ${FEW_GAMES}: con tan pocas, los números dicen poco. "—" es un dato que la fuente no tiene.</p>
     </section>
-    <section class="stack">${state.tab === 'equipos' ? teamsTable(data) : playersTable(data)}</section>`;
+    <section class="stack">${body}</section>`;
 
   el.onclick = (event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button');
