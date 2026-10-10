@@ -1,4 +1,4 @@
-import type { Elo, Meta, PlayersFile, Schedule, TeamsFile } from './types';
+import type { ChampionsFile, Elo, Meta, PlayersFile, Schedule, TeamsFile } from './types';
 
 export interface SiteData {
   schedule: Schedule;
@@ -6,6 +6,7 @@ export interface SiteData {
   elo: Elo;
   teams: TeamsFile;
   players: PlayersFile;
+  champions: ChampionsFile;
 }
 
 async function getJson<T>(file: string): Promise<T> {
@@ -24,12 +25,13 @@ export function loadMeta(): Promise<Meta> {
 }
 
 export async function loadData(): Promise<SiteData> {
-  const [schedule, meta, elo, teams, players] = await Promise.all([
+  const [schedule, meta, elo, teams, players, champions] = await Promise.all([
     getJson<Schedule>('schedule.json'),
     getJson<Meta>('meta.json'),
     getJson<Elo>('elo.json'),
     getJson<TeamsFile>('teams.json'),
     getJson<PlayersFile>('players.json'),
+    getJson<ChampionsFile>('champions.json'),
   ]);
-  return { schedule, meta, elo, teams, players };
+  return { schedule, meta, elo, teams, players, champions };
 }

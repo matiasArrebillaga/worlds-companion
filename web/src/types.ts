@@ -30,6 +30,11 @@ export interface Meta {
   updated_at: string;
   source_fetched_at: string;
   match_count: number;
+  // Etapa 4 (opcionales: un meta.json viejo en caché no los trae)
+  worlds_patch?: string;
+  guide_patch?: string | null;
+  worlds_games?: number;
+  samples?: Partial<Record<SampleId, MetaSample>>;
 }
 
 export interface Prediction {
@@ -181,4 +186,52 @@ export interface TeamsFile {
 
 export interface PlayersFile {
   players: PlayerEntry[];
+}
+
+// Meta (champions.json y samples de meta.json): "worlds" = Worlds 2026; "guide" = ligas en los últimos parches
+export type SampleId = 'worlds' | 'guide';
+
+export interface SideSplit {
+  games: number;
+  blue_wins: number;
+  blue_winrate: number | null;
+  red_winrate: number | null;
+}
+
+export interface PaceSplit {
+  games: number;
+  median_minutes: number | null;
+  kills_per_min: number | null;
+}
+
+export interface RegionEntry {
+  region: string;
+  games: number;
+  wins: number;
+  winrate: number | null;
+}
+
+export interface MetaSample {
+  games: number;
+  sides: { total: SideSplit; by_phase: Partial<Record<Phase, SideSplit>> };
+  pace: { total: PaceSplit; by_phase: Partial<Record<Phase, PaceSplit>> };
+  regions: RegionEntry[];
+}
+
+export interface ChampionEntry {
+  champion: string;
+  games: number;
+  picks: number;
+  bans: number;
+  presence: number | null;
+  wins: number;
+  winrate: number | null;
+  first_rotation: number | null;
+}
+
+export interface ChampionsFile {
+  updated_at: string;
+  worlds_patch: string;
+  guide_patch: string | null;
+  samples: Partial<Record<SampleId, ChampionEntry[]>>;
 }
