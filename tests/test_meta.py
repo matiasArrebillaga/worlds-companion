@@ -1,6 +1,5 @@
-import pytest
-
-from pipeline.meta import champion_stats, draft_slots
+from pipeline.meta import (GUIDE_PATCH, GUIDE_UNTIL_GAMES, build_meta, champion_stats, draft_slots, pace_stats,
+                           phase_of, region_stats, side_stats)
 
 ROLES = ("top", "jng", "mid", "bot", "sup")
 
@@ -58,3 +57,53 @@ def test_missing_pick_order_still_counts_picks():
             g["teams"][side][f"pick{i}"] = ""
     stats = {c["champion"]: c for c in champion_stats([g])}
     assert stats["Aatrox"]["picks"] == 1 and stats["Aatrox"]["first_rotation"] == 0.0
+
+
+SCHEDULE = [{"phase": "play-in", "date": "2026-10-15"}, {"phase": "swiss", "date": "2026-10-20"},
+            {"phase": "knockout", "date": "2026-11-01"}, {"phase": "swiss", "date": None}]
+
+
+def test_phase_of_uses_the_calendar_dates():
+    assert phase_of("2026-10-15 18:00:00", SCHEDULE) == "play-in"
+    assert phase_of("2026-10-22 09:00:00", SCHEDULE) == "swiss"
+    assert phase_of("2026-11-08 09:00:00", SCHEDULE) == "knockout"
+
+
+def test_side_stats_total_and_by_phase():
+    games = [game(winner="blue", date="2026-10-15 10:00:00"), game(winner="red", date="2026-10-21 10:00:00"),
+             game(winner="blue", date="2026-10-21 12:00:00")]
+    s = side_stats(games, lambda d: phase_of(d, SCHEDULE))
+    assert s["total"] == {"games": 3, "blue_wins": 2, "blue_winrate": 0.6667, "red_winrate": 0.3333}
+    assert s["by_phase"]["swiss"]["games"] == 2 and "knockout" not in s["by_phase"]
+    assert side_stats([])["total"] == {"games": 0, "blue_wins": 0, "blue_winrate": None, "red_winrate": None}
+
+
+def test_pace_uses_the_median_and_a_ratio_of_totals():
+    games = [game(minutes=30, kills=(10, 5)), game(minutes=32, kills=(8, 8)), game(minutes=60, kills=(20, 10))]
+    p = pace_stats(games)["total"]
+    assert p["median_minutes"] == 32.0  # el partido de 60 no la mueve (el promedio daría 40,7)
+    assert p["kills_per_min"] == round(61 / 122, 4)
+    assert pace_stats([game(minutes=None)])["total"] == {"games": 1, "median_minutes": None, "kills_per_min": None}
+
+
+def test_regions_only_count_games_between_different_regions():
+    games = [game(blue="A", red="B", winner="blue"), game(blue="A", red="C", winner="red"),
+             game(blue="A", red="X", winner="blue")]
+    rows = {r["region"]: r for r in region_stats(games, {"A": "KR", "B": "KR", "C": "CN"})}
+    assert rows["KR"] == {"region": "KR", "games": 1, "wins": 0, "winrate": 0.0}  # A-B es KR vs KR; X sin región
+    assert rows["CN"] == {"region": "CN", "games": 1, "wins": 1, "winrate": 1.0}
+
+
+def test_build_meta_keeps_the_guide_until_worlds_has_enough_games():
+    league = [game(page="LCK", region="KR", patch=GUIDE_PATCH, date="2026-10-05 10:00:00"),
+              game(page="LCK", region="KR", patch="16.17", date="2026-10-01 10:00:00")]
+    qualifier = [game(date="2026-09-10 10:00:00")]  # "WLDs" antes del torneo: clasificatorio regional
+    before = build_meta(league + qualifier, SCHEDULE, "2026-10-15")
+    assert before["worlds_games"] == 0 and before["guide_patch"] == GUIDE_PATCH
+    assert before["samples"]["guide"]["games"] == 1 and before["samples"]["worlds"]["games"] == 0
+    assert set(before["champions"]) == {"worlds", "guide"}
+
+    worlds = [game(date=f"2026-10-{15 + i % 5} 10:00:00") for i in range(GUIDE_UNTIL_GAMES)]
+    after = build_meta(league + worlds, SCHEDULE, "2026-10-15")
+    assert after["guide_patch"] is None and set(after["samples"]) == {"worlds"}
+    assert after["samples"]["worlds"]["games"] == GUIDE_UNTIL_GAMES
