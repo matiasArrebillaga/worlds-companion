@@ -1,0 +1,69 @@
+{
+ "fetched_at": "2026-10-10T04:17:53Z",
+ "rows": [
+  {
+   "Name": "Anyone's Legend",
+   "Short": "AL"
+  },
+  {
+   "Name": "Bilibili Gaming",
+   "Short": "BLG"
+  },
+  {
+   "Name": "CTBC Flying Oyster",
+   "Short": "CFO"
+  },
+  {
+   "Name": "Cloud9",
+   "Short": "C9"
+  },
+  {
+   "Name": "Dplus Kia",
+   "Short": "DK"
+  },
+  {
+   "Name": "G2 Esports",
+   "Short": "G2"
+  },
+  {
+   "Name": "Gen.G",
+   "Short": "GEN"
+  },
+  {
+   "Name": "Hanwha Life Esports",
+   "Short": "HLE"
+  },
+  {
+   "Name": "Invictus Gaming",
+   "Short": "iG"
+  },
+  {
+   "Name": "Karmine Corp",
+   "Short": "KC"
+  },
+  {
+   "Name": "MVK Esports",
+   "Short": "MVK"
+  },
+  {
+   "Name": "Movistar KOI",
+   "Short": "MKOI"
+  },
+  {
+   "Name": "T1",
+   "Short": "T1"
+  },
+  {
+   "Name": "Team Liquid",
+   "Short": "TL"
+  },
+  {
+   "Name": "Team Secret Whales",
+   "Short": "TSW"
+  },
+  {
+   "Name": "Top Esports",
+   "Short": "TES"
+  }
+ ]
+}

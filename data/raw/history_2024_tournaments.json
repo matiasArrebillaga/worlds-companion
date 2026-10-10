@@ -1,0 +1,373 @@
+{
+ "fetched_at": "2026-10-10T04:13:01Z",
+ "rows": [
+  {
+   "OverviewPage": "2024 Mid-Season Invitational",
+   "League": "Mid-Season Invitational",
+   "Region": "International",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "2024 Season World Championship/Main Event",
+   "League": "World Championship",
+   "Region": "International",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "2024 Season World Championship/Play-In",
+   "League": "World Championship",
+   "Region": "International",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "1",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "CBLOL/2024 Season/Split 1",
+   "League": "Circuit Brazilian League of Legends",
+   "Region": "Brazil",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "CBLOL/2024 Season/Split 1 Playoffs",
+   "League": "Circuit Brazilian League of Legends",
+   "Region": "Brazil",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "CBLOL/2024 Season/Split 2",
+   "League": "Circuit Brazilian League of Legends",
+   "Region": "Brazil",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "CBLOL/2024 Season/Split 2 Playoffs",
+   "League": "Circuit Brazilian League of Legends",
+   "Region": "Brazil",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "Esports World Cup 2024",
+   "League": "Esports World Cup",
+   "Region": "International",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LCK/2024 Season/Regional Finals",
+   "League": "World Championship",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "1",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LCK/2024 Season/Spring Playoffs",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LCK/2024 Season/Spring Season",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LCK/2024 Season/Summer Playoffs",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LCK/2024 Season/Summer Season",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LCS/2024 Season/Championship",
+   "League": "League of Legends Championship Series",
+   "Region": "North America",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LCS/2024 Season/Spring Playoffs",
+   "League": "League of Legends Championship Series",
+   "Region": "North America",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LCS/2024 Season/Spring Season",
+   "League": "League of Legends Championship Series",
+   "Region": "North America",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LCS/2024 Season/Summer Season",
+   "League": "League of Legends Championship Series",
+   "Region": "North America",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LEC/2024 Season/Season Finals",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LEC/2024 Season/Spring Playoffs",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LEC/2024 Season/Spring Season",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LEC/2024 Season/Summer Playoffs",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LEC/2024 Season/Summer Season",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LEC/2024 Season/Winter Playoffs",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LEC/2024 Season/Winter Season",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LJL/2024 Season/Spring Playoffs",
+   "League": "LoL Japan League",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LJL/2024 Season/Spring Season",
+   "League": "LoL Japan League",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LJL/2024 Season/Summer Playoffs",
+   "League": "LoL Japan League",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LJL/2024 Season/Summer Season",
+   "League": "LoL Japan League",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LLA/2024 Season/Closing Playoffs",
+   "League": "Liga Latinoamerica",
+   "Region": "Latin America",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LLA/2024 Season/Closing Season",
+   "League": "Liga Latinoamerica",
+   "Region": "Latin America",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LLA/2024 Season/Opening Playoffs",
+   "League": "Liga Latinoamerica",
+   "Region": "Latin America",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LLA/2024 Season/Opening Season",
+   "League": "Liga Latinoamerica",
+   "Region": "Latin America",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LPL/2024 Season/Regional Finals",
+   "League": "World Championship",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "1",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LPL/2024 Season/Spring Playoffs",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LPL/2024 Season/Spring Season",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LPL/2024 Season/Summer Placements",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LPL/2024 Season/Summer Playoffs",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "LPL/2024 Season/Summer Season",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "PCS/2024 Season/Spring Playoffs",
+   "League": "Pacific Championship Series",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "PCS/2024 Season/Spring Season",
+   "League": "Pacific Championship Series",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "PCS/2024 Season/Summer Playoffs",
+   "League": "Pacific Championship Series",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "PCS/2024 Season/Summer Season",
+   "League": "Pacific Championship Series",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "VCS/2024 Season/Spring Playoffs",
+   "League": "Vietnam Championship Series",
+   "Region": "Vietnam",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "VCS/2024 Season/Spring Season",
+   "League": "Vietnam Championship Series",
+   "Region": "Vietnam",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "VCS/2024 Season/Summer Playoffs",
+   "League": "Vietnam Championship Series",
+   "Region": "Vietnam",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  },
+  {
+   "OverviewPage": "VCS/2024 Season/Summer Season",
+   "League": "Vietnam Championship Series",
+   "Region": "Vietnam",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2024"
+  }
+ ]
+}

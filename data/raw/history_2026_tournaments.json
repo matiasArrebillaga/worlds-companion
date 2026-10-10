@@ -1,0 +1,317 @@
+{
+ "fetched_at": "2026-10-10T04:13:01Z",
+ "rows": [
+  {
+   "OverviewPage": "2026 First Stand",
+   "League": "First Stand",
+   "Region": "International",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "2026 Mid-Season Invitational",
+   "League": "Mid-Season Invitational",
+   "Region": "International",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "2026 Season World Championship/Main Event",
+   "League": "World Championship",
+   "Region": "International",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "2026 Season World Championship/Play-In",
+   "League": "World Championship",
+   "Region": "International",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "1",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "CBLOL/2026 Season/Cup",
+   "League": "Circuit Brazilian League of Legends",
+   "Region": "Brazil",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "CBLOL/2026 Season/Split 1",
+   "League": "Circuit Brazilian League of Legends",
+   "Region": "Brazil",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "CBLOL/2026 Season/Split 1 Playoffs",
+   "League": "Circuit Brazilian League of Legends",
+   "Region": "Brazil",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "CBLOL/2026 Season/Split 2",
+   "League": "Circuit Brazilian League of Legends",
+   "Region": "Brazil",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "CBLOL/2026 Season/Split 2 Playoffs",
+   "League": "Circuit Brazilian League of Legends",
+   "Region": "Brazil",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "Esports World Cup 2026",
+   "League": "Esports World Cup",
+   "Region": "International",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCK/2026 Season/Cup",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCK/2026 Season/Road to MSI",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCK/2026 Season/Rounds 1-2",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCK/2026 Season/Rounds 3-4",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCK/2026 Season/Season Play-In",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCK/2026 Season/Season Playoffs",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCP/2026 Season/Split 1",
+   "League": "League of Legends Championship Pacific",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCP/2026 Season/Split 1 Playoffs",
+   "League": "League of Legends Championship Pacific",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCP/2026 Season/Split 2",
+   "League": "League of Legends Championship Pacific",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCP/2026 Season/Split 2 Playoffs",
+   "League": "League of Legends Championship Pacific",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCP/2026 Season/Split 3",
+   "League": "League of Legends Championship Pacific",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCS/2026 Season/Lock-In",
+   "League": "League of Legends Championship Series",
+   "Region": "North America",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCS/2026 Season/Spring Playoffs",
+   "League": "League of Legends Championship Series",
+   "Region": "North America",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCS/2026 Season/Spring Season",
+   "League": "League of Legends Championship Series",
+   "Region": "North America",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCS/2026 Season/Summer Playoffs",
+   "League": "League of Legends Championship Series",
+   "Region": "North America",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LCS/2026 Season/Summer Season",
+   "League": "League of Legends Championship Series",
+   "Region": "North America",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LEC/2026 Season/Spring Playoffs",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LEC/2026 Season/Spring Season",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LEC/2026 Season/Summer Playoffs",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LEC/2026 Season/Summer Season",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LEC/2026 Season/Versus Playoffs",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LEC/2026 Season/Versus Season",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LPL/2026 Season/Grand Finals",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LPL/2026 Season/Regional Finals",
+   "League": "World Championship",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "1",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LPL/2026 Season/Split 1",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LPL/2026 Season/Split 1 Playoffs",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LPL/2026 Season/Split 2",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LPL/2026 Season/Split 2 Playoffs",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  },
+  {
+   "OverviewPage": "LPL/2026 Season/Split 3",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2026"
+  }
+ ]
+}

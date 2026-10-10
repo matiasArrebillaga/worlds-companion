@@ -1,0 +1,333 @@
+{
+ "fetched_at": "2026-10-10T04:13:01Z",
+ "rows": [
+  {
+   "OverviewPage": "2025 First Stand",
+   "League": "First Stand",
+   "Region": "International",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "2025 Mid-Season Invitational",
+   "League": "Mid-Season Invitational",
+   "Region": "International",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "2025 Season World Championship/Main Event",
+   "League": "World Championship",
+   "Region": "International",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "2025 Season World Championship/Play-In",
+   "League": "World Championship",
+   "Region": "International",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "1",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "Esports World Cup 2025",
+   "League": "Esports World Cup",
+   "Region": "International",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LCK/2025 Season/Cup",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LCK/2025 Season/Road to MSI",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LCK/2025 Season/Rounds 1-2",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LCK/2025 Season/Rounds 3-5",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LCK/2025 Season/Season Play-In",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LCK/2025 Season/Season Playoffs",
+   "League": "LoL Champions Korea",
+   "Region": "Korea",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LCP/2025 Season/Mid Season",
+   "League": "League of Legends Championship Pacific",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LCP/2025 Season/Mid Season Qualifying Series",
+   "League": "League of Legends Championship Pacific",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LCP/2025 Season/Season Finals",
+   "League": "League of Legends Championship Pacific",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LCP/2025 Season/Season Finals Playoffs",
+   "League": "League of Legends Championship Pacific",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LCP/2025 Season/Season Kickoff",
+   "League": "League of Legends Championship Pacific",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LCP/2025 Season/Season Kickoff Qualifying Series",
+   "League": "League of Legends Championship Pacific",
+   "Region": "Asia Pacific",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LEC/2025 Season/Spring Playoffs",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LEC/2025 Season/Spring Season",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LEC/2025 Season/Summer Playoffs",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LEC/2025 Season/Summer Season",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LEC/2025 Season/Winter Playoffs",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LEC/2025 Season/Winter Season",
+   "League": "LoL EMEA Championship",
+   "Region": "EMEA",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LPL/2025 Season/Grand Finals",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LPL/2025 Season/Regional Finals",
+   "League": "World Championship",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "1",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LPL/2025 Season/Split 1",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LPL/2025 Season/Split 1 Playoffs",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LPL/2025 Season/Split 2",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LPL/2025 Season/Split 2 Placements",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LPL/2025 Season/Split 2 Playoffs",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LPL/2025 Season/Split 3",
+   "League": "Tencent LoL Pro League",
+   "Region": "China",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LTA North/2025 Season/Split 1",
+   "League": "League of Legends Championship of The Americas North",
+   "Region": "Americas",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LTA North/2025 Season/Split 2",
+   "League": "League of Legends Championship of The Americas North",
+   "Region": "Americas",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LTA North/2025 Season/Split 2 Playoffs",
+   "League": "League of Legends Championship of The Americas North",
+   "Region": "Americas",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LTA North/2025 Season/Split 3",
+   "League": "League of Legends Championship of The Americas North",
+   "Region": "Americas",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LTA South/2025 Season/Split 1",
+   "League": "League of Legends Championship of The Americas South",
+   "Region": "Americas",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LTA South/2025 Season/Split 2",
+   "League": "League of Legends Championship of The Americas South",
+   "Region": "Americas",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LTA South/2025 Season/Split 2 Playoffs",
+   "League": "League of Legends Championship of The Americas South",
+   "Region": "Americas",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LTA South/2025 Season/Split 3",
+   "League": "League of Legends Championship of The Americas South",
+   "Region": "Americas",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LTA/2025 Season/Regional Championship",
+   "League": "League of Legends Championship of The Americas",
+   "Region": "Americas",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  },
+  {
+   "OverviewPage": "LTA/2025 Season/Split 1 Playoffs",
+   "League": "League of Legends Championship of The Americas",
+   "Region": "Americas",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "Year": "2025"
+  }
+ ]
+}
