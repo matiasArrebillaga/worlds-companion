@@ -72,7 +72,9 @@ EXTRACT_COLUMNS = ("gameid", "league", "date", "game", "side", "position", "team
                    "golddiffat15", "xpdiffat15", "csdiffat15", "kills", "deaths", "assists", "teamkills",
                    "damageshare", "earnedgoldshare",
                    "champion", "gamelength", "total cs", "damagetochampions",
-                   "firstblood", "firstdragon", "firsttower", "totalgold")
+                   "firstblood", "firstdragon", "firsttower", "totalgold",
+                   # Meta (filas de equipo): parche y draft
+                   "patch", "ban1", "ban2", "ban3", "ban4", "ban5", "pick1", "pick2", "pick3", "pick4", "pick5")
 
 
 def write_extract(path: Path, rows: list[dict], fetched_at: str) -> None:
