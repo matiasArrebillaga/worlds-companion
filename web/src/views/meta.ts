@@ -1,256 +1,212 @@
-import { drawBarChart } from '../charts/barChart';
 import type { SiteData } from '../data';
 import { PHASE_LABELS } from '../format';
 import { escapeHtml } from '../html';
 import { defaultSample, flexPicks, minutes, mirages, paceRows, PHASES, presenceShifts, range, sampleOptions, sideVerdict } from '../meta';
 import { FEW_GAMES, fmt, pct, ROLE_LABELS, signed, sortBy } from '../stats';
-import type { ChampionEntry, MetaSample, Phase, SampleId, SideSplit, WinrateNoise } from '../types';
+import type { ChampionEntry, MetaSample, SampleId, SideSplit, WinrateNoise } from '../types';
 import { champHex } from './player';
+import { airyTable, axis, chips, dumbbell, how, kpiTiles, leaders, sortBar, subtabs, who, whisker, type Column, type Dir } from './ui';
 
-type Tab = 'campeones' | 'draft' | 'lados' | 'ritmo' | 'regiones' | 'analisis';
-const TABS: [Tab, string][] = [['campeones', 'Campeones'], ['draft', 'Draft'], ['lados', 'Lados'], ['ritmo', 'Ritmo'], ['regiones', 'Regiones'], ['analisis', 'Análisis']];
+type Tab = 'campeones' | 'panorama';
+type View = 'principal' | 'resultado';
+const TABS: [Tab, string][] = [['campeones', 'Campeones'], ['panorama', 'Panorama']];
 const NOISE_MIN_PICKS = 5; // igual que en pipeline/meta.py
 
 // Estado mientras la página esté abierta; la muestra se elige la primera vez según los datos
-const state = { tab: 'campeones' as Tab, sample: null as SampleId | null, sort: 'presence', dir: 'desc' as 'asc' | 'desc' };
-
-// Limpieza del render actual (gráfico + listener). Vive a nivel de módulo: un click re-renderiza sin pasar por
-// main.ts, y main.ts tiene que poder limpiar el último render, no el primero.
-let teardown: () => void = () => {};
-
-function seg(group: string, options: [string, string][], current: string, label: string): string {
-  const buttons = options.map(([id, text]) =>
-    `<button type="button" data-${group}="${id}" aria-pressed="${id === current}">${escapeHtml(text)}</button>`).join('');
-  return `<div class="seg" role="group" aria-label="${label}">${buttons}</div>`;
-}
+const state = { tab: 'campeones' as Tab, sample: null as SampleId | null, view: 'principal' as View, sort: 'presence', dir: 'desc' as Dir };
 
 function empty(): string {
   return '<div class="state"><b>Todavía no hay partidas de Worlds 2026</b><span>El meta del torneo aparece después de las primeras partidas.</span></div>';
 }
 
-const COLUMNS: { id: string; label: string; value: (c: ChampionEntry) => number | null; show: (c: ChampionEntry) => string }[] = [
-  { id: 'presence', label: 'Presencia', value: (c) => c.presence, show: (c) => pct(c.presence) },
-  { id: 'pick_rate', label: '% Pick', value: (c) => c.pick_rate ?? null, show: (c) => pct(c.pick_rate ?? null) },
-  { id: 'ban_rate', label: '% Ban', value: (c) => c.ban_rate ?? null, show: (c) => pct(c.ban_rate ?? null) },
-  { id: 'picks', label: 'Picks', value: (c) => c.picks, show: (c) => String(c.picks) },
-  { id: 'bans', label: 'Bans', value: (c) => c.bans, show: (c) => String(c.bans) },
-  // El % de victorias de un campeón con menos de 5 picks no se ordena: 3 de 3 = 100% engañaría
-  { id: 'winrate', label: '% Vict.', value: (c) => (c.picks < FEW_GAMES ? null : c.winrate),
-    show: (c) => (c.picks < FEW_GAMES && c.winrate !== null ? `${pct(c.winrate)} <span class="muted">· pocas</span>` : pct(c.winrate)) },
-  { id: 'kda', label: 'KDA', value: (c) => c.kda ?? null, show: (c) => fmt(c.kda ?? null, 2) },
-  { id: 'cs_min', label: 'CS/min', value: (c) => c.cs_min ?? null, show: (c) => fmt(c.cs_min ?? null, 1) },
-  { id: 'dpm', label: 'DPM', value: (c) => c.dpm ?? null, show: (c) => fmt(c.dpm ?? null) },
-  { id: 'kp', label: 'KP', value: (c) => c.kp ?? null, show: (c) => pct(c.kp ?? null) },
-];
+// ---- Campeones: tabla aireada ----
 
-function header(): string {
-  return COLUMNS.map((c) => {
-    const active = c.id === state.sort;
-    const sortState = active ? (state.dir === 'desc' ? 'descending' : 'ascending') : 'none';
-    return `<th class="num" aria-sort="${sortState}"><button type="button" class="sort" data-sort="${c.id}">${c.label}${active ? (state.dir === 'desc' ? ' ▼' : ' ▲') : ''}</button></th>`;
-  }).join('');
+// Presencia partida en pick (lleno) y ban (rayado)
+function pickBan(c: ChampionEntry): string {
+  if (c.pick_rate == null || c.ban_rate == null) return '';
+  return `<span class="pb" title="Pick ${pct(c.pick_rate)} · Ban ${pct(c.ban_rate)}" aria-hidden="true"><i class="p" style="width:${c.pick_rate * 100}%"></i><i class="b" style="width:${c.ban_rate * 100}%"></i></span>`;
 }
 
-function champions(rows: ChampionEntry[]): string {
+const rate = (id: 'pick_rate' | 'ban_rate' | 'kp' | 'first_rotation', label: string, hint?: string): Column<ChampionEntry> =>
+  ({ id, label, hint, value: (c) => c[id] ?? null, show: (c) => pct(c[id] ?? null), kind: 'share' });
+
+const COL = {
+  presence: { id: 'presence', label: 'Presencia', hint: 'pick + ban', value: (c) => c.presence, show: (c) => pct(c.presence), bar: pickBan, kind: 'share' },
+  first_rotation: rate('first_rotation', 'Prioridad', '1ª rotación'),
+  // % y no cantidad: los picks y bans absolutos ya están debajo del nombre
+  pick_rate: rate('pick_rate', '% Pick'),
+  ban_rate: rate('ban_rate', '% Ban'),
+  kda: { id: 'kda', label: 'KDA', value: (c) => c.kda ?? null, show: (c) => fmt(c.kda ?? null, 2), kind: 'count' },
+  dpm: { id: 'dpm', label: 'DPM', hint: 'daño/min', value: (c) => c.dpm ?? null, show: (c) => fmt(c.dpm ?? null), kind: 'count' },
+  cs_min: { id: 'cs_min', label: 'CS/min', value: (c) => c.cs_min ?? null, show: (c) => fmt(c.cs_min ?? null, 1), kind: 'count' },
+  kp: rate('kp', 'KP', 'part. kills'),
+  winrate_adj: { id: 'winrate_adj', label: '% Vict.', hint: 'ajustado', value: (c) => c.winrate_adj ?? null, show: (c) => pct(c.winrate_adj ?? null),
+    sub: (c) => `${pct(c.winrate)} crudo`, kind: 'diverge', ref: 0.5 },
+  range: { id: 'range', label: 'Rango 95%', hint: 'del % real', value: (c) => c.winrate_low ?? null, show: (c) => range(c.winrate_low, c.winrate_high),
+    bar: (c) => whisker(c.winrate_low, c.winrate_high, c.winrate, 0.1, 0.9), kind: 'share', wide: true },
+} satisfies Record<string, Column<ChampionEntry>>;
+
+// Draft y Rendimiento juntos; Resultado aparte
+const VIEWS: Record<View, [string, [string, Column<ChampionEntry>[]][]]> = {
+  principal: ['Draft y rendimiento', [['Draft', [COL.presence, COL.first_rotation, COL.pick_rate, COL.ban_rate]], ['Rendimiento', [COL.kda, COL.dpm, COL.cs_min, COL.kp]]]],
+  resultado: ['Resultado', [['Resultado', [COL.winrate_adj, COL.range, COL.pick_rate, COL.ban_rate]]]],
+};
+
+const champWho = (c: ChampionEntry) => who(champHex(c.champion), escapeHtml(c.champion), `${c.picks} picks · ${c.bans} bans`);
+
+function champions(rows: ChampionEntry[], k: number | undefined): string {
   if (!rows.length) return empty();
-  const column = COLUMNS.find((c) => c.id === state.sort) ?? COLUMNS[0];
-  const body = sortBy(rows, column.value, state.dir).map((c) => `
-    <tr><td><span class="champ-cell">${champHex(c.champion)}<b>${escapeHtml(c.champion)}</b></span></td>${COLUMNS.map((col) => `<td class="num">${col.show(c)}</td>`).join('')}</tr>`).join('');
-  return `
-    <p class="note">Presencia = % Pick + % Ban: cuánto le importa el campeón al meta. Uno que se banea siempre tiene 0 picks y 100% de presencia. El % de victorias con menos de ${FEW_GAMES} picks dice "pocas" y no se ordena: con tan pocas partidas es casi azar. KDA, CS/min, DPM y KP son de los jugadores que lo usaron, sumando todas sus partidas.</p>
-    <div class="table-wrap"><table class="rank"><thead><tr><th>Campeón · ${rows[0].games} partidas</th>${header()}</tr></thead><tbody>${body}</tbody></table></div>`;
-}
-
-function draft(rows: ChampionEntry[]): string {
-  if (!rows.length) return empty();
-  const top = sortBy(rows, (c) => c.first_rotation, 'desc').slice(0, 20);
-  const body = top.map((c, i) => `
-    <tr><td class="num">${i + 1}</td><td><span class="champ-cell">${champHex(c.champion)}<b>${escapeHtml(c.champion)}</b></span></td>
-      <td class="num">${pct(c.first_rotation)}</td><td class="num">${c.picks}</td><td class="num">${c.bans}</td></tr>`).join('');
-  return `
-    <p class="note">Prioridad = % de partidas en que el campeón se elige en la primera rotación (los 6 primeros picks) o se banea en la primera fase de bans. Mide qué se considera imprescindible, no qué gana más.</p>
-    <div class="table-wrap"><table class="rank"><thead><tr><th class="num">#</th><th>Campeón</th><th class="num">Prioridad</th><th class="num">Picks</th><th class="num">Bans</th></tr></thead><tbody>${body}</tbody></table></div>`;
-}
-
-function phasesWithData(byPhase: Partial<Record<Phase, unknown>>): Phase[] {
-  return PHASES.filter((p) => byPhase[p]);
-}
-
-function kpi(label: string, value: string, sub: string): string {
-  return `<div class="bezel"><div class="core kpi"><span class="label">${label}</span><b>${value}</b><span class="muted">${sub}</span></div></div>`;
-}
-
-function sides(s: MetaSample): string {
-  const t = s.sides.total;
-  if (!t.games) return empty();
-  return `
-    <div class="kpis">
-      ${kpi('Lado azul', pct(t.blue_winrate), `${t.blue_wins} de ${t.games} partidas`)}
-      ${kpi('Lado rojo', pct(t.red_winrate), `${t.games - t.blue_wins} de ${t.games} partidas`)}
-    </div>
-    ${phasesWithData(s.sides.by_phase).length ? '<div class="chart-box"><canvas id="meta-chart" role="img" aria-label="Porcentaje de victorias de cada lado por fase"></canvas></div>' : ''}
-    <p class="note">Cuidado al leerlo: en Bo3 y Bo5 el que perdió la partida anterior elige lado, y casi siempre elige azul. Entonces el rojo queda más seguido en manos del equipo que viene ganando: el % mezcla la ventaja del lado con quién lo elige.</p>`;
-}
-
-function pace(s: MetaSample): string {
-  const t = s.pace.total;
-  if (!t.games) return empty();
-  return `
-    <div class="kpis">
-      ${kpi('Duración mediana', minutes(t.median_minutes), `${t.games} partidas`)}
-      ${kpi('Kills por minuto', fmt(t.kills_per_min, 2), 'entre los dos equipos')}
-    </div>
-    ${phasesWithData(s.pace.by_phase).length ? `<div class="chart-box"><canvas id="meta-chart" role="img" aria-label="Duración mediana por fase"></canvas></div>
-    <div class="table-wrap"><table class="rank"><thead><tr><th>Fase</th><th class="num">PJ</th><th class="num">Duración mediana</th><th class="num">Kills/min</th></tr></thead>
-      <tbody>${paceRows(s.pace.by_phase).map((r) => `<tr><td>${r.label}</td><td class="num">${r.games}</td><td class="num">${r.duration}</td><td class="num">${r.kpm}</td></tr>`).join('')}</tbody></table></div>` : ''}
-    <p class="note">Mediana y no promedio: es la partida "del medio". Una partida de 50 minutos tira el promedio para arriba; la mediana casi no se mueve.</p>`;
-}
-
-function regions(s: MetaSample): string {
-  if (!s.regions.length) return '<div class="state"><b>Todavía no hay partidas entre regiones</b><span>Aparecen cuando se crucen equipos de ligas distintas.</span></div>';
-  const body = s.regions.map((r) => `
-    <tr><td class="team"><b>${escapeHtml(r.region)}</b>${r.games < FEW_GAMES ? '<span class="muted">pocas partidas</span>' : ''}</td>
-      <td class="num">${r.games}</td><td class="num">${r.wins}-${r.games - r.wins}</td><td class="num">${pct(r.winrate)}</td></tr>`).join('');
-  return `
-    <p class="note">Solo cuentan partidas contra otras regiones: en un LCK contra LCK la región gana siempre exactamente el 50%, así que esas partidas no dicen nada.</p>
-    <div class="table-wrap"><table class="rank"><thead><tr><th>Región</th><th class="num">PJ</th><th class="num">V-D</th><th class="num">% Vict.</th></tr></thead><tbody>${body}</tbody></table></div>`;
-}
-
-// ---- Sub-pestaña Análisis: lo que se puede (y no se puede) concluir de los números ----
-
-function noiseBlock(noise: WinrateNoise | null | undefined, k: number | undefined): string {
-  if (!noise) return `<h2>¿Cuánto es ruido?</h2><div class="state"><b>Todavía hay pocos campeones con ${NOISE_MIN_PICKS} picks o más</b><span>La medición aparece cuando haya más partidas.</span></div>`;
-  const realSpread = Math.round(Math.sqrt(noise.true_var) * 100);
-  return `<h2>¿Cuánto es ruido?</h2>
-    <div class="kpis">
-      ${kpi('Azar', pct(noise.noise_share), 'de las diferencias de % de victorias')}
-      ${kpi('Diferencia real', `±${realSpread} pts`, 'típica entre campeones')}
-      ${k ? kpi('Picks para creerle', String(k), 'mitad dato propio, mitad 50%') : ''}
-    </div>
-    <p class="note">Aunque todos los campeones fueran igual de buenos, sus % de victorias serían distintos por pura suerte: con pocas partidas, el azar mueve mucho el número. Comparamos la dispersión que se ve entre los ${noise.champions} campeones con ${NOISE_MIN_PICKS} picks o más contra la que daría el azar solo (binomial); lo que sobra es la diferencia real. Además, con 100 campeones unos 5 parecen "significativos" de casualidad: ojo con el que encabeza la tabla.</p>`;
-}
-
-function adjustedBlock(rows: ChampionEntry[], k: number | undefined): string {
-  const top = sortBy(rows.filter((c) => c.picks > 0), (c) => c.winrate_adj ?? null, 'desc').slice(0, 15);
-  if (!top.length || top[0].winrate_adj == null) return '';
-  const cell = (name: string) => `<span class="champ-cell">${champHex(name)}<b>${escapeHtml(name)}</b></span>`;
-  const body = top.map((c, i) => `
-    <tr><td class="num">${i + 1}</td><td>${cell(c.champion)}</td><td class="num"><b>${pct(c.winrate_adj ?? null)}</b></td>
-      <td class="num">${pct(c.winrate)} <span class="muted">${c.wins}-${c.picks - c.wins}</span></td><td class="num">${range(c.winrate_low, c.winrate_high)}</td></tr>`).join('');
-  const odd = mirages(rows, 5).map((c) => `
-    <tr><td>${cell(c.champion)}</td><td class="num">${pct(c.winrate)}</td><td class="num">${pct(c.winrate_adj ?? null)}</td><td class="num">${c.picks}</td></tr>`).join('');
+  const groups = VIEWS[state.view][1];
+  const columns = groups.flatMap(([, cols]) => cols);
+  const sort = columns.find((c) => c.id === state.sort) ?? columns[0];
+  const played = rows.filter((c) => c.picks >= FEW_GAMES); // el daño o el % de un campeón con 2 picks no dice nada
+  const views = chips('view', Object.entries(VIEWS).map(([id, [label]]) => [id, label]), state.view, 'Vista');
+  const legend = columns.includes(COL.presence)
+    ? '<div class="legend"><span><i class="lg-pick"></i>Pick</span><span><i class="lg-ban"></i>Ban</span><span>Presencia = las dos juntas</span></div>' : '';
   const kk = k ?? 'k';
-  return `<h2>% de victorias ajustado</h2>
-    <p class="note">Ajustado = (victorias + ${kk}/2) / (picks + ${kk}): se le suman ${kk} partidas "imaginarias" al 50%. Con pocos picks queda cerca de 50%; con muchos manda el dato propio. El ${kk} sale de la temporada de las ligas: es cuánta evidencia hace falta cuando las diferencias reales son así de chicas. Rango = dónde está el % real con 95% de confianza.</p>
-    <div class="table-wrap"><table class="rank"><thead><tr><th class="num">#</th><th>Campeón</th><th class="num">Ajustado</th><th class="num">Crudo</th><th class="num">Rango</th></tr></thead><tbody>${body}</tbody></table></div>
-    <h3 class="eyebrow">Espejismos: los que más cambian al ajustar</h3>
-    <div class="table-wrap"><table class="rank"><thead><tr><th>Campeón</th><th class="num">Crudo</th><th class="num">Ajustado</th><th class="num">Picks</th></tr></thead><tbody>${odd}</tbody></table></div>`;
+  return `
+    ${leaders([
+      { column: COL.presence, label: 'Más presente', rows },
+      { column: COL.first_rotation, label: 'Más prioridad', rows },
+      { column: COL.winrate_adj, label: 'Mejor % ajustado', rows: played },
+      { column: COL.dpm, label: 'Más daño', rows: played },
+    ], champWho)}
+    <div class="tools">${views}${sortBar(columns, sort.id, state.dir)}${legend}</div>
+    ${airyTable({ rows: sortBy(rows, sort.value, state.dir), scale: rows, groups, first: `Campeón · ${rows[0].games} partidas`, whoOf: champWho, sort: sort.id, dir: state.dir })}
+    ${how(`Presencia = % pick + % ban: cuánto le importa el campeón al meta. Uno que se banea siempre tiene 0 picks y 100% de presencia. Prioridad = % de partidas en que se elige en la primera rotación (los 6 primeros picks) o se banea en la primera fase de bans: mide qué se considera imprescindible, no qué gana más. KDA, CS/min, DPM y KP son de los jugadores que lo usaron. El % de victorias es el ajustado: (victorias + ${kk}/2) / (picks + ${kk}), o sea ${kk} partidas "imaginarias" al 50%; abajo va el crudo. Rango = dónde está el % real con 95% de confianza: si cruza la línea dorada del 50%, no se distingue de una moneda.`)}`;
 }
+
+// ---- Panorama: tablero ----
 
 function sideRow(label: string, s: SideSplit | undefined): string {
   if (!s || !s.games) return '';
-  return `<tr><td>${label}</td><td class="num">${s.games}</td><td class="num">${pct(s.blue_winrate)}</td><td class="num">${range(s.low, s.high)}</td><td>${sideVerdict(s.low, s.high)}</td></tr>`;
+  return `<div class="lrow"><span class="lab">${label}<small>${s.games} partidas</small></span>${whisker(s.low, s.high, s.blue_winrate, 0.2, 0.8)}<span class="v">${pct(s.blue_winrate)}<small>${range(s.low, s.high)}</small></span></div>`;
 }
 
-function sidesBlock(s: MetaSample): string {
-  if (!s.sides.total.games) return '';
-  return `<h2>Lados: ¿hay ventaja de verdad?</h2>
-    <div class="table-wrap"><table class="rank"><thead><tr><th>Partidas</th><th class="num">PJ</th><th class="num">% azul</th><th class="num">Rango</th><th>Veredicto</th></tr></thead>
-      <tbody>${sideRow('Todas', s.sides.total)}${sideRow('Partida 1 de la serie', s.sides.by_game?.first)}${sideRow('Partidas 2 en adelante', s.sides.by_game?.rest)}</tbody></table></div>
-    <p class="note">Solo hay ventaja si todo el rango queda de un lado del 50%. La partida 1 es la medición más limpia: en las siguientes elige lado el que perdió, así que el lado se mezcla con quién viene ganando.</p>`;
+function sidesModule(s: MetaSample): string {
+  const t = s.sides.total;
+  if (!t.games) return '';
+  const phases = PHASES.map((p) => sideRow(PHASE_LABELS[p], s.sides.by_phase[p])).join('');
+  return `<section class="mod"><header class="mh"><h2>Lados</h2><span class="q">¿Gana más el azul?</span></header>
+    <div class="split" role="img" aria-label="Azul ${pct(t.blue_winrate)}, rojo ${pct(t.red_winrate)}">
+      <span class="bl" style="flex:${t.blue_winrate ?? 0.5}"><small>AZUL</small>${pct(t.blue_winrate)}</span><span class="rd" style="flex:${t.red_winrate ?? 0.5}">${pct(t.red_winrate)}<small>ROJO</small></span></div>
+    <span class="side-verdict">${sideVerdict(t.low, t.high)}</span>
+    <div><div class="lrow head"><span></span>${axis([0.2, 0.35, 0.5, 0.65, 0.8], 0.2, 0.8, pct)}<span></span></div>
+      ${sideRow('Todas', t)}${sideRow('Partida 1 de la serie', s.sides.by_game?.first)}${sideRow('Partidas 2 en adelante', s.sides.by_game?.rest)}${phases}</div>
+    ${how('El % es del lado azul. Solo hay ventaja si toda la línea del rango queda de un lado del 50% (línea dorada). La partida 1 es la medición más limpia: en Bo3 y Bo5, después elige lado el que perdió, y casi siempre elige azul, así que el lado se mezcla con quién viene ganando.')}</section>`;
 }
 
-function shiftsBlock(rows: ChampionEntry[]): string {
-  const { up, down } = presenceShifts(rows, 8);
-  if (!up.length && !down.length) return '';
-  const table = (items: typeof up) => `<div class="table-wrap"><table class="rank">
-    <thead><tr><th>Campeón</th><th class="num">Guía</th><th class="num">Worlds</th><th class="num">Cambio</th></tr></thead>
-    <tbody>${items.map((x) => `<tr><td><span class="champ-cell">${champHex(x.champion)}<b>${escapeHtml(x.champion)}</b></span></td>
-      <td class="num">${pct(x.before)}</td><td class="num">${pct(x.after)}</td><td class="num">${signed(x.delta * 100)} pts</td></tr>`).join('')}</tbody></table></div>`;
-  return `<h2>Qué cambió con el parche de Worlds</h2>
-    <p class="note">Presencia en Worlds contra la de la guía (ligas en los parches anteriores). La presencia se estabiliza mucho antes que el % de victorias: cada partida dice si el campeón apareció o no.</p>
-    ${up.length ? `<h3 class="eyebrow">Suben</h3>${table(up)}` : ''}
-    ${down.length ? `<h3 class="eyebrow">Bajan</h3>${table(down)}` : ''}`;
+function paceModule(s: MetaSample): string {
+  const t = s.pace.total;
+  if (!t.games) return '';
+  const [min, max] = [20, 45];
+  const x = (v: number) => Math.min(100, Math.max(0, ((v - min) / (max - min)) * 100));
+  const iqr = t.p25_minutes != null && t.p75_minutes != null && t.median_minutes != null ? `
+    <div class="iqr"><span class="label">La mitad de las partidas dura entre ${minutes(t.p25_minutes)} y ${minutes(t.p75_minutes)}</span>
+      <div class="track" role="img" aria-label="Rango intercuartil de ${minutes(t.p25_minutes)} a ${minutes(t.p75_minutes)}, mediana ${minutes(t.median_minutes)}">
+        <span class="band" style="left:${x(t.p25_minutes)}%;width:${x(t.p75_minutes) - x(t.p25_minutes)}%"></span><span class="med" style="left:${x(t.median_minutes)}%"></span></div>
+      ${axis([20, 25, 30, 35, 40, 45], min, max, (v) => `${v}'`)}</div>` : '';
+  const phases = paceRows(s.pace.by_phase).map((r) => `
+    <div class="lrow"><span class="lab">${r.label}<small>${r.games} partidas</small></span><span class="v left">${r.duration}<small>mediana</small></span><span class="v">${r.kpm}<small>kills/min</small></span></div>`).join('');
+  return `<section class="mod"><header class="mh"><h2>Ritmo</h2><span class="q">¿Cuánto duran las partidas?</span></header>
+    <div class="big"><div><span class="label">Duración mediana</span><b>${minutes(t.median_minutes)}</b></div><div><span class="label">Kills por minuto</span><b>${fmt(t.kills_per_min, 2)}</b></div></div>
+    ${iqr}${phases ? `<div>${phases}</div>` : ''}
+    ${how(`Mediana y no promedio: es la partida "del medio" de las ${t.games}. Una partida de 50 minutos tira el promedio para arriba; la mediana casi no se mueve. La franja es el rango intercuartil: si es angosta, casi todas las partidas se parecen.`)}</section>`;
 }
 
-function flexBlock(rows: ChampionEntry[]): string {
-  const flex = flexPicks(rows);
+function regionsModule(s: MetaSample): string {
+  const head = `<header class="mh"><h2>Regiones</h2><span class="q">¿Qué liga gana más contra las otras?</span></header>`;
+  if (!s.regions.length) return `<section class="mod">${head}<div class="state"><b>Todavía no hay partidas entre regiones</b><span>Aparecen cuando se crucen equipos de ligas distintas.</span></div></section>`;
+  const rows = s.regions.map((r) => `
+    <div class="lrow ${r.games < FEW_GAMES ? 'few' : ''}"><span class="lab"><b>${escapeHtml(r.region)}</b><small>${r.wins}-${r.games - r.wins}${r.games < FEW_GAMES ? ' · pocas' : ''}</small></span>
+      ${whisker(r.low, r.high, r.winrate)}<span class="v">${pct(r.winrate)}<small>${range(r.low, r.high)}</small></span></div>`).join('');
+  return `<section class="mod">${head}
+    <div><div class="lrow head"><span></span>${axis([0, 0.25, 0.5, 0.75, 1], 0, 1, pct)}<span></span></div>${rows}</div>
+    ${how('Solo cuentan partidas contra otras regiones: en un LCK contra LCK la región gana siempre exactamente el 50%. Con pocas partidas el rango es enorme; si los rangos de dos regiones se superponen mucho, todavía no se puede decir cuál es mejor.')}</section>`;
+}
+
+function noiseModule(noise: WinrateNoise | null | undefined, k: number | undefined): string {
+  const head = `<header class="mh"><h2>¿Cuánto es ruido?</h2><span class="q">Diferencias de % de victorias entre campeones</span></header>`;
+  if (!noise) return `<section class="mod s2">${head}<div class="state"><b>Todavía hay pocos campeones con ${NOISE_MIN_PICKS} picks o más</b><span>La medición aparece cuando haya más partidas.</span></div></section>`;
+  const spread = Math.round(Math.sqrt(noise.true_var) * 100);
+  return `<section class="mod s2">${head}
+    <div class="noisebar" role="img" aria-label="${pct(noise.noise_share)} azar, ${pct(1 - noise.noise_share)} diferencia real">
+      <span class="nz" style="flex:${noise.noise_share}">${pct(noise.noise_share)} azar</span><span class="rl" style="flex:${1 - noise.noise_share}">${pct(1 - noise.noise_share)}</span></div>
+    <div class="big"><div><span class="label">Diferencia real típica</span><b>±${spread}<small> pts</small></b></div>${k ? `<div><span class="label">Picks para creerle a medias</span><b>${k}</b></div>` : ''}</div>
+    ${how(`Aunque todos los campeones fueran igual de buenos, sus % de victorias serían distintos por pura suerte: con pocas partidas, el azar mueve mucho el número. Comparamos la dispersión entre los ${noise.champions} campeones con ${NOISE_MIN_PICKS} picks o más contra la que daría el azar solo (binomial); lo que sobra es la diferencia real.${k ? ` Con ${k} picks, el % ajustado es mitad dato propio y mitad 50%.` : ''}`)}</section>`;
+}
+
+function miragesModule(rows: ChampionEntry[]): string {
+  const odd = mirages(rows, 5);
+  if (!odd.length) return '';
+  const body = odd.map((c) => `
+    <div class="lrow">${who(champHex(c.champion), escapeHtml(c.champion), `${c.wins}-${c.picks - c.wins}`)}
+      ${dumbbell(c.winrate ?? 0, c.winrate_adj ?? 0, 0, 1)}<span class="v">${pct(c.winrate_adj ?? null)}<small>${pct(c.winrate)} crudo</small></span></div>`).join('');
+  return `<section class="mod s2"><header class="mh"><h2>Espejismos</h2><span class="q">Los que más cambian al ajustar</span></header>
+    <div class="legend"><span><i class="lg-hollow"></i>Crudo</span><span><i class="lg-solid"></i>Ajustado</span></div>
+    <div><div class="lrow head"><span></span>${axis([0, 0.5, 1], 0, 1, pct)}<span></span></div>${body}</div>
+    ${how('Un 100% con 5 picks parece imbatible; ajustado queda cerca del 50%. Con 100 campeones, unos 5 parecen "significativos" de casualidad: ojo con el que encabeza cualquier tabla de % de victorias.')}</section>`;
+}
+
+function flexModule(rows: ChampionEntry[]): string {
+  const flex = flexPicks(rows).slice(0, 8);
   if (!flex.length) return '';
   const body = flex.map((f) => `
-    <tr><td><span class="champ-cell">${champHex(f.champion)}<b>${escapeHtml(f.champion)}</b></span></td>
-      <td>${f.roles.map(([role, n]) => `${ROLE_LABELS[role]} ${n}`).join(' · ')}</td><td class="num">${f.picks}</td></tr>`).join('');
-  return `<h2>Picks flex</h2>
-    <p class="note">Campeones jugados en dos roles o más (al menos 2 partidas en cada uno). Un flex esconde para qué rol se eligió y el rival no puede contrarrestarlo: por eso suelen salir temprano en el draft.</p>
-    <div class="table-wrap"><table class="rank"><thead><tr><th>Campeón</th><th>Roles</th><th class="num">Picks</th></tr></thead><tbody>${body}</tbody></table></div>`;
+    <div class="lrow flex">${who(champHex(f.champion), escapeHtml(f.champion), `${f.picks} picks`)}
+      <span class="roles">${f.roles.map(([role, n]) => `<span>${ROLE_LABELS[role]} ${n}</span>`).join('')}</span></div>`).join('');
+  return `<section class="mod s2"><header class="mh"><h2>Picks flex</h2><span class="q">Jugados en dos roles o más</span></header><div>${body}</div>
+    ${how('Al menos 2 partidas en cada rol. Un flex esconde para qué rol se eligió y el rival no puede contrarrestarlo: por eso suele salir temprano en el draft.')}</section>`;
 }
 
-function spreadBlock(s: MetaSample): string {
-  const t = s.pace.total;
-  const pace = t.p25_minutes != null && t.p75_minutes != null ? `<h2>Ritmo: no solo el centro</h2>
-    <p class="note">La mitad de las partidas dura entre <b>${minutes(t.p25_minutes)}</b> y <b>${minutes(t.p75_minutes)}</b> (mediana ${minutes(t.median_minutes)}). Ese rango (intercuartil) dice cuánto varían: si es angosto, casi todas las partidas se parecen.</p>` : '';
-  const rows = s.regions.map((r) => `
-    <tr><td class="team"><b>${escapeHtml(r.region)}</b></td><td class="num">${r.games}</td><td class="num">${pct(r.winrate)}</td><td class="num">${range(r.low, r.high)}</td></tr>`).join('');
-  const regionsTable = rows ? `<h2>Regiones con su rango</h2>
-    <p class="note">Con pocas partidas entre regiones el rango es enorme. Si los rangos de dos regiones se superponen mucho, todavía no se puede decir cuál es mejor.</p>
-    <div class="table-wrap"><table class="rank"><thead><tr><th>Región</th><th class="num">PJ</th><th class="num">% Vict.</th><th class="num">Rango</th></tr></thead><tbody>${rows}</tbody></table></div>` : '';
-  return pace + regionsTable;
+function shiftsModule(rows: ChampionEntry[]): string {
+  const head = `<header class="mh"><h2>Cambios del parche</h2><span class="q">Presencia en Worlds contra la guía</span></header>`;
+  const { up, down } = presenceShifts(rows, 5);
+  if (!up.length && !down.length) return `<section class="mod">${head}<div class="state"><b>Aparece con las primeras partidas de Worlds</b><span>Compara la presencia de cada campeón en Worlds con la que tenía en la guía.</span></div></section>`;
+  const list = (title: string, items: typeof up) => (items.length ? `<span class="label">${title}</span>${items.map((x) => `
+    <div class="lrow">${who(champHex(x.champion), escapeHtml(x.champion), `${pct(x.before)} → ${pct(x.after)}`)}
+      ${dumbbell(x.before, x.after, 0, 1)}<span class="v ${x.delta < 0 ? 'neg' : 'pos'}">${signed(x.delta * 100)}<small>pts</small></span></div>`).join('')}` : '');
+  return `<section class="mod">${head}
+    <div class="legend"><span><i class="lg-hollow"></i>Guía</span><span><i class="lg-solid"></i>Worlds</span></div>
+    <div>${list('Suben', up)}${list('Bajan', down)}</div>
+    ${how('La guía son las ligas en los parches anteriores. La presencia se estabiliza mucho antes que el % de victorias: cada partida dice si el campeón apareció o no.')}</section>`;
 }
 
-function analysis(s: MetaSample, rows: ChampionEntry[], noise: WinrateNoise | null | undefined, k: number | undefined): string {
+function panorama(s: MetaSample, rows: ChampionEntry[], noise: WinrateNoise | null | undefined, k: number | undefined): string {
   if (!s.games) return empty();
-  return [noiseBlock(noise, k), adjustedBlock(rows, k), sidesBlock(s), shiftsBlock(rows), flexBlock(rows), spreadBlock(s)].join('');
-}
-
-function chartFor(canvas: HTMLCanvasElement, sample: MetaSample): Promise<() => void> {
-  if (state.tab === 'lados') {
-    const phases = phasesWithData(sample.sides.by_phase);
-    return drawBarChart(canvas, phases.map((p) => PHASE_LABELS[p]), [
-      { label: 'Azul', data: phases.map((p) => sample.sides.by_phase[p]?.blue_winrate ?? null), color: '--blue' },
-      { label: 'Rojo', data: phases.map((p) => sample.sides.by_phase[p]?.red_winrate ?? null), color: '--red' },
-    ], (v) => `${Math.round(v * 100)}%`);
-  }
-  const phases = phasesWithData(sample.pace.by_phase);
-  return drawBarChart(canvas, phases.map((p) => PHASE_LABELS[p]), [
-    { label: 'Duración mediana', data: phases.map((p) => sample.pace.by_phase[p]?.median_minutes ?? null), color: '--cyan' },
-  ], minutes);
+  const t = s.sides.total;
+  const kpis = kpiTiles([
+    ['Lado azul', pct(t.blue_winrate), sideVerdict(t.low, t.high)],
+    ['Duración mediana', minutes(s.pace.total.median_minutes), `${s.pace.total.games} partidas`],
+    ['Kills por minuto', fmt(s.pace.total.kills_per_min, 2), 'entre los dos equipos'],
+    ['Azar', noise ? pct(noise.noise_share) : '—', 'de las diferencias de % de victorias'],
+  ]);
+  return `<div class="board">${kpis}${sidesModule(s)}${paceModule(s)}${noiseModule(noise, k)}${miragesModule(rows)}${flexModule(rows)}${regionsModule(s)}${shiftsModule(rows)}</div>`;
 }
 
 export function renderMeta(el: HTMLElement, data: SiteData): () => void {
-  teardown();
   const options = sampleOptions(data.meta);
   if (!state.sample || !options.some(([id]) => id === state.sample)) state.sample = defaultSample(data.meta);
   const sample = data.meta.samples?.[state.sample];
   const champs = data.champions?.samples?.[state.sample] ?? [];
+  const k = data.champions?.prior_picks;
   const body = !sample ? empty()
-    : state.tab === 'campeones' ? champions(champs)
-    : state.tab === 'draft' ? draft(champs)
-    : state.tab === 'lados' ? sides(sample)
-    : state.tab === 'ritmo' ? pace(sample)
-    : state.tab === 'regiones' ? regions(sample)
-    : analysis(sample, champs, data.champions?.analysis?.[state.sample], data.champions?.prior_picks);
+    : state.tab === 'campeones' ? champions(champs, k)
+    : panorama(sample, champs, data.champions?.analysis?.[state.sample], k);
+  const samples = options.length > 1
+    ? `<div class="seg small" role="group" aria-label="Muestra">${options.map(([id, label]) => `<button type="button" data-sample="${id}" aria-pressed="${id === state.sample}">${escapeHtml(label)}</button>`).join('')}</div>`
+    : '';
   const guide = state.sample === 'guide'
-    ? `<p class="note">Guía: partidas de las ligas en los parches ${escapeHtml(data.meta.guide_patch ?? '')}, no de Worlds. Sirve de orientación hasta que el torneo tenga 10 partidas; después se va.</p>`
+    ? `<p class="muted small-note">Guía: partidas de las ligas en los parches ${escapeHtml(data.meta.guide_patch ?? '')}, no de Worlds. Sirve de orientación hasta que el torneo tenga 10 partidas; después se va.</p>`
     : '';
 
   el.innerHTML = `
     <section class="stack">
       <span class="eyebrow">Parche ${escapeHtml(data.meta.worlds_patch ?? '—')} · datos de Oracle's Elixir</span>
       <h1>Meta</h1>
-      ${seg('tab', TABS, state.tab, 'Secciones del meta')}
-      ${options.length > 1 ? seg('sample', options, state.sample, 'Muestra') : ''}
+      <div class="subhead">${subtabs('tab', TABS, state.tab, 'Secciones del meta')}${samples}</div>
       ${guide}
     </section>
     <section class="stack">${body}</section>`;
-
-  // Gráfico de la sub-vista (si corresponde); se destruye al salir o al re-renderizar
-  let destroy: (() => void) | null = null;
-  let alive = true;
-  const canvas = el.querySelector<HTMLCanvasElement>('#meta-chart');
-  if (canvas && sample) {
-    chartFor(canvas, sample).then((d) => { if (alive) destroy = d; else d(); }).catch(() => {
-      canvas.parentElement?.remove(); // sin el gráfico la vista sigue teniendo los números
-    });
-  }
 
   el.onclick = (event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button');
@@ -258,16 +214,21 @@ export function renderMeta(el: HTMLElement, data: SiteData): () => void {
     const d = button.dataset;
     if (d.tab) state.tab = d.tab as Tab;
     else if (d.sample) state.sample = d.sample as SampleId;
+    else if (d.view) { state.view = d.view as View; state.dir = 'desc'; }
+    else if (d.dir !== undefined) state.dir = state.dir === 'desc' ? 'asc' : 'desc';
     else if (d.sort) {
       state.dir = state.sort === d.sort && state.dir === 'desc' ? 'asc' : 'desc';
       state.sort = d.sort;
     } else return;
     renderMeta(el, data);
   };
-  teardown = () => {
-    alive = false;
-    destroy?.();
-    el.onclick = null;
+  el.onchange = (event) => {
+    const select = event.target as HTMLSelectElement;
+    if (select.dataset.sortselect === undefined) return;
+    state.sort = select.value;
+    state.dir = 'desc';
+    renderMeta(el, data);
+    el.querySelector<HTMLSelectElement>('#sort-select')?.focus();
   };
-  return () => teardown();
+  return () => { el.onclick = null; el.onchange = null; };
 }
