@@ -1,5 +1,6 @@
 import type { SiteData } from '../data';
 import { escapeHtml } from '../html';
+import { championIcon } from '../theme/champions';
 import { FEW_GAMES, findById, fmt, PERIODS, pct, periodOf, ROLE_LABELS, signed, type Period } from '../stats';
 import type { PlayerEntry, PlayerStats } from '../types';
 import { notFound } from './team';
@@ -7,10 +8,13 @@ import { how } from './ui';
 
 let period: Period = 'season';
 
-// Campeón como monograma en hexágono (sin retratos oficiales)
+// Campeón en hexágono: el ícono de Data Dragon encima del monograma. Si la imagen no carga
+// (alt vacío = no se dibuja nada roto), se sigue viendo el monograma de abajo
 export function champHex(name: string): string {
   const initials = name.replace(/[^A-Za-z ]/g, '').split(' ').map((w) => w[0] ?? '').join('').slice(0, 2) || '?';
-  return `<span class="champ" title="${escapeHtml(name)}" aria-hidden="true">${escapeHtml(initials.toUpperCase())}</span>`;
+  const icon = championIcon(name);
+  const img = icon ? `<img src="${escapeHtml(icon)}" alt="" loading="lazy" decoding="async">` : '';
+  return `<span class="champ" title="${escapeHtml(name)}" aria-hidden="true">${escapeHtml(initials.toUpperCase())}${img}</span>`;
 }
 
 function kpis(s: PlayerStats): string {

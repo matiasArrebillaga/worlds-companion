@@ -31,7 +31,8 @@ No me dejes tareas para hacer a mí: implementá vos.
 - Frontend: sitio estático Vite + TypeScript sin framework, gráficos con Chart.js (D3 solo si Chart.js no alcanza).
 - Deploy: GitHub Pages, actualizado por GitHub Actions (cron horario durante Worlds).
 - Flujo: scripts de Python generan JSON en `web/public/data/`; el frontend solo lee esos JSON.
-  El frontend nunca llama directamente a APIs externas.
+  El frontend nunca llama directamente a APIs externas (la única excepción son las imágenes de campeones,
+  que se cargan del CDN de Data Dragon de Riot).
 
 ## Estructura
 
@@ -48,6 +49,7 @@ notebooks/              # exploración, aprendizaje y backtest
 tests/                  # pytest
 web/                    # sitio (Vite)
 web/public/data/        # JSON que consume el sitio
+web/public/img/teams/   # logos de equipos (128 px, los baja pipeline/assets.py; commiteados)
 ```
 
 ## Comandos
@@ -55,6 +57,7 @@ web/public/data/        # JSON que consume el sitio
 ```
 python -m pipeline.fetch        # descarga datos nuevos a data/raw/
 python -m pipeline.fetch_oracles  # extracto de Oracle's Elixir (como mucho una vez por día)
+python -m pipeline.assets       # logos que falten + versión de Data Dragon (también lo corre pipeline.fetch)
 python -m models.role_form      # reajusta los pesos de la forma por rol (necesita --history)
 python -m pipeline.build        # limpia, corre el Elo, calcula stats, valida y genera los JSON del sitio
 python -m models.elo            # recalcula ratings y predicciones (suelto, para experimentar)
@@ -70,6 +73,9 @@ cd web && npm run build         # build de producción
 - Cachear en `data/raw/` y no repetir descargas innecesarias. El historial de la temporada se baja una sola vez.
 - Guardar siempre la fecha de descarga junto a los datos.
 - Atribuir a Leaguepedia (CC-BY-SA).
+- Logos de equipos: variante "square" de Leaguepedia (respaldo: campo Image de Teams), bajados una sola vez.
+  El CDN de Fandom pide Referer de lol.fandom.com. Los logos negros se pasan a blanco (no se verían).
+- Íconos de campeones: Data Dragon de Riot (`data/raw/ddragon_champions.json`: nombre en inglés → id de imagen).
 - Oracle's Elixir: forma de los jugadores del modelo elo-2 y meta (parche de Worlds 16.20; guía 16.17–16.18 hasta
   que Worlds tenga 10 partidas), con un extracto diario en `data/raw/oracles_2026.json`; CSV completos para los
   notebooks (`--history`, no se commitean). Atribuir en el footer.
@@ -105,12 +111,13 @@ cd web && npm run build         # build de producción
 ## Estilo visual
 
 Estética "hextech de transmisión", oscura y elegante, original. 
-Riot Games. Solo modo oscuro.
+Se usan recursos del juego (íconos de campeones) bajo la política de fan content de Riot; nunca logos ni marcas de
+Riot Games (ni el de League of Legends ni el de Worlds). Fotos de jugadores: no. Solo modo oscuro.
 
 | Token | Color | Uso |
 |---|---|---|
-| bg | `#05070E` | Fondo principal |
-| sunken | `#020309` | Pistas de barras, inputs |
+| bg | `#090D18` | Fondo principal |
+| sunken | `#05070E` | Pistas de barras, inputs |
 | card | `#111A2E` | Tarjetas |
 | raised | `#1C2842` | Hover, sub-pestaña activa, paneles laterales |
 | card-hi | `#24324F` | Tarjeta del próximo partido |
@@ -136,7 +143,8 @@ Riot Games. Solo modo oscuro.
 - Tipografía (Google Fonts): Saira Condensed 600–700 para títulos (mayúsculas, leve espaciado),
   Plus Jakarta Sans para texto, JetBrains Mono con `tabular-nums` para números.
 - Tarjetas con esquinas cortadas (clip-path) y borde degradé dorado→cian sutil; panal de hexágonos muy tenue.
-- Campeones con monograma en hexágono, sin retratos oficiales.
+- Campeones: ícono de Data Dragon recortado en hexágono; si no carga, monograma.
+- Equipos: logo junto a la sigla, subrayado con el color de la región; sin logo, rombito de la región.
 - Mobile first: se usa mucho desde el celular mientras se mira el partido.
 - Gráficos con fondo transparente, grillas tenues y tooltips con el dato exacto.
 - Animaciones sutiles y cortas con `cubic-bezier(.32,.72,0,1)`; respetar `prefers-reduced-motion`.
@@ -153,7 +161,9 @@ Riot Games. Solo modo oscuro.
 
 El footer de todas las páginas debe incluir: "Worlds Companion no está respaldado por Riot Games y no refleja
 las opiniones de Riot Games ni de nadie involucrado oficialmente en la producción o gestión de League of Legends.
-League of Legends y Riot Games son marcas registradas de Riot Games, Inc."
+League of Legends y Riot Games son marcas registradas de Riot Games, Inc." y, como se usan recursos de Riot,
+"Worlds Companion se creó bajo la política «Legal Jibber Jabber» de Riot Games usando recursos propiedad de
+Riot Games. Riot Games no respalda ni patrocina este proyecto."
 
 ## Glosario
 

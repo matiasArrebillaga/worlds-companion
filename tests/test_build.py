@@ -67,7 +67,8 @@ def test_build_writes_contract_files(tmp_path):
     assert meta["worlds_games"] == 0 and meta["guide_patch"] == "16.17–16.18"
     assert set(meta["samples"]["worlds"]) == {"games", "sides", "pace", "regions"}
     champions = json.loads((tmp_path / "out" / "champions.json").read_text(encoding="utf-8"))
-    assert set(champions) == {"updated_at", "worlds_patch", "guide_patch", "samples", "prior_picks", "analysis"}
+    assert set(champions) == {"updated_at", "worlds_patch", "guide_patch", "samples", "prior_picks", "analysis", "icons"}
+    assert champions["icons"] is None  # sin caché de Data Dragon en el raw de prueba
     assert set(champions["samples"]) == {"worlds", "guide"}
     assert set(elo) == {"model_version", "updated_at", "params", "backtest", "role_form", "teams", "accuracy"}
     ratings = [t["rating"] for t in elo["teams"]]
@@ -141,7 +142,7 @@ def test_build_writes_team_and_player_stats(tmp_path):
     teams, players = read("teams.json"), read("players.json")
     assert set(teams) == {"updated_at", "stats_fetched_at", "teams"}
     t1 = next(t for t in teams["teams"] if t["name"] == "T1")
-    assert set(t1) == {"id", "name", "short", "region", "rating", "roster", "season", "worlds", "vs_worlds",
+    assert set(t1) == {"id", "name", "short", "region", "logo", "rating", "roster", "season", "worlds", "vs_worlds",
                       "elo_history", "series"}
     assert all("form" in p for p in players["players"])
     assert t1["id"] == "t1" and len(t1["elo_history"]) == 12 and t1["series"]

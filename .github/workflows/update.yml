@@ -45,11 +45,11 @@ jobs:
       - name: Build site data and freeze new predictions (fails on invalid data, so nothing is deployed)
         run: python -m pipeline.build --freeze
 
-      - name: Commit raw data and frozen predictions if they changed
+      - name: Commit raw data, frozen predictions and new team logos if they changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/raw data/predictions.jsonl
+          git add data/raw data/predictions.jsonl web/public/img
           git diff --cached --quiet || (git commit -m "data: update Worlds 2026 data and frozen predictions" && git push)
 
       - uses: actions/setup-node@v4

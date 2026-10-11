@@ -1,6 +1,7 @@
 import { drawEloChart } from '../charts/eloChart';
 import type { SiteData } from '../data';
 import { escapeHtml } from '../html';
+import { logoImg } from '../theme/regions';
 import { findById, fmt, PERIODS, pct, periodOf, ROLE_LABELS, signed, type Period } from '../stats';
 import type { TeamEntry, TeamStats } from '../types';
 
@@ -56,7 +57,7 @@ export function renderTeam(el: HTMLElement, data: SiteData, _tz: string, param: 
   el.innerHTML = `
     <section class="stack">
       <span class="eyebrow">${escapeHtml(team.region ?? 'Equipo')} · Elo ${fmt(team.rating)}</span>
-      <h1>${escapeHtml(team.short)}</h1>
+      <h1 class="team-title">${logoImg(team.logo)}${escapeHtml(team.short)}</h1>
       <p class="muted">${escapeHtml(team.name)}</p>
       <div class="seg" role="group" aria-label="Período">${buttons}</div>
       ${stats ? teamKpis(stats) : '<div class="state"><b>Todavía no jugó en Worlds 2026</b></div>'}

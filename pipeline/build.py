@@ -13,6 +13,7 @@ from models.oracles import read_extract
 from models.role_form import adjustment, load_model, norms_of, resolve_team
 from models.predictions import attach_predictions, evaluate, freeze, make_predictions, read_frozen, ready_to_freeze
 from pipeline import utc_now_iso
+from pipeline.assets import DDRAGON_FILE, champion_icons, logo_url
 from pipeline.history import CURRENT_YEAR, load_aliases, load_season_games
 from pipeline.meta import build_meta
 from pipeline.schedule import UNDECIDED_TEAMS, build_schedule, short_name
@@ -51,7 +52,7 @@ def elo_payload(teams, run, regions, shorts, aliases, accuracy, now, role_model,
     for name in teams:
         canonical = aliases.get(name, name)
         rated.append({"name": name, "short": short_name(name, shorts), "region": regions.get(canonical),
-                      "rating": round(run.ratings[canonical], 1), "games": run.games_played[canonical]})
+                      "logo": logo_url(name), "rating": round(run.ratings[canonical], 1), "games": run.games_played[canonical]})
     rated.sort(key=lambda t: -t["rating"])
     return {
         "model_version": MODEL_VERSION,
@@ -102,7 +103,7 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
             teams_payload.append({
                 **{k: team_stats_by_name[name][k] for k in ("id", "roster", "season", "worlds", "vs_worlds")},
                 "name": name, "short": short_name(name, shorts), "region": regions.get(canonical),
-                "rating": round(run.ratings[canonical], 1),
+                "logo": logo_url(name), "rating": round(run.ratings[canonical], 1),
                 "elo_history": elo_history(run.records, canonical),
                 "series": series_list(run.records, canonical),
             })
@@ -134,7 +135,9 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
         "samples": meta_stats["samples"],
     })
     _write(out_dir / "champions.json", {"updated_at": now, **patches, "prior_picks": meta_stats["prior_picks"],
-                                        "samples": meta_stats["champions"], "analysis": meta_stats["analysis"]})
+                                        "samples": meta_stats["champions"], "analysis": meta_stats["analysis"],
+                                        # Íconos de Data Dragon: el sitio arma la URL con base + id
+                                        "icons": champion_icons(raw_dir / DDRAGON_FILE.name)})
     _write(out_dir / "elo.json", elo_payload(teams, run, regions, shorts, aliases, evaluate(schedule, frozen), now,
                                                 role_model, oe_fetched_at))
     _write(out_dir / "teams.json", {"updated_at": now, "stats_fetched_at": oe_fetched_at, "teams": teams_payload})

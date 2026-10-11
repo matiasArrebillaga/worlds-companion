@@ -73,6 +73,11 @@ def _get(session, params: dict, sleep) -> dict:
     raise AssertionError("unreachable")
 
 
+def api_get(session, params: dict, sleep=time.sleep) -> dict:
+    """Consulta a la API de MediaWiki (no Cargo), con los mismos reintentos ante rate limit."""
+    return _get(session, {"format": "json", **params}, sleep)
+
+
 def cargo_query(session, *, tables: str, fields: str, where: str = "", order_by: str = "", sleep=time.sleep) -> list[dict]:
     """Consulta Cargo completa (recorre todas las páginas). Cada fila es un dict de strings."""
     rows: list[dict] = []

@@ -1,5 +1,6 @@
 import type { SiteData } from '../data';
 import { escapeHtml } from '../html';
+import { logoImg } from '../theme/regions';
 import { minutes } from '../meta';
 import { FEW_GAMES, fmt, formRanking, PERIODS, pct, periodOf, ROLE_LABELS, signed, sortBy, vsWorldsRows, type Period } from '../stats';
 import type { PlayerEntry, PlayerStats, Role, TeamEntry, TeamStats } from '../types';
@@ -70,7 +71,7 @@ function empty(): string {
   return '<div class="state"><b>Todavía no hay partidas de Worlds 2026</b><span>Las estadísticas del torneo aparecen después de las primeras partidas. Mientras tanto, mirá la temporada.</span></div>';
 }
 
-const teamWho = (r: TeamRow) => who(`<span class="tagchip">${escapeHtml(r.team.region ?? '—')}</span>`,
+const teamWho = (r: TeamRow) => who(`${logoImg(r.team.logo)}<span class="tagchip">${escapeHtml(r.team.region ?? '—')}</span>`,
   `<a href="#/equipo/${encodeURIComponent(r.team.id)}">${escapeHtml(r.team.short)}</a>`, escapeHtml(r.team.name), 'tm');
 
 const playerWho = (r: PlayerRow) => who(`<span class="tagchip">${ROLE_TAGS[r.player.role]}</span>`,

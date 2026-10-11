@@ -48,6 +48,7 @@ export interface RatedTeam {
   name: string;
   short: string;
   region: string | null;
+  logo?: string | null; // ruta relativa al sitio (img/teams/...), null si no hay logo
   rating: number;
   games: number;
 }
@@ -129,6 +130,7 @@ export interface TeamEntry {
   name: string;
   short: string;
   region: string | null;
+  logo?: string | null;
   rating: number;
   roster: string[]; // ids de jugadores de la última alineación, en orden de rol
   season: TeamStats;
@@ -268,4 +270,10 @@ export interface ChampionsFile {
   prior_picks?: number;
   samples: Partial<Record<SampleId, ChampionEntry[]>>;
   analysis?: Partial<Record<SampleId, WinrateNoise | null>>;
+  icons?: ChampionIcons | null; // Data Dragon: URL = base + ids[nombre] + '.png'
+}
+
+export interface ChampionIcons {
+  base: string;
+  ids: Record<string, string>;
 }

@@ -4,7 +4,7 @@ import { countdownParts, formatDateTimeLong, formatDayHeading, formatDayShort, f
 import { escapeHtml } from '../html';
 import { dayKeyOf, featuredMatch, groupByDay, recentResults } from '../schedule';
 import { PENDING, swissRounds, swissStandings } from '../swiss';
-import { teamRegionColor } from '../theme/regions';
+import { teamMark, teamRegionColor } from '../theme/regions';
 import type { Match, Team } from '../types';
 import { matchCard, predictionBlock, teamTag } from './matchCard';
 import { BO1_NOTE, handlePredictionsClick, predictionsView } from './predictions';
@@ -104,7 +104,7 @@ function shortOf(team: Team | null): string {
 // Botón con la sigla: tocarlo resalta el camino del equipo en todas las rondas
 function teamButton(team: Team): string {
   const on = picked === team.name ? ' hl' : '';
-  return `<button type="button" class="tm${on}" data-team="${escapeHtml(team.name)}" aria-pressed="${picked === team.name}" style="--rc:${teamRegionColor(team.name)}"><i class="rg" aria-hidden="true"></i>${escapeHtml(team.short)}</button>`;
+  return `<button type="button" class="tm${on}" data-team="${escapeHtml(team.name)}" aria-pressed="${picked === team.name}" style="--rc:${teamRegionColor(team.name)}">${teamMark(team.name)}${escapeHtml(team.short)}</button>`;
 }
 
 function teamLine(m: Match, side: 'team1' | 'team2'): string {

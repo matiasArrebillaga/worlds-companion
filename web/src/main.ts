@@ -1,6 +1,7 @@
 import './styles.css';
 import { isNewer, loadData, loadMeta, type SiteData } from './data';
-import { setRegions } from './theme/regions';
+import { setChampionIcons } from './theme/champions';
+import { setTeams } from './theme/regions';
 import { localDayKey, resolveTimeZone } from './format';
 import { dayKeyOf } from './schedule';
 import { renderCalendar } from './views/calendar';
@@ -35,7 +36,8 @@ function currentRoute() {
 }
 
 function render(data: SiteData): void {
-  setRegions(data.elo.teams);
+  setTeams(data.elo.teams);
+  setChampionIcons(data.champions.icons);
   cleanup();
   const { path, param } = currentRoute();
   cleanup = ROUTES[path](view, data, tz, param);

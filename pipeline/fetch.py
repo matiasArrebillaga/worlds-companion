@@ -6,7 +6,7 @@ Solo reescribe un archivo si los datos cambiaron, para no ensuciar el historial 
 import json
 from pathlib import Path
 
-from pipeline import leaguepedia, utc_now_iso
+from pipeline import assets, leaguepedia, utc_now_iso
 from pipeline.history import GAME_FIELDS
 from pipeline.schedule import UNDECIDED_TEAMS
 
@@ -98,6 +98,12 @@ def main() -> None:
         teams = sorted(cached + fetched, key=lambda t: t["Name"])
         write_if_changed(TEAMS_FILE, teams, now)
     print(f"teams: {len(known) + len(missing)} ({len(missing)} new)")
+
+    # Imágenes (logos que falten y versión de Data Dragon). Si falla, los datos ya quedaron guardados
+    try:
+        assets.main(session)
+    except Exception as error:  # noqa: BLE001 — una imagen nunca debe frenar la actualización
+        print(f"assets: skipped ({error})")
 
 
 if __name__ == "__main__":

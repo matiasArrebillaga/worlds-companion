@@ -1,14 +1,15 @@
+import { escapeHtml } from '../html';
 import type { RatedTeam } from '../types';
 
-// Color de cada región: un rombito al lado del nombre del equipo, siempre junto al texto (nunca solo color).
-// Los valores viven en styles.css (--region-*); acá solo se elige cuál usar.
+// Identidad visual de cada equipo: color de su región (rombito o subrayado del logo) y logo.
+// Los colores viven en styles.css (--region-*); los logos, en public/img/teams (los baja pipeline/assets.py).
 const KNOWN = new Set(['KR', 'CN', 'EU', 'NA', 'BR', 'APAC']);
 
-// Región por nombre de equipo. Los partidos no traen la región: sale del ranking Elo al cargar los datos
-let byTeam = new Map<string, string | null>();
+// Los partidos solo traen nombre y sigla: región y logo salen del ranking Elo al cargar los datos
+let byTeam = new Map<string, Pick<RatedTeam, 'region' | 'logo'>>();
 
-export function setRegions(teams: RatedTeam[]): void {
-  byTeam = new Map(teams.map((t) => [t.name, t.region]));
+export function setTeams(teams: RatedTeam[]): void {
+  byTeam = new Map(teams.map((t) => [t.name, { region: t.region, logo: t.logo }]));
 }
 
 export function regionColor(region: string | null | undefined): string {
@@ -16,5 +17,20 @@ export function regionColor(region: string | null | undefined): string {
 }
 
 export function teamRegionColor(teamName: string): string {
-  return regionColor(byTeam.get(teamName));
+  return regionColor(byTeam.get(teamName)?.region);
+}
+
+export function logoSrc(logo: string | null | undefined): string | null {
+  return logo ? `${import.meta.env.BASE_URL}${logo}` : null;
+}
+
+// <img> del logo (decorativo: la sigla o el nombre siempre van al lado). Vacío si no hay logo
+export function logoImg(logo: string | null | undefined): string {
+  const src = logoSrc(logo);
+  return src ? `<img class="logo" src="${escapeHtml(src)}" alt="" loading="lazy" decoding="async">` : '';
+}
+
+// Logo del equipo o, si no tiene, el rombito de su región
+export function teamMark(teamName: string): string {
+  return logoImg(byTeam.get(teamName)?.logo) || '<i class="rg" aria-hidden="true"></i>';
 }

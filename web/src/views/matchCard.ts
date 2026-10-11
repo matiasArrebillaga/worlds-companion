@@ -1,7 +1,7 @@
 import { formatPercent, formatTime, PHASE_LABELS, roundLabel } from '../format';
 import { escapeHtml } from '../html';
 import { favorite, gameOdds, verdict } from '../predictions';
-import { teamRegionColor } from '../theme/regions';
+import { teamMark, teamRegionColor } from '../theme/regions';
 import type { Match, Team } from '../types';
 
 type Side = 'team1' | 'team2';
@@ -13,10 +13,10 @@ function result(m: Match, side: Side): string {
     : '<span class="res l" title="Derrota">D</span>';
 }
 
-// Sigla del equipo con el rombito del color de su región
+// Sigla del equipo con su logo (subrayado con el color de la región) o, si no hay logo, el rombito
 export function teamTag(team: Team | null): string {
   if (!team) return '<span class="tag tbd">Por definir</span>';
-  return `<span class="tag" title="${escapeHtml(team.name)}" style="--rc:${teamRegionColor(team.name)}"><i class="rg" aria-hidden="true"></i>${escapeHtml(team.short)}</span>`;
+  return `<span class="tag" title="${escapeHtml(team.name)}" style="--rc:${teamRegionColor(team.name)}">${teamMark(team.name)}${escapeHtml(team.short)}</span>`;
 }
 
 function teamSide(m: Match, side: Side): string {

@@ -1,7 +1,7 @@
 :root {
   color-scheme: dark;
-  --bg: #05070E;
-  --sunken: #020309;
+  --bg: #090D18;
+  --sunken: #05070E;
   --card: #111A2E;
   --raised: #1C2842;
   --card-hi: #24324F;
@@ -557,3 +557,14 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
   .hit-row { grid-template-columns: 1fr auto; }
   .hit-row .d { grid-column: 1 / -1; }
 }
+
+/* ================= Logos de equipos e íconos de campeones =================
+   Logo: tamaño relativo a la sigla, subrayado con el color de la región. Sin logo queda el rombito.
+   Campeón: ícono de Data Dragon recortado en el hexágono, encima del monograma (que se ve si no carga). */
+.logo { object-fit: contain; flex: none; }
+.tag .logo, .tm .logo { width: 1.15em; height: 1.15em; padding-bottom: 3px; border-bottom: 2px solid var(--rc); }
+.who .logo { width: 30px; height: 30px; }
+.team-title { display: flex; align-items: center; gap: 14px; }
+.team-title .logo { width: 1.1em; height: 1.1em; }
+.champ { position: relative; overflow: hidden; }
+.champ img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.15); }
