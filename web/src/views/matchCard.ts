@@ -77,7 +77,7 @@ export function matchCard(m: Match, tz: string): string {
   const middle = m.score ? `<span class="score">${m.score[0]}–${m.score[1]}</span>` : '<span class="vs">VS</span>';
   const footRight = m.status === 'live' ? 'Se actualiza cada hora' : escapeHtml(time);
   return `
-    <article class="bezel${m.status === 'live' ? ' live' : m.status === 'finished' ? ' done' : ''}">
+    <article class="bezel${m.status === 'live' ? ' live' : m.status === 'finished' ? ' done' : ''}" data-id="${escapeHtml(m.id)}">
       <div class="core match">
         <div class="match-head">${head(m, time)}<span class="label">${escapeHtml(roundLabel(m.round))} · Bo${m.best_of}</span></div>
         <div class="teams">${teamSide(m, 'team1')}${middle}${teamSide(m, 'team2')}</div>

@@ -6,7 +6,11 @@ import { localDayKey, resolveTimeZone } from './format';
 import { dayKeyOf } from './schedule';
 import { renderCalendar } from './views/calendar';
 import { canGoBack, markNewStep, parseHash, rememberScroll, savedScroll, syncDepth, tabFor, type Route } from './router';
-import { renderUpdated, setActiveTab } from './views/layout';
+import { renderLive, renderUpdated, setActiveTab, showToast, withTransition } from './views/layout';
+import { finishedSince, resultLine } from './changes';
+import { escapeHtml } from './html';
+import { verdict } from './predictions';
+import type { Match } from './types';
 import { renderMatch } from './views/match';
 import { renderMeta } from './views/meta';
 import { renderPlayer } from './views/player';
@@ -46,6 +50,7 @@ function render(data: SiteData): void {
   cleanup();
   const r = currentRoute();
   cleanup = ROUTES[r.path](view, data, tz, r);
+  renderLive(data.schedule.matches.some((m) => m.status === 'live'));
 }
 
 // Navegar. Si es "atrás" o "adelante" y ya habíamos estado ahí, se vuelve al mismo lugar del scroll;
@@ -58,6 +63,23 @@ function route(data: SiteData, restore = false): void {
   if (saved !== undefined) window.scrollTo(0, saved);
   else if (today) today.scrollIntoView({ block: 'start' });
   else window.scrollTo(0, 0);
+}
+
+// Tarjetas esqueleto mientras llegan los datos: la espera tiene la forma de lo que viene
+const SKELETON = `<div class="stack" aria-busy="true" aria-label="Cargando partidos">${'<div class="sk"><i style="width:30%"></i><i class="big" style="width:80%"></i><i style="width:55%"></i></div>'.repeat(3)}</div>`;
+
+// Aviso de los partidos que terminaron desde la última carga, y destello en su tarjeta
+function announce(finished: Match[]): void {
+  const lines = finished.flatMap((m) => {
+    const line = resultLine(m);
+    if (!line) return [];
+    const v = verdict(m);
+    const mark = v === 'hit' ? '<span class="verdict hit">✓ Acertó</span>' : v === 'miss' ? '<span class="verdict miss">✗ Falló</span>' : '';
+    return [`<span class="toast-line"><b>${escapeHtml(line)}</b><span class="muted">terminó la serie</span>${mark}</span>`];
+  });
+  if (!lines.length) return;
+  showToast(lines.slice(0, 3).join('') + (lines.length > 3 ? `<span class="muted">y ${lines.length - 3} más</span>` : ''));
+  for (const m of finished) view.querySelector(`[data-id="${CSS.escape(m.id)}"]`)?.classList.add('flash');
 }
 
 // Un clic en un link interno es una navegación nueva; un hashchange sin clic es atrás/adelante
@@ -83,6 +105,7 @@ async function refreshIfNewer(data: SiteData): Promise<SiteData> {
     if (!isNewer(data.meta, await loadMeta())) return data;
     const fresh = await loadData();
     render(fresh);
+    announce(finishedSince(data.schedule.matches, fresh.schedule.matches));
     return fresh;
   } catch {
     return data; // sin conexión: se sigue mostrando lo último que se cargó
@@ -97,7 +120,7 @@ function refreshUpdated(data: SiteData): void {
 }
 
 async function start(): Promise<void> {
-  view.innerHTML = '<div class="state"><b>Cargando partidos…</b></div>';
+  view.innerHTML = SKELETON;
   let data: SiteData;
   try {
     data = await loadData();
@@ -116,7 +139,8 @@ async function start(): Promise<void> {
     rememberScroll(new URL(event.oldURL).hash, window.scrollY);
     if (linkClicked) markNewStep();
     else syncDepth();
-    route(data, !linkClicked);
+    const restore = !linkClicked;
+    withTransition(() => route(data, restore));
     linkClicked = false;
   });
   route(data);

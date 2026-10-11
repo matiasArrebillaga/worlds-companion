@@ -3,6 +3,7 @@ import type { SiteData } from '../data';
 import { countdownParts, formatDateTimeLong, formatDayHeading, formatDayShort, formatTime, localDayKey, pad2, PHASE_LABELS, roundLabel } from '../format';
 import { escapeHtml } from '../html';
 import { go, pick } from '../router';
+import { withTransition } from './layout';
 import { dayKeyOf, featuredMatch, groupByDay, recentResults } from '../schedule';
 import { PENDING, swissRounds, swissStandings } from '../swiss';
 import { teamMark, teamRegionColor } from '../theme/regions';
@@ -53,7 +54,7 @@ function featureCard(m: Match, tz: string): string {
     : `<span class="pill gold">Próximo · ${PHASE_LABELS[m.phase]} · ${escapeHtml(roundLabel(m.round))}</span>`;
   const middle = m.score ? `<span class="score">${m.score[0]}–${m.score[1]}</span>` : '<span class="vs">VS</span>';
   return `
-    <article class="bezel feature${m.status === 'live' ? ' live' : ''}" id="hoy">
+    <article class="bezel feature${m.status === 'live' ? ' live' : ''}" id="hoy" data-id="${escapeHtml(m.id)}">
       <div class="core">
         <div class="match-head">${pill}<span class="label">${when} · Bo${m.best_of}</span></div>
         <div class="teams">
@@ -277,15 +278,21 @@ export function renderCalendar(el: HTMLElement, data: SiteData, tz: string, rout
       next = { sub: 'predicciones', ...pred };
     }
     const [key, value] = Object.entries(button.dataset)[0];
-    go(hashOf(next));
-    renderCalendar(el, data, tz, next);
-    // Volver el foco al botón elegido (el re-render reemplaza los botones)
-    el.querySelector<HTMLButtonElement>(`button[data-${key}="${value}"]`)?.focus();
-    // Al entrar a la lista o a la suiza, ir a lo de hoy (como al abrir la página)
-    const toSwiss = next.sub === 'bracket' && pick(next.stage ?? null, STAGE_IDS, currentStage(matches)) === 'suiza';
-    if (button.dataset.stage === 'suiza' || (button.dataset.sub && (next.sub === 'lista' || toSwiss))) {
-      el.querySelector('#hoy')?.scrollIntoView({ block: 'start' });
-    }
+    const hash = hashOf(next);
+    const update = () => {
+      go(hash);
+      renderCalendar(el, data, tz, next);
+      // Volver el foco al botón elegido (el re-render reemplaza los botones)
+      el.querySelector<HTMLButtonElement>(`button[data-${key}="${value}"]`)?.focus();
+      // Al entrar a la lista o a la suiza, ir a lo de hoy (como al abrir la página)
+      const toSwiss = next.sub === 'bracket' && pick(next.stage ?? null, STAGE_IDS, currentStage(matches)) === 'suiza';
+      if (button.dataset.stage === 'suiza' || (button.dataset.sub && (next.sub === 'lista' || toSwiss))) {
+        el.querySelector('#hoy')?.scrollIntoView({ block: 'start' });
+      }
+    };
+    // Cambiar de pestaña o de fase lleva fundido; un filtro redibuja en el lugar
+    if (hash !== location.hash) withTransition(update);
+    else update();
   };
 
   return () => {

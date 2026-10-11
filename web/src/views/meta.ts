@@ -2,6 +2,7 @@ import type { SiteData } from '../data';
 import { PHASE_LABELS } from '../format';
 import { escapeHtml } from '../html';
 import { go, pick } from '../router';
+import { withTransition } from './layout';
 import { defaultSample, flexPicks, minutes, mirages, paceRows, PHASES, presenceShifts, range, sampleOptions, sideVerdict } from '../meta';
 import { FEW_GAMES, fmt, pct, ROLE_LABELS, signed, sortBy } from '../stats';
 import type { ChampionEntry, MetaSample, SampleId, SideSplit, WinrateNoise } from '../types';
@@ -229,9 +230,12 @@ export function renderMeta(el: HTMLElement, data: SiteData, tabParam: string | n
     const d = button.dataset;
     if (d.tab) {
       // La pestaña entra al historial: "atrás" vuelve a la anterior
-      go(`#/meta/${d.tab}`);
-      renderMeta(el, data, d.tab);
-      el.querySelector<HTMLButtonElement>(`button[data-tab="${d.tab}"]`)?.focus();
+      const next = d.tab;
+      withTransition(() => {
+        go(`#/meta/${next}`);
+        renderMeta(el, data, next);
+        el.querySelector<HTMLButtonElement>(`button[data-tab="${next}"]`)?.focus();
+      });
       return;
     }
     if (d.sample) state.sample = d.sample as SampleId;

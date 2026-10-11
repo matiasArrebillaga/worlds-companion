@@ -1,6 +1,7 @@
 import type { SiteData } from '../data';
 import { escapeHtml } from '../html';
 import { go, pick } from '../router';
+import { withTransition } from './layout';
 import { logoImg, REGION_LEAGUES } from '../theme/regions';
 import { minutes } from '../meta';
 import { FEW_GAMES, fmt, formRanking, PERIODS, pct, periodOf, ROLE_LABELS, signed, sortBy, vsWorldsRows, type Period } from '../stats';
@@ -196,9 +197,12 @@ export function renderStats(el: HTMLElement, data: SiteData, tabParam: string | 
     const d = button.dataset;
     if (d.tab) {
       // La pestaña entra al historial: "atrás" vuelve a la anterior
-      go(`#/equipos/${d.tab}`);
-      renderStats(el, data, d.tab);
-      el.querySelector<HTMLButtonElement>(`button[data-tab="${d.tab}"]`)?.focus();
+      const next = d.tab;
+      withTransition(() => {
+        go(`#/equipos/${next}`);
+        renderStats(el, data, next);
+        el.querySelector<HTMLButtonElement>(`button[data-tab="${next}"]`)?.focus();
+      });
       return;
     }
     if (d.period) state.period = d.period as Period;

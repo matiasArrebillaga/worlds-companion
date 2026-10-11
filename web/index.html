@@ -17,7 +17,7 @@
     <header class="topbar">
       <a class="wordmark" href="#/" aria-label="Worlds Companion, ir al Calendario"><span class="hexmark" aria-hidden="true"></span>Worlds Companion</a>
       <nav class="tabs" aria-label="Secciones">
-        <a class="tab" href="#/" data-tab="#/">Calendario</a>
+        <a class="tab" href="#/" data-tab="#/"><i class="dot live-dot" aria-hidden="true"></i>Calendario</a>
         <a class="tab" href="#/equipos" data-tab="#/equipos">Equipos</a>
         <a class="tab" href="#/meta" data-tab="#/meta">Meta</a>
       </nav>
@@ -25,6 +25,7 @@
     </header>
 
     <main id="view" class="app"></main>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
     <footer class="site-footer">
       <div class="rule" aria-hidden="true"><i></i></div>
@@ -35,7 +36,7 @@
 
     <nav class="bottombar" aria-label="Secciones">
       <a href="#/" data-tab="#/">
-        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>Calendario
+        <i class="dot live-dot" aria-hidden="true"></i><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15"/><path d="M4 10h16M9 3v4M15 3v4"/></svg><span data-cal-label>Calendario</span>
       </a>
       <a href="#/equipos" data-tab="#/equipos">
         <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M7 16V9M12 16V5M17 16v-4"/></svg>Equipos
