@@ -144,6 +144,7 @@ export interface TableOptions<T> {
   sort: string;
   dir: Dir;
   few?: (row: T) => boolean; // muestra chica: la fila se atenúa
+  rankOf?: (row: T) => number; // puesto en la tabla completa (al buscar, las filas filtradas lo conservan)
 }
 
 // Tabla aireada: encabezado por grupo, la columna que ordena resaltada y con barra
@@ -166,7 +167,44 @@ export function airyTable<T>(o: TableOptions<T>): string {
       const drawing = c.bar ? c.bar(row) : c.id === o.sort ? meter(c.kind, c.value(row), scale[c.id], c.ref) : '';
       return `<td class="${cls(c)}" data-label="${c.label}">${c.show(row)}${c.sub ? `<small>${c.sub(row)}</small>` : ''}${drawing}</td>`;
     }).join('');
-    return `<tr class="${o.few?.(row) ? 'few' : ''}"><td class="ent"><div class="ent-in"><span class="rk">${i + 1}</span>${o.whoOf(row)}</div></td>${cells}</tr>`;
+    return `<tr class="${o.few?.(row) ? 'few' : ''}"><td class="ent"><div class="ent-in"><span class="rk">${o.rankOf ? o.rankOf(row) : i + 1}</span>${o.whoOf(row)}</div></td>${cells}</tr>`;
   }).join('');
   return `<table class="airy"><thead>${groupRow}<tr><th>${o.first}</th>${head}</tr></thead><tbody>${body}</tbody></table>`;
+}
+
+// ---- Buscador de tablas ----
+
+// Sin tildes, mayúsculas ni signos: "kaisa" encuentra a "Kai'Sa" y "leblanc" a "LeBlanc"
+export function normalize(text: string): string {
+  return text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+// ¿Alguno de los campos contiene lo buscado? Sin búsqueda, todo coincide
+export function matches(query: string, ...fields: (string | null | undefined)[]): boolean {
+  const q = normalize(query);
+  return !q || fields.some((f) => f != null && normalize(f).includes(q));
+}
+
+export function searchBox(value: string, placeholder: string): string {
+  return `<input type="search" class="search" id="search" data-search value="${escapeHtml(value)}" placeholder="${escapeHtml(placeholder)}" aria-label="${escapeHtml(placeholder)}" autocomplete="off" spellcheck="false">`;
+}
+
+export function noResults(query: string): string {
+  return `<div class="state"><b>No hay resultados para «${escapeHtml(query)}»</b><span>Probá con otra parte del nombre.</span></div>`;
+}
+
+// Puesto de cada fila en la lista completa ya ordenada
+export function ranks<T>(sorted: T[]): (row: T) => number {
+  const at = new Map(sorted.map((row, i) => [row, i + 1]));
+  return (row) => at.get(row) ?? 0;
+}
+
+// Al escribir solo se reemplazan los resultados ([data-results]) con los de la vista nueva: el campo de texto
+// queda intacto, así no se pierde el foco ni se cierra el teclado del celular
+export function swapResults(el: HTMLElement, html: string): void {
+  const template = document.createElement('template');
+  template.innerHTML = html;
+  const fresh = template.content.querySelector('[data-results]');
+  const old = el.querySelector('[data-results]');
+  if (fresh && old) old.replaceWith(fresh);
 }

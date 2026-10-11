@@ -8,6 +8,11 @@ const KNOWN = new Set(['KR', 'CN', 'EU', 'NA', 'BR', 'APAC']);
 // Los partidos solo traen nombre y sigla: región y logo salen del ranking Elo al cargar los datos
 let byTeam = new Map<string, Pick<RatedTeam, 'region' | 'logo'>>();
 
+// Ligas de cada región, para que el buscador encuentre "lck" o "lec" (los datos traen el código de región)
+export const REGION_LEAGUES: Record<string, string> = {
+  KR: 'LCK', CN: 'LPL', EU: 'LEC', NA: 'LCS LTA', BR: 'CBLOL LTA', APAC: 'LCP PCS VCS',
+};
+
 export function setTeams(teams: RatedTeam[]): void {
   byTeam = new Map(teams.map((t) => [t.name, { region: t.region, logo: t.logo }]));
 }

@@ -1,10 +1,11 @@
 import type { SiteData } from '../data';
 import { escapeHtml } from '../html';
-import { logoImg } from '../theme/regions';
+import { logoImg, REGION_LEAGUES } from '../theme/regions';
 import { minutes } from '../meta';
 import { FEW_GAMES, fmt, formRanking, PERIODS, pct, periodOf, ROLE_LABELS, signed, sortBy, vsWorldsRows, type Period } from '../stats';
 import type { PlayerEntry, PlayerStats, Role, TeamEntry, TeamStats } from '../types';
-import { airyTable, axis, chips, dumbbell, how, leaders, meter, sortBar, subtabs, who, type Column, type Dir } from './ui';
+import { airyTable, axis, chips, dumbbell, how, leaders, matches, meter, noResults, ranks, searchBox, swapResults, sortBar, subtabs, who,
+  type Column, type Dir } from './ui';
 
 type Tab = 'equipos' | 'jugadores' | 'analisis';
 type Table = 'equipos' | 'jugadores';
@@ -24,6 +25,7 @@ const state = {
   sort: { equipos: 'rating', jugadores: 'kda' } as Record<Table, string>,
   dir: { equipos: 'desc', jugadores: 'desc' } as Record<Table, Dir>,
   showAll: { jugadores: false, forma: false } as Record<string, boolean>,
+  query: { equipos: '', jugadores: '' } as Record<Table, string>, // texto del buscador de cada tabla
 };
 
 const share = (label: string, id: keyof TeamStats): Column<TeamRow> =>
@@ -89,10 +91,20 @@ function teamsView(data: SiteData): string {
   const top = (id: string, label: string) => ({ column: column(TEAM_GROUPS, id), label, rows: solid });
   return `
     ${leaders([top('rating', 'Mejor Elo'), top('gd15', 'Más oro al 15'), top('first_tower', 'Más 1ª torre'), top('gold_per_min', 'Más oro/min')], teamWho)}
-    <div class="tools">${sortBar(TEAM_GROUPS.flatMap(([, c]) => c), sort.id, state.dir.equipos)}</div>
-    ${airyTable({ rows: sortBy(rows, sort.value, state.dir.equipos), scale: rows, groups: TEAM_GROUPS, first: 'Equipo', whoOf: teamWho,
-      sort: sort.id, dir: state.dir.equipos, few: (r) => r.s.games < FEW_GAMES })}
+    <div class="tools">${searchBox(state.query.equipos, 'Buscar equipo o región')}${sortBar(TEAM_GROUPS.flatMap(([, c]) => c), sort.id, state.dir.equipos)}</div>
+    ${teamTable(rows, sort)}
     ${how(`GD@15 = oro de ventaja al minuto 15 (a parte de la LPL le falta: "—"). Los "primeros" son el % de partidas en que el equipo consiguió ese objetivo antes que el rival. Las filas atenuadas tienen menos de ${FEW_GAMES} partidas: con tan pocas, los números dicen poco.`)}`;
+}
+
+function teamTable(rows: TeamRow[], sort: Column<TeamRow>): string {
+  const sorted = sortBy(rows, sort.value, state.dir.equipos);
+  const q = state.query.equipos;
+  const found = sorted.filter((r) => matches(q, r.team.short, r.team.name, r.team.region, REGION_LEAGUES[r.team.region ?? '']));
+  const table = found.length
+    ? airyTable({ rows: found, scale: rows, groups: TEAM_GROUPS, first: 'Equipo', whoOf: teamWho,
+      sort: sort.id, dir: state.dir.equipos, few: (r) => r.s.games < FEW_GAMES, rankOf: ranks(sorted) })
+    : noResults(q);
+  return `<div data-results>${table}</div>`;
 }
 
 function playersView(data: SiteData): string {
@@ -105,15 +117,20 @@ function playersView(data: SiteData): string {
   if (!rows.length) return `<div class="tools">${roles}</div>${empty()}`;
   const sort = column(PLAYER_GROUPS, state.sort.jugadores);
   const sorted = sortBy(rows, sort.value, state.dir.jugadores);
-  const visible = state.showAll.jugadores ? sorted : sorted.slice(0, LIMIT);
+  // Buscando se recorre la lista entera; sin buscar, los primeros 20 hasta "Mostrar todos"
+  const q = state.query.jugadores;
+  const found = sorted.filter((r) => matches(q, r.player.name, r.team, r.player.team, ROLE_LABELS[r.player.role]));
+  const visible = q || state.showAll.jugadores ? found : found.slice(0, LIMIT);
   const solid = rows.filter((r) => r.s.games >= FEW_GAMES);
   const top = (id: string, label: string) => ({ column: column(PLAYER_GROUPS, id), label, rows: solid });
   return `
     ${leaders([top('kda', 'Mejor KDA'), top('dpm', 'Más daño'), top('kp', 'Más presente en kills'), top('cs_min', 'Más farmeo')], playerWho)}
-    <div class="tools">${roles}${sortBar(PLAYER_GROUPS.flatMap(([, c]) => c), sort.id, state.dir.jugadores)}</div>
-    ${airyTable({ rows: visible, scale: rows, groups: PLAYER_GROUPS, first: 'Jugador', whoOf: playerWho,
-      sort: sort.id, dir: state.dir.jugadores, few: (r) => r.s.games < FEW_GAMES })}
-    ${moreButton('jugadores', rows.length)}
+    <div class="tools">${searchBox(q, 'Buscar jugador, equipo o rol')}${roles}${sortBar(PLAYER_GROUPS.flatMap(([, c]) => c), sort.id, state.dir.jugadores)}</div>
+    <div data-results>
+      ${visible.length ? airyTable({ rows: visible, scale: rows, groups: PLAYER_GROUPS, first: 'Jugador', whoOf: playerWho,
+        sort: sort.id, dir: state.dir.jugadores, few: (r) => r.s.games < FEW_GAMES, rankOf: ranks(sorted) }) : noResults(q)}
+      ${q ? '' : moreButton('jugadores', rows.length)}
+    </div>
     ${how(`Compará jugadores del mismo rol: un support nunca va a tener el DPM de un ADC. Las filas atenuadas tienen menos de ${FEW_GAMES} partidas. "—" es un dato que la fuente no tiene.`)}`;
 }
 
@@ -186,6 +203,12 @@ export function renderStats(el: HTMLElement, data: SiteData): () => void {
     } else return;
     renderStats(el, data);
   };
+  el.oninput = (event) => {
+    const input = event.target as HTMLInputElement;
+    if (input.dataset.search === undefined || !table) return;
+    state.query[table] = input.value;
+    swapResults(el, table === 'equipos' ? teamsView(data) : playersView(data));
+  };
   el.onchange = (event) => {
     const select = event.target as HTMLSelectElement;
     if (select.dataset.sortselect === undefined || !table) return;
@@ -194,5 +217,5 @@ export function renderStats(el: HTMLElement, data: SiteData): () => void {
     renderStats(el, data);
     el.querySelector<HTMLSelectElement>('#sort-select')?.focus();
   };
-  return () => { el.onclick = null; el.onchange = null; };
+  return () => { el.onclick = null; el.onchange = null; el.oninput = null; };
 }

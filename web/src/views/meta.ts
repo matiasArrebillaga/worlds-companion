@@ -5,7 +5,8 @@ import { defaultSample, flexPicks, minutes, mirages, paceRows, PHASES, presenceS
 import { FEW_GAMES, fmt, pct, ROLE_LABELS, signed, sortBy } from '../stats';
 import type { ChampionEntry, MetaSample, SampleId, SideSplit, WinrateNoise } from '../types';
 import { champHex } from './player';
-import { airyTable, axis, chips, dumbbell, how, kpiTiles, leaders, sortBar, subtabs, who, whisker, type Column, type Dir } from './ui';
+import { airyTable, axis, chips, dumbbell, how, kpiTiles, leaders, matches, noResults, ranks, searchBox, swapResults, sortBar, subtabs, who,
+  whisker, type Column, type Dir } from './ui';
 
 type Tab = 'campeones' | 'panorama';
 type View = 'principal' | 'resultado';
@@ -13,7 +14,8 @@ const TABS: [Tab, string][] = [['campeones', 'Campeones'], ['panorama', 'Panoram
 const NOISE_MIN_PICKS = 5; // igual que en pipeline/meta.py
 
 // Estado mientras la página esté abierta; la muestra se elige la primera vez según los datos
-const state = { tab: 'campeones' as Tab, sample: null as SampleId | null, view: 'principal' as View, sort: 'presence', dir: 'desc' as Dir };
+const state = { tab: 'campeones' as Tab, sample: null as SampleId | null, view: 'principal' as View, sort: 'presence', dir: 'desc' as Dir,
+  query: '' };
 
 function empty(): string {
   return '<div class="state"><b>Todavía no hay partidas de Worlds 2026</b><span>El meta del torneo aparece después de las primeras partidas.</span></div>';
@@ -54,6 +56,16 @@ const VIEWS: Record<View, [string, [string, Column<ChampionEntry>[]][]]> = {
 
 const champWho = (c: ChampionEntry) => who(champHex(c.champion), escapeHtml(c.champion), `${c.picks} picks · ${c.bans} bans`);
 
+function championTable(rows: ChampionEntry[], groups: [string, Column<ChampionEntry>[]][], sort: Column<ChampionEntry>): string {
+  const sorted = sortBy(rows, sort.value, state.dir);
+  const found = sorted.filter((c) => matches(state.query, c.champion));
+  const table = found.length
+    ? airyTable({ rows: found, scale: rows, groups, first: `Campeón · ${rows[0].games} partidas`, whoOf: champWho,
+      sort: sort.id, dir: state.dir, rankOf: ranks(sorted) })
+    : noResults(state.query);
+  return `<div data-results>${table}</div>`;
+}
+
 function champions(rows: ChampionEntry[], k: number | undefined): string {
   if (!rows.length) return empty();
   const groups = VIEWS[state.view][1];
@@ -71,8 +83,8 @@ function champions(rows: ChampionEntry[], k: number | undefined): string {
       { column: COL.winrate_adj, label: 'Mejor % ajustado', rows: played },
       { column: COL.dpm, label: 'Más daño', rows: played },
     ], champWho)}
-    <div class="tools">${views}${sortBar(columns, sort.id, state.dir)}${legend}</div>
-    ${airyTable({ rows: sortBy(rows, sort.value, state.dir), scale: rows, groups, first: `Campeón · ${rows[0].games} partidas`, whoOf: champWho, sort: sort.id, dir: state.dir })}
+    <div class="tools">${searchBox(state.query, 'Buscar campeón')}${views}${sortBar(columns, sort.id, state.dir)}${legend}</div>
+    ${championTable(rows, groups, sort)}
     ${how(`Presencia = % pick + % ban: cuánto le importa el campeón al meta. Uno que se banea siempre tiene 0 picks y 100% de presencia. Prioridad = % de partidas en que se elige en la primera rotación (los 6 primeros picks) o se banea en la primera fase de bans: mide qué se considera imprescindible, no qué gana más. KDA, CS/min, DPM y KP son de los jugadores que lo usaron. El % de victorias es el ajustado: (victorias + ${kk}/2) / (picks + ${kk}), o sea ${kk} partidas "imaginarias" al 50%; abajo va el crudo. Rango = dónde está el % real con 95% de confianza: si cruza la línea dorada del 50%, no se distingue de una moneda.`)}`;
 }
 
@@ -222,6 +234,12 @@ export function renderMeta(el: HTMLElement, data: SiteData): () => void {
     } else return;
     renderMeta(el, data);
   };
+  el.oninput = (event) => {
+    const input = event.target as HTMLInputElement;
+    if (input.dataset.search === undefined) return;
+    state.query = input.value;
+    swapResults(el, champions(champs, k));
+  };
   el.onchange = (event) => {
     const select = event.target as HTMLSelectElement;
     if (select.dataset.sortselect === undefined) return;
@@ -230,5 +248,5 @@ export function renderMeta(el: HTMLElement, data: SiteData): () => void {
     renderMeta(el, data);
     el.querySelector<HTMLSelectElement>('#sort-select')?.focus();
   };
-  return () => { el.onclick = null; el.onchange = null; };
+  return () => { el.onclick = null; el.onchange = null; el.oninput = null; };
 }

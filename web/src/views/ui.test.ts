@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { barWidth } from './ui';
+import { barWidth, matches, ranks } from './ui';
 
 describe('barWidth', () => {
   it('scales each kind of bar so the biggest value is visible and the zero point means something', () => {
@@ -16,5 +16,20 @@ describe('barWidth', () => {
     // Todos iguales: sin división por cero
     expect(barWidth('diverge', 0, [0, 0], 0)).toBe(0);
     expect(barWidth('span', 5, [5, 5])).toBe(100);
+  });
+});
+
+describe('search', () => {
+  it('ignores accents, case and punctuation', () => {
+    expect(matches('kaisa', "Kai'Sa")).toBe(true);
+    expect(matches('KIIN', 'Kíin')).toBe(true);
+    expect(matches('gen g', 'Gen.G')).toBe(true);
+    expect(matches('zz', 'Ahri', null)).toBe(false);
+    expect(matches('', 'Ahri')).toBe(true);
+  });
+
+  it('keeps the place in the full list', () => {
+    const sorted = ['a', 'b', 'c'];
+    expect(ranks(sorted)('c')).toBe(3);
   });
 });
