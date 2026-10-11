@@ -1,6 +1,7 @@
 import type { SiteData } from '../data';
 import { escapeHtml } from '../html';
-import { advantage, findById, fmt, pct, ROLE_LABELS, starterByRole, teamByName } from '../stats';
+import { advantage, findById, fmt, pct, ROLE_LABELS, signed, starterByRole, teamByName } from '../stats';
+import { logoImg, regionColor } from '../theme/regions';
 import type { ChampionCount, PlayerEntry, Role, TeamEntry } from '../types';
 import { drawEloChart } from '../charts/eloChart';
 import { firstDay } from '../schedule';
@@ -22,12 +23,34 @@ function mirror(label: string, left: string, right: string, edge?: [number | nul
     <span class="num${adv?.side === 'b' ? ' lead' : ''}">${right}</span></div>`;
 }
 
-function duel(role: Role, a: PlayerEntry | undefined, b: PlayerEntry | undefined): string {
-  const name = (p?: PlayerEntry) => p ? `<a href="#/jugador/${encodeURIComponent(p.id)}">${escapeHtml(p.name)}</a>` : '—';
-  const line = (p?: PlayerEntry) => p ? `KDA ${fmt(p.season.kda, 1)} · DPM ${fmt(p.season.dpm)} · KP ${pct(p.season.kp)}` : '';
-  return `<div class="duel"><div>${name(a)}<span class="muted">${line(a)}</span></div>
-    <span class="label">${ROLE_LABELS[role]}</span>
-    <div class="r">${name(b)}<span class="muted">${line(b)}</span></div></div>`;
+// Duelo de un rol: cerrado muestra los nombres y la forma del modelo; al tocarlo se despliegan KDA, DPM y KP.
+// <details> nativo: se abre y se cierra sin JavaScript y funciona con teclado
+function duel(role: Role, a: PlayerEntry | undefined, b: PlayerEntry | undefined, ta: TeamEntry, tb: TeamEntry): string {
+  const name = (p: PlayerEntry | undefined, team: TeamEntry) => p
+    ? `<a href="#/jugador/${encodeURIComponent(p.id)}">${escapeHtml(p.name)}</a>${logoImg(team.logo)}`
+    : '<span class="muted">—</span>';
+  const n = (p: PlayerEntry | undefined, pick: (p: PlayerEntry) => number | null | undefined) => (p ? pick(p) ?? null : null);
+  const form = (p?: PlayerEntry) => n(p, (x) => x.form);
+  return `<details class="duel">
+    <summary>
+      <span class="duel-names"><span class="l">${name(a, ta)}</span><span class="label">${ROLE_LABELS[role]}<i class="chev" aria-hidden="true"></i></span><span class="r">${name(b, tb)}</span></span>
+      ${mirror('Forma', signed(form(a), 2), signed(form(b), 2), [form(a), form(b), 0.5])}
+    </summary>
+    <div class="duel-more">
+      ${mirror('KDA', fmt(n(a, (x) => x.season.kda), 1), fmt(n(b, (x) => x.season.kda), 1), [n(a, (x) => x.season.kda), n(b, (x) => x.season.kda), 2])}
+      ${mirror('DPM', fmt(n(a, (x) => x.season.dpm)), fmt(n(b, (x) => x.season.dpm)), [n(a, (x) => x.season.dpm), n(b, (x) => x.season.dpm), 150])}
+      ${mirror('KP', pct(n(a, (x) => x.season.kp)), pct(n(b, (x) => x.season.kp)), [n(a, (x) => x.season.kp), n(b, (x) => x.season.kp), 0.1])}
+    </div>
+  </details>`;
+}
+
+// Un lado del encabezado: logo grande subrayado con el color de la región, sigla, nombre y Elo; lleva a la página del equipo
+function heroSide(team: TeamEntry, fav: string, side: 'l' | 'r'): string {
+  return `<a class="vs-side ${side}" href="#/equipo/${encodeURIComponent(team.id)}" style="--rc:${regionColor(team.region)}">
+    ${logoImg(team.logo) || '<i class="rg" aria-hidden="true"></i>'}
+    <span class="vs-short">${escapeHtml(team.short)}${fav}</span>
+    <span class="vs-name">${escapeHtml(team.name)}</span>
+    <span class="label">${escapeHtml(team.region ?? '—')} · Elo ${fmt(team.rating)}</span></a>`;
 }
 
 // Campeones más jugados por los titulares del equipo en la temporada
@@ -56,11 +79,16 @@ export function renderMatch(el: HTMLElement, data: SiteData, _tz: string, param:
   el.innerHTML = `
     <section class="stack">
       ${backLink('#/')}
-      <span class="eyebrow">Cara a cara · Bo${m.best_of}</span>
-      <h1 class="vs-title"><a href="#/equipo/${encodeURIComponent(a.id)}">${escapeHtml(a.short)}</a>${favMark(m, 'team1')} vs ${favMark(m, 'team2')}<a href="#/equipo/${encodeURIComponent(b.id)}">${escapeHtml(b.short)}</a></h1>
+      <span class="eyebrow">Cara a cara</span>
+      <div class="bezel"><div class="core"><h1 class="vs-hero">
+        ${heroSide(a, favMark(m, 'team1'), 'l')}
+        <span class="vs-mid"><span class="label">Bo${m.best_of}</span><b>VS</b></span>
+        ${heroSide(b, favMark(m, 'team2'), 'r')}
+      </h1></div></div>
       ${predictionBlock(m)}
     </section>
     <section class="stack"><h2>Temporada 2026</h2><div class="bezel"><div class="core">
+      <div class="mirror mhead" aria-hidden="true"><span>${logoImg(a.logo) || escapeHtml(a.short)}</span><span></span><span></span><span></span><span>${logoImg(b.logo) || escapeHtml(b.short)}</span></div>
       ${mirror('Elo', fmt(a.rating), fmt(b.rating), [a.rating, b.rating, 100])}
       ${mirror('Récord', `${sa.wins}-${sa.games - sa.wins}`, `${sb.wins}-${sb.games - sb.wins}`)}
       ${mirror('% victorias', pct(sa.winrate), pct(sb.winrate), [sa.winrate, sb.winrate, 0.2])}
@@ -74,8 +102,9 @@ export function renderMatch(el: HTMLElement, data: SiteData, _tz: string, param:
     <section class="stack"><h2>Elo en 2026</h2>
       <div class="legend"><span><i class="lg-a"></i>${escapeHtml(a.short)}</span><span><i class="lg-b"></i>${escapeHtml(b.short)}</span></div>
       <div class="chart-box"><canvas aria-label="Evolución del Elo de ${escapeHtml(a.short)} y ${escapeHtml(b.short)} en 2026" role="img"></canvas></div></section>
-    <section class="stack"><h2>Duelos por rol</h2>
-      ${roles.map((r) => duel(r, starterByRole(a, data.players.players, r), starterByRole(b, data.players.players, r))).join('')}</section>
+    <section class="stack"><h2>Duelos por rol</h2><div class="bezel"><div class="core duels">
+      ${roles.map((r) => duel(r, starterByRole(a, data.players.players, r), starterByRole(b, data.players.players, r), a, b)).join('')}</div></div>
+      ${how('Tocá un rol para ver KDA, DPM y KP de la temporada. Forma = la del modelo elo-2: desvíos sobre el promedio del rol (+0.30 es 0,3 desvíos por encima). La barra va hacia el que saca ventaja y llega al borde con 0,5 de forma, 2 de KDA, 150 de DPM o 10 puntos de KP. Se comparan jugadores del mismo rol, así que el DPM es justo.')}</section>
     <section class="grid g2">
       <div class="stack"><h2>Campeones de ${escapeHtml(a.short)}</h2>${topChampions(a, data.players.players)}</div>
       <div class="stack"><h2>Campeones de ${escapeHtml(b.short)}</h2>${topChampions(b, data.players.players)}</div>
