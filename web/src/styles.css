@@ -779,11 +779,17 @@ html { -webkit-tap-highlight-color: transparent; }
 .duel[open] .duel-more { animation: duel-open .35s var(--ease); }
 @keyframes duel-open { from { opacity: 0; transform: translateY(-6px); } }
 
-/* Tablas de Equipos y Jugadores: la fila entera lleva a la página (el link de la sigla o el nombre la cubre) */
-.airy tbody tr { position: relative; }
-.airy td.ent a::after { content: ""; position: absolute; inset: 0; }
-.airy .tm { position: static; }
-.airy .tm::after { display: none; }
+/* Tablas, filas de Análisis y tarjetas de líderes: la fila o tarjeta entera lleva a la página del equipo o jugador
+   (el link de la sigla o el nombre la cubre); los gráficos con tooltip quedan por encima */
+.airy tbody tr, .lrow, .formrow, .leader .core { position: relative; }
+.airy td.ent a::after, .lrow .who a::after, .formrow .who a::after, .leader .who a::after { content: ""; position: absolute; inset: 0; }
+.airy .tm, .lrow .tm, .leader .tm { position: static; }
+.airy .tm::after, .lrow .tm::after, .leader .tm::after { display: none; }
+.wh, .db { z-index: 1; }
+.lrow:has(.who a:focus-visible), .formrow:has(.who a:focus-visible), .leader:has(.who a:focus-visible) { outline: 2px solid var(--cyan); outline-offset: -2px; }
+.leader:has(.who a) { transition: transform .35s var(--ease); }
+.leader:has(.who a):hover .who a { color: var(--gold); }
+.leader:has(.who a):active { transform: scale(.985); }
 .airy tbody tr:has(td.ent a:focus-visible) { outline: 2px solid var(--cyan); outline-offset: -2px; }
 .airy tbody tr:active td { background: var(--raised); }
 
