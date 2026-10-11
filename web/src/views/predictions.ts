@@ -1,3 +1,4 @@
+import { currentStage, type Stage } from '../bracket';
 import type { SiteData } from '../data';
 import { formatDayShort, formatPercent, roundLabel } from '../format';
 import { escapeHtml } from '../html';
@@ -17,7 +18,10 @@ const HITS_TABS: [HitsTab, string][] = [['resumen', 'Resumen'], ['partidos', 'Pa
 const FILTERS: [Filter, string][] = [['all', 'Todos'], ['hit', 'Acertados'], ['miss', 'Errados']];
 
 // Lo elegido se recuerda mientras la página esté abierta
-const state: { tab: Tab; hits: HitsTab; filter: Filter } = { tab: 'aciertos', hits: 'resumen', filter: 'all' };
+// stage null = la fase que se está jugando (hasta que el usuario elija otra)
+const state: { tab: Tab; hits: HitsTab; filter: Filter; stage: Stage | null } = {
+  tab: 'aciertos', hits: 'resumen', filter: 'all', stage: null,
+};
 
 // Plegado como el resto de las explicaciones: está, pero solo se abre si el usuario quiere
 export const BO1_NOTE = how('Los Bo1 tienen alta varianza: una sola partida decide la serie, así que un favorito al 65% pierde una de cada tres. Mirá el porcentaje, no solo quién es el favorito.', '¿Por qué el favorito puede perder un Bo1?');
@@ -118,7 +122,7 @@ function matchList(matches: Match[], tz: string): string {
 
 export function predictionsView(data: SiteData, tz: string): string {
   const body = state.tab === 'como' ? howItWorks(data.elo)
-    : state.tab === 'torneo' ? tournamentView(data.tournament, tz)
+    : state.tab === 'torneo' ? tournamentView(data.tournament, tz, state.stage ?? currentStage(data.schedule.matches))
     : `${seg('phits', HITS_TABS, state.hits, 'Aciertos', true)}
        ${state.hits === 'resumen' ? summary(data.elo) : matchList(data.schedule.matches, tz)}`;
   return `
@@ -135,6 +139,7 @@ export function handlePredictionsClick(button: HTMLButtonElement): boolean {
   if (d.ptab) state.tab = d.ptab as Tab;
   else if (d.phits) state.hits = d.phits as HitsTab;
   else if (d.pfilter) state.filter = d.pfilter as Filter;
+  else if (d.tstage) state.stage = d.tstage as Stage;
   else return false;
   return true;
 }

@@ -253,7 +253,7 @@ def chalk_bracket(matches: dict[str, dict], bracket: dict, labels: dict, prob: S
         t1, t2 = p["team1"], p["team2"]
         finished = _real_winner(m) is not None
         rows.append({
-            "id": m.get("id"), "label": labels[key], "start_utc": m.get("start_utc"), "best_of": m.get("best_of", 5),
+            "id": m.get("id"), "key": key, "label": labels[key], "start_utc": m.get("start_utc"), "best_of": m.get("best_of", 5),
             "team1": t1, "team2": t2,
             "p_team1": round(prob(t1, t2, m.get("best_of", 5)), 4) if t1 and t2 else None,
             "pick": ("team1" if p["winner"] == t1 else "team2") if p["winner"] else None,

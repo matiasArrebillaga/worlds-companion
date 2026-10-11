@@ -83,14 +83,17 @@ cd web && npm run build         # build de producción
 
 ## Secciones del sitio
 
-- **Calendario** (inicio, `#/`): Lista | Suiza | Bracket | Predicciones.
+- **Calendario** (inicio, `#/`): Lista | Bracket | Predicciones.
   - Lista: línea de tiempo (una tarjeta por fila) que abre en el próximo partido; arriba lo jugado, abajo lo que viene.
     En PC, columna lateral con "Hoy, en tu hora" y "Últimos resultados". Cada tarjeta lleva su predicción.
-  - Suiza: estructura de lolesports (columna por ronda, cajas por récord con Bo1/Bo3, Clasificados/Eliminados).
-    En celular las rondas se apilan y la vista abre en la ronda en curso; nada se desliza de costado.
+  - Bracket: Play-In · Suiza · Eliminatoria (abre en la fase que se está jugando).
+    - Play-In y Eliminatoria: cuadro estilo lolesports (cajas unidas por conectores en PC; apiladas en celular).
+    - Suiza: estructura de lolesports (columna por ronda, cajas por récord con Bo1/Bo3, Clasificados/Eliminados).
+      En celular las rondas se apilan y la vista abre en la ronda en curso; nada se desliza de costado.
   - Predicciones: Aciertos (Resumen | Partidos acertados/errados) | Torneo | Cómo funciona.
-    Torneo (para los pick'ems): bracket del camino más probable (Play-In; eliminatorias cuando se sorteen los cuartos)
-    y chances por equipo por Monte Carlo (gana el Play-In; 3-0 / clasifica / 0-3; semis / final / campeón).
+    Torneo (para los pick'ems): misma distribución que Bracket (Play-In · Suiza · Eliminatoria). En los cuadros, el
+    camino más probable (un pick por partido; eliminatorias cuando se sorteen los cuartos); en las tablas, chances por
+    equipo por Monte Carlo (gana el Play-In; 3-0 / clasifica / 0-3; semis / final / campeón).
     Sale de `tournament.json`, se recalcula en cada build y no cuenta para Aciertos.
 - **Equipos** (`#/equipos`): Equipos | Jugadores | Análisis (temporada vs. contra equipos de Worlds, forma del modelo), con páginas por
   equipo y por jugador.

@@ -281,6 +281,7 @@ export interface ChampionIcons {
 // tournament.json: el torneo completo simulado (Predicciones › Torneo)
 export interface BracketMatch {
   id: string | null;
+  key?: string | null; // lugar en el cuadro ('Round 1_1'); lo trae tournament.json
   label: string;
   start_utc: string | null;
   best_of: number;

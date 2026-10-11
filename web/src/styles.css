@@ -247,10 +247,6 @@ h1 a { text-decoration: none; }
 /* Calendario: Suiza y Bracket */
 .pill.win { color: var(--win); border-color: var(--win); }
 .pill.loss { color: var(--loss); border-color: var(--loss); }
-.bracket { display: grid; gap: 24px; }
-@media (min-width: 860px) {
-  .bracket { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); align-items: center; }
-}
 
 .chart-box { position: relative; height: 240px; }
 
@@ -571,7 +567,6 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
 
 /* ================= Predicciones › Torneo =================
    Bracket del camino más probable (cajas como las de la suiza) + tablas de chances por equipo. */
-.pk-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); align-items: start; }
 .pk .mu { border-top: 0; padding: 8px 10px; }
 .pk .ln.picked { background: var(--gold-soft); box-shadow: inset 2px 0 0 var(--gold); }
 .pk-when { padding: 6px 10px; border-top: 1px solid var(--line); font: 11px var(--f-data); color: var(--fg2); }
@@ -581,3 +576,18 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
 .pk-summary { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); }
 .pk-summary > div { background: var(--raised); padding: 12px 14px; display: grid; gap: 6px; }
 .pk-summary b { font: 700 1.05rem/1.3 var(--f-display); letter-spacing: .04em; text-transform: uppercase; }
+
+/* ================= Cuadro de Play-In y Eliminatoria (estilo lolesports) =================
+   PC: grilla de 5 columnas (caja · conector · caja · conector · caja). Todas las filas miden lo mismo, así que
+   cada conector ubica sus líneas con los % que trae (--a y --b entran, --o sale). Celular: cajas apiladas en orden. */
+.bk { display: grid; }
+.bk-cell { padding-block: 6px; min-width: 0; }
+.bk-line { display: none; }
+@media (min-width: 860px) {
+  .bk { grid-template-columns: minmax(0, 1fr) 32px minmax(0, 1fr) 32px minmax(0, 1fr); align-items: center; }
+  .bk-cell, .bk-line { grid-area: var(--area); }
+  .bk-line { display: block; position: relative; align-self: stretch; }
+  .bk-line::before { content: ""; position: absolute; left: 0; width: 50%; top: var(--a); height: calc(var(--b) - var(--a));
+    border: 1px solid var(--line-ctl); border-left: 0; }
+  .bk-line::after { content: ""; position: absolute; left: 50%; right: 0; top: var(--o); border-top: 1px solid var(--line-ctl); }
+}

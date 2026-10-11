@@ -8,8 +8,8 @@ const sample: TournamentFile = {
   updated_at: '2026-10-15T00:00:00Z', model_version: 'elo-2', simulations: 10000,
   playin: {
     bracket: [
-      { id: 'a', label: 'Semi 1', start_utc: null, best_of: 5, team1: team('FUR'), team2: team('MVK'), p_team1: 0.89, pick: 'team1', status: 'finished', score: [3, 1] },
-      { id: 'b', label: 'Gran final', start_utc: null, best_of: 5, team1: team('FUR'), team2: team('KC'), p_team1: 0.3, pick: 'team2', status: 'projected', score: null },
+      { id: 'a', key: 'Round 1_1', label: 'Semi 1', start_utc: null, best_of: 5, team1: team('FUR'), team2: team('MVK'), p_team1: 0.89, pick: 'team1', status: 'finished', score: [3, 1] },
+      { id: 'b', key: 'Round 3_1', label: 'Gran final', start_utc: null, best_of: 5, team1: team('FUR'), team2: team('KC'), p_team1: 0.3, pick: 'team2', status: 'projected', score: null },
     ],
     teams: [{ ...team('KC'), p_win: 0.6 }, { ...team('FUR'), p_win: 0.4 }],
   },
@@ -27,15 +27,19 @@ describe('chance', () => {
 });
 
 describe('tournamentView', () => {
-  it('shows real results, projected picks and the suggested pick\'em', () => {
-    const html = tournamentView(sample, 'UTC');
+  it('draws the Play-In with real results and projected picks', () => {
+    const html = tournamentView(sample, 'UTC', 'playin');
     expect(html).toContain('Si se cumple lo anterior'); // la gran final es proyectada
     expect(html).toContain('title="Victoria">V'); // la semi ya se jugó
     expect(html).toContain('70%'); // KC en la gran final
-    expect(html).toContain('Pick sugerido');
+    expect(html).toContain('Final de ganadores'); // lugar del cuadro todavía sin partido
+  });
+
+  it('suggests the Swiss pick\'em', () => {
+    expect(tournamentView(sample, 'UTC', 'suiza')).toContain('Pick sugerido');
   });
 
   it('has an empty state without data', () => {
-    expect(tournamentView(null, 'UTC')).toContain('Todavía no hay simulación');
+    expect(tournamentView(null, 'UTC', 'playin')).toContain('Todavía no hay simulación');
   });
 });

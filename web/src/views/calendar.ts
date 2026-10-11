@@ -1,4 +1,4 @@
-import { bracketRounds } from '../bracket';
+import { currentStage, KNOCKOUT_LAYOUT, PLAYIN_LAYOUT, slotMatches, type Stage } from '../bracket';
 import type { SiteData } from '../data';
 import { countdownParts, formatDateTimeLong, formatDayHeading, formatDayShort, formatTime, localDayKey, pad2, PHASE_LABELS, roundLabel } from '../format';
 import { escapeHtml } from '../html';
@@ -6,15 +6,19 @@ import { dayKeyOf, featuredMatch, groupByDay, recentResults } from '../schedule'
 import { PENDING, swissRounds, swissStandings } from '../swiss';
 import { teamMark, teamRegionColor } from '../theme/regions';
 import type { Match, Team } from '../types';
+import { bracketGrid, stageButtons } from './bracketGrid';
 import { matchCard, predictionBlock, teamTag } from './matchCard';
 import { BO1_NOTE, handlePredictionsClick, predictionsView } from './predictions';
 
-// Calendario: la página de inicio. Lista (línea de tiempo centrada en el próximo partido), Suiza, Bracket y Predicciones
-type Sub = 'lista' | 'suiza' | 'bracket' | 'predicciones';
-const SUBS: [Sub, string][] = [['lista', 'Lista'], ['suiza', 'Suiza'], ['bracket', 'Bracket'], ['predicciones', 'Predicciones']];
+// Calendario: la página de inicio. Lista (línea de tiempo centrada en el próximo partido),
+// Bracket (Play-In · Suiza · Eliminatoria) y Predicciones
+type Sub = 'lista' | 'bracket' | 'predicciones';
+const SUBS: [Sub, string][] = [['lista', 'Lista'], ['bracket', 'Bracket'], ['predicciones', 'Predicciones']];
 
 // La sub-vista y el equipo resaltado en la suiza se recuerdan mientras la página esté abierta
 let sub: Sub = 'lista';
+// Fase del Bracket; null = la que se está jugando (hasta que el usuario elija otra)
+let stage: Stage | null = null;
 let picked: string | null = null;
 // Reloj de la cuenta regresiva de la vista actual (se frena al redibujar o al salir)
 let stopTimer: () => void = () => {};
@@ -179,16 +183,15 @@ function swissView(matches: Match[]): string {
     <div class="sw-cols">${columns}${end}</div>`;
 }
 
-// ---------- Bracket ----------
+// ---------- Bracket: Play-In · Suiza · Eliminatoria ----------
 
 function bracketView(matches: Match[], tz: string): string {
-  const rounds = bracketRounds(matches);
-  if (!rounds.length) return emptyState('Las eliminatorias todavía no tienen partidos', 'Aparecen cuando termine la fase suiza.');
-  return `<div class="bracket">${rounds.map((r) => `
-    <section class="stack">
-      <h2 class="day-title">${escapeHtml(roundLabel(r.round))}</h2>
-      <div class="grid">${r.matches.map((m) => matchCard(m, tz)).join('')}</div>
-    </section>`).join('')}</div>`;
+  const current = stage ?? currentStage(matches);
+  const body = current === 'suiza' ? swissView(matches)
+    : current === 'playin'
+      ? `<p class="muted">Doble eliminación, todo Bo5: pasa solo el campeón.</p>${bracketGrid(PLAYIN_LAYOUT, slotMatches(matches, PLAYIN_LAYOUT), tz)}`
+      : `<p class="muted">Eliminación directa, todo Bo5.</p>${bracketGrid(KNOCKOUT_LAYOUT, slotMatches(matches, KNOCKOUT_LAYOUT), tz)}`;
+  return `<section class="stack">${stageButtons('stage', current)}${body}</section>`;
 }
 
 // ---------- Página ----------
@@ -216,8 +219,7 @@ function startCountdown(el: HTMLElement, featured: Match | null): () => void {
 export function renderCalendar(el: HTMLElement, data: SiteData, tz: string): () => void {
   const matches = data.schedule.matches;
   const featured = featuredMatch(matches, new Date());
-  const body = sub === 'suiza' ? swissView(matches)
-    : sub === 'bracket' ? bracketView(matches, tz)
+  const body = sub === 'bracket' ? bracketView(matches, tz)
     : sub === 'predicciones' ? predictionsView(data, tz)
     : listView(matches, tz, featured);
 
@@ -251,6 +253,9 @@ export function renderCalendar(el: HTMLElement, data: SiteData, tz: string): () 
     if (button.dataset.sub) {
       sub = button.dataset.sub as Sub;
       focus = `button[data-sub="${sub}"]`;
+    } else if (button.dataset.stage) {
+      stage = button.dataset.stage as Stage;
+      focus = `button[data-stage="${stage}"]`;
     } else if (handlePredictionsClick(button)) {
       const [key, value] = Object.entries(button.dataset)[0];
       focus = `button[data-${key}="${value}"]`;
@@ -259,7 +264,9 @@ export function renderCalendar(el: HTMLElement, data: SiteData, tz: string): () 
     // Volver el foco al botón elegido (el re-render reemplaza los botones)
     el.querySelector<HTMLButtonElement>(focus)?.focus();
     // Al entrar a la lista o a la suiza, ir a lo de hoy (como al abrir la página)
-    if (button.dataset.sub === 'lista' || button.dataset.sub === 'suiza') {
+    const toSwiss = button.dataset.stage === 'suiza'
+      || (button.dataset.sub === 'bracket' && (stage ?? currentStage(matches)) === 'suiza');
+    if (button.dataset.sub === 'lista' || toSwiss) {
       el.querySelector('#hoy')?.scrollIntoView({ block: 'start' });
     }
   };
