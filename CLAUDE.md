@@ -45,6 +45,7 @@ pipeline/               # fetch, build (limpieza, stats, validación, export a J
                         #   stats.py: agregados de equipos y jugadores (Oracle's Elixir) + historia del Elo
                         #   meta.py: campeones, draft, lados, ritmo y regiones (Oracle's Elixir)
 models/                 # Elo y modelos de predicción
+                        #   tournament.py: torneo completo (camino más probable + Monte Carlo, semilla fija)
 notebooks/              # exploración, aprendizaje y backtest
 tests/                  # pytest
 web/                    # sitio (Vite)
@@ -87,7 +88,10 @@ cd web && npm run build         # build de producción
     En PC, columna lateral con "Hoy, en tu hora" y "Últimos resultados". Cada tarjeta lleva su predicción.
   - Suiza: estructura de lolesports (columna por ronda, cajas por récord con Bo1/Bo3, Clasificados/Eliminados).
     En celular las rondas se apilan y la vista abre en la ronda en curso; nada se desliza de costado.
-  - Predicciones: Aciertos (Resumen | Partidos acertados/errados) | Cómo funciona.
+  - Predicciones: Aciertos (Resumen | Partidos acertados/errados) | Torneo | Cómo funciona.
+    Torneo (para los pick'ems): bracket del camino más probable (Play-In; eliminatorias cuando se sorteen los cuartos)
+    y chances por equipo por Monte Carlo (gana el Play-In; 3-0 / clasifica / 0-3; semis / final / campeón).
+    Sale de `tournament.json`, se recalcula en cada build y no cuenta para Aciertos.
 - **Equipos** (`#/equipos`): Equipos | Jugadores | Análisis (temporada vs. contra equipos de Worlds, forma del modelo), con páginas por
   equipo y por jugador.
 - **Meta**: Campeones (draft, rendimiento y resultado) | Panorama (lados, ritmo, regiones, ruido vs. señal, espejismos, flex,
@@ -174,6 +178,9 @@ Riot Games. Riot Games no respalda ni patrocina este proyecto."
 - **Fase suiza:** los equipos con el mismo récord se enfrentan entre sí; 3 victorias clasifican, 3 derrotas eliminan.
 - **Elo:** rating que sube al ganar y baja al perder; la diferencia entre dos equipos da la probabilidad de victoria.
 - **Brier score:** error cuadrático medio de las probabilidades; 0 es perfecto, 0.25 es tirar una moneda.
+- **Monte Carlo:** jugar el torneo muchas veces sorteando cada serie con la probabilidad del modelo y contar
+  cuántas veces pasa cada cosa. Con 10.000 simulaciones el error de cada porcentaje es ≤ 0,5 puntos.
+- **Camino más probable (chalk):** en cada partido avanza el favorito; da un pick por partido, no la chance del torneo.
 
 ## graphify
 

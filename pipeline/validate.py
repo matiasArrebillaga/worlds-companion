@@ -101,3 +101,28 @@ def validate_meta(champions: dict[str, list[dict]]) -> list[str]:
                 if value is not None and not 0.0 <= value <= 1.0:
                     errors.append(f"{sample}: {r['champion']} {key} out of range: {value}")
     return errors
+
+
+# Cuántos equipos tiene que haber en cada resultado: la suma de las chances da exactamente eso
+TOURNAMENT_TOTALS = {("playin", "p_win"): 1, ("swiss", "p_advance"): 8, ("swiss", "p_3_0"): 2,
+                     ("swiss", "p_0_3"): 2, ("knockout", "p_semis"): 4, ("knockout", "p_final"): 2,
+                     ("knockout", "p_champion"): 1}
+TOTAL_TOLERANCE = 0.01  # por el redondeo a 4 decimales de cada equipo
+
+
+def validate_tournament(sim: dict) -> list[str]:
+    """Chances entre 0 y 1, sin equipos repetidos, y que cada resultado sume la cantidad de equipos que corresponde."""
+    errors = []
+    for (stage, key), total in TOURNAMENT_TOTALS.items():
+        rows = sim[stage]["teams"]
+        if not rows:
+            continue
+        for name, n in Counter(r["name"] for r in rows).items():
+            if n > 1:
+                errors.append(f"tournament {stage}: duplicate team {name}")
+        for r in rows:
+            if not 0.0 <= r[key] <= 1.0:
+                errors.append(f"tournament {stage}: {r['name']} {key} out of range: {r[key]}")
+        if abs(sum(r[key] for r in rows) - total) > TOTAL_TOLERANCE:
+            errors.append(f"tournament {stage}: {key} adds up to {sum(r[key] for r in rows):.3f}, expected {total}")
+    return errors

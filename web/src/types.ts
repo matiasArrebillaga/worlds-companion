@@ -277,3 +277,38 @@ export interface ChampionIcons {
   base: string;
   ids: Record<string, string>;
 }
+
+// tournament.json: el torneo completo simulado (Predicciones › Torneo)
+export interface BracketMatch {
+  id: string | null;
+  label: string;
+  start_utc: string | null;
+  best_of: number;
+  team1: Team | null;
+  team2: Team | null;
+  p_team1: number | null; // chance de que gane la serie el equipo 1
+  pick: 'team1' | 'team2' | null; // favorito (o ganador real si ya se jugó)
+  status: 'finished' | 'scheduled' | 'projected'; // projected = los equipos salen del camino más probable
+  score: [number, number] | null;
+}
+
+export interface TournamentTeam {
+  name: string;
+  short: string;
+  p_win?: number;
+  p_3_0?: number;
+  p_advance?: number;
+  p_0_3?: number;
+  p_semis?: number;
+  p_final?: number;
+  p_champion?: number;
+}
+
+export interface TournamentFile {
+  updated_at: string;
+  model_version: string;
+  simulations: number;
+  playin: { bracket: BracketMatch[]; teams: TournamentTeam[] };
+  swiss: { teams: TournamentTeam[] };
+  knockout: { bracket: BracketMatch[]; teams: TournamentTeam[] };
+}

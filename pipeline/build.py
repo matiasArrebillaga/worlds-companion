@@ -11,7 +11,9 @@ from models.elo import BACKTEST, MODEL_VERSION, PARAMS, run_elo, team_regions
 from models.features import lineups, player_forms
 from models.oracles import read_extract
 from models.role_form import adjustment, load_model, norms_of, resolve_team
-from models.predictions import attach_predictions, evaluate, freeze, make_predictions, read_frozen, ready_to_freeze
+from models.predictions import (attach_predictions, evaluate, freeze, game_probability, make_predictions, read_frozen,
+                                ready_to_freeze)
+from models import tournament
 from pipeline import utc_now_iso
 from pipeline.assets import DDRAGON_FILE, champion_icons, logo_url
 from pipeline.history import CURRENT_YEAR, load_aliases, load_season_games
@@ -19,7 +21,7 @@ from pipeline.meta import build_meta
 from pipeline.schedule import UNDECIDED_TEAMS, build_schedule, short_name
 from pipeline.stats import build_team_and_player_stats, elo_history, series_list
 from pipeline.validate import (validate_lineups, validate_meta, validate_predictions, validate_ratings,
-                               validate_schedule, validate_stats)
+                               validate_schedule, validate_stats, validate_tournament)
 
 RAW_DIR = Path("data/raw")
 OUT_DIR = Path("web/public/data")
@@ -38,6 +40,12 @@ def _rows_if_exists(path: Path) -> list[dict]:
 
 def _write(path: Path, payload: dict) -> None:
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+
+
+def main_event_teams(rosters: list[dict]) -> list[str]:
+    """Clasificados directo a la suiza (el del Play-In figura como TBD hasta que se define)."""
+    names = {(r.get("Team") or "").strip() for r in rosters if r.get("OverviewPage", "").endswith("/Main Event")}
+    return sorted(n for n in names if n and n.lower() not in UNDECIDED_TEAMS)
 
 
 def participants(schedule: list[dict], rosters: list[dict]) -> list[str]:
@@ -76,7 +84,8 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
     games = load_season_games(raw_dir, CURRENT_YEAR, aliases)
     regions = team_regions(games)
     run = run_elo(games, PARAMS, regions)
-    teams = participants(schedule, _rows_if_exists(raw_dir / "worlds_2026_rosters.json"))
+    rosters = _rows_if_exists(raw_dir / "worlds_2026_rosters.json")
+    teams = participants(schedule, rosters)
 
     # Forma de los jugadores con los datos de Oracle's Elixir de la temporada
     role_model = load_model()
@@ -114,6 +123,12 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
         errors += validate_meta(meta_stats["champions"])
     current = [] if errors else make_predictions(schedule, run.ratings, now, aliases, adjust)
     errors += validate_predictions(attach_predictions(schedule, [], current))
+    # Torneo completo para los pick'ems: se recalcula con cada build (no son predicciones congeladas)
+    bracket_sim = {}
+    if not errors:
+        series = tournament.series_model(lambda a, b: game_probability(a, b, run.ratings, aliases, adjust))
+        bracket_sim = tournament.payload(schedule, main_event_teams(rosters), series, lambda n: short_name(n, shorts))
+        errors += validate_tournament(bracket_sim)
     if errors:
         raise ValueError("validation failed:\n- " + "\n- ".join(errors))
 
@@ -142,6 +157,7 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
                                                 role_model, oe_fetched_at))
     _write(out_dir / "teams.json", {"updated_at": now, "stats_fetched_at": oe_fetched_at, "teams": teams_payload})
     _write(out_dir / "players.json", {"players": players_payload})
+    _write(out_dir / "tournament.json", {"updated_at": now, "model_version": MODEL_VERSION, **bracket_sim})
 
 
 def main() -> None:
@@ -149,7 +165,7 @@ def main() -> None:
         build(RAW_DIR, OUT_DIR, utc_now_iso(), freeze_predictions="--freeze" in sys.argv)
     except ValueError as error:
         sys.exit(str(error))
-    print(f"wrote {OUT_DIR}/schedule.json, meta.json, elo.json, teams.json, players.json and champions.json")
+    print(f"wrote {OUT_DIR}/schedule.json, meta.json, elo.json, teams.json, players.json, champions.json and tournament.json")
 
 
 if __name__ == "__main__":

@@ -90,3 +90,14 @@ def test_validate_meta_flags_duplicates_and_out_of_range():
     assert any("duplicate champion Azir" in e for e in errors)
     assert any("presence out of range" in e for e in errors)
     assert any("winrate_adj out of range" in e for e in validate_meta({"worlds": [{**ok, "winrate_adj": -0.1}]}))
+
+
+def test_validate_tournament_checks_totals_and_ranges():
+    from pipeline.validate import validate_tournament
+    teams = lambda key, values: [{"name": f"T{i}", key: v} for i, v in enumerate(values)]  # noqa: E731
+    ok = {"playin": {"teams": teams("p_win", [0.6, 0.4])},
+          "swiss": {"teams": [{"name": f"T{i}", "p_advance": 0.5, "p_3_0": 0.125, "p_0_3": 0.125} for i in range(16)]},
+          "knockout": {"teams": [{"name": f"T{i}", "p_semis": 0.5, "p_final": 0.25, "p_champion": 0.125} for i in range(8)]}}
+    assert validate_tournament(ok) == []
+    bad = {**ok, "playin": {"teams": teams("p_win", [0.6, 0.6])}}
+    assert validate_tournament(bad) == ["tournament playin: p_win adds up to 1.200, expected 1"]

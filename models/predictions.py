@@ -32,6 +32,19 @@ def _match_key(m: dict) -> tuple | None:
     return _key(m["id"], MODEL_VERSION, m["team1"]["name"], m["team2"]["name"])
 
 
+def game_probability(team1: str, team2: str, ratings: dict[str, float], aliases: dict[str, str] | None = None,
+                     adjust: Callable[[str, str], float] | None = None) -> float:
+    """Probabilidad de que team1 le gane una partida a team2: Elo + ajuste por la forma de los jugadores.
+
+    `adjust(team1, team2)` suma a los log-odds del Elo (ver models/role_form.py).
+    """
+    aliases = aliases or {}
+    p_game = win_probability(ratings[aliases.get(team1, team1)], ratings[aliases.get(team2, team2)])
+    if adjust is not None:
+        p_game = 1.0 / (1.0 + exp(-(log(p_game / (1.0 - p_game)) + adjust(team1, team2))))
+    return p_game
+
+
 def make_predictions(schedule: list[dict], ratings: dict[str, float], now_iso: str,
                      aliases: dict[str, str] | None = None,
                      adjust: Callable[[str, str], float] | None = None) -> list[dict]:
@@ -49,9 +62,7 @@ def make_predictions(schedule: list[dict], ratings: dict[str, float], now_iso: s
         if not m["start_utc"] and (not m["date"] or m["date"] < now_iso[:10]):
             continue  # sin hora confirmada y de un día que ya pasó: puede haberse jugado
         t1, t2 = m["team1"]["name"], m["team2"]["name"]
-        p_game = win_probability(ratings[aliases.get(t1, t1)], ratings[aliases.get(t2, t2)])
-        if adjust is not None:
-            p_game = 1.0 / (1.0 + exp(-(log(p_game / (1.0 - p_game)) + adjust(t1, t2))))
+        p_game = game_probability(t1, t2, ratings, aliases, adjust)
         predictions.append({
             "match_id": m["id"], "team1": t1, "team2": t2, "best_of": m["best_of"],
             "p_team1_game": round(p_game, 4),

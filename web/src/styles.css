@@ -527,19 +527,19 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
 .slot { padding: 8px 10px; border-top: 1px solid var(--line); display: flex; gap: 6px 12px; align-items: center; flex-wrap: wrap; min-height: 40px; }
 .slot b { font: 700 13px var(--f-data); width: 30px; }
 @media (max-width: 859px) {
-  .grp:not(.end) { display: grid; grid-template-columns: 1fr 1fr; }
-  .grp:not(.end) .grp-h { grid-column: 1 / -1; }
-  .mu { padding: 6px 8px; }
+  .sw-cols .grp:not(.end) { display: grid; grid-template-columns: 1fr 1fr; }
+  .sw-cols .grp:not(.end) .grp-h { grid-column: 1 / -1; }
+  .sw-cols .mu { padding: 6px 8px; }
   /* El encabezado también es un div: los cruces de la columna derecha quedan en posiciones impares */
-  .mu:nth-of-type(odd) { border-left: 1px solid var(--line); }
-  .mu:nth-of-type(even):last-child { grid-column: 1 / -1; }
-  .ln { grid-template-columns: 20px 1fr auto; gap: 6px; }
-  .tm { font-size: .95rem; }
+  .sw-cols .mu:nth-of-type(odd) { border-left: 1px solid var(--line); }
+  .sw-cols .mu:nth-of-type(even):last-child { grid-column: 1 / -1; }
+  .sw-cols .ln { grid-template-columns: 20px 1fr auto; gap: 6px; }
+  .sw-cols .tm { font-size: .95rem; }
   /* Cruce por jugar: una sola línea "GEN VS BLG" */
-  .mu.up { display: flex; align-items: center; justify-content: center; gap: 10px; }
-  .mu.up .vs { display: inline; font-size: 10px; }
-  .mu.up .ln { display: block; }
-  .mu.up .res-slot, .mu.up .s { display: none; }
+  .sw-cols .mu.up { display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .sw-cols .mu.up .vs { display: inline; font-size: 10px; }
+  .sw-cols .mu.up .ln { display: block; }
+  .sw-cols .mu.up .res-slot, .mu.up .s { display: none; }
 }
 
 /* ================= Predicciones: lista de aciertos ================= */
@@ -568,3 +568,16 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
 .team-title .logo { width: 1.1em; height: 1.1em; }
 .champ { position: relative; overflow: hidden; }
 .champ img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.15); }
+
+/* ================= Predicciones › Torneo =================
+   Bracket del camino más probable (cajas como las de la suiza) + tablas de chances por equipo. */
+.pk-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); align-items: start; }
+.pk .mu { border-top: 0; padding: 8px 10px; }
+.pk .ln.picked { background: var(--gold-soft); box-shadow: inset 2px 0 0 var(--gold); }
+.pk-when { padding: 6px 10px; border-top: 1px solid var(--line); font: 11px var(--f-data); color: var(--fg2); }
+.pick { color: var(--gold); font: 700 13px/1 var(--f-data); width: 20px; text-align: center; }
+.pk-table td.picked { color: var(--gold); font-weight: 700; }
+.pk-table td .tag { font-size: 1.05rem; }
+.pk-summary { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr)); }
+.pk-summary > div { background: var(--raised); padding: 12px 14px; display: grid; gap: 6px; }
+.pk-summary b { font: 700 1.05rem/1.3 var(--f-display); letter-spacing: .04em; text-transform: uppercase; }

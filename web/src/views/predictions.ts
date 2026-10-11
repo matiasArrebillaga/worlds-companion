@@ -4,14 +4,15 @@ import { escapeHtml } from '../html';
 import { favorite, verdict } from '../predictions';
 import { dayKeyOf } from '../schedule';
 import type { CalibrationBucket, Elo, Match } from '../types';
+import { tournamentView } from './tournament';
 import { how } from './ui';
 
-// Sub-vista Predicciones del calendario: Aciertos (Resumen | Partidos) y Cómo funciona.
+// Sub-vista Predicciones del calendario: Aciertos (Resumen | Partidos), Torneo (para los pick'ems) y Cómo funciona.
 // Los próximos partidos ya muestran su probabilidad en el calendario y el Elo está en Equipos.
-type Tab = 'aciertos' | 'como';
+type Tab = 'aciertos' | 'torneo' | 'como';
 type HitsTab = 'resumen' | 'partidos';
 type Filter = 'all' | 'hit' | 'miss';
-const TABS: [Tab, string][] = [['aciertos', 'Aciertos'], ['como', 'Cómo funciona']];
+const TABS: [Tab, string][] = [['aciertos', 'Aciertos'], ['torneo', 'Torneo'], ['como', 'Cómo funciona']];
 const HITS_TABS: [HitsTab, string][] = [['resumen', 'Resumen'], ['partidos', 'Partidos']];
 const FILTERS: [Filter, string][] = [['all', 'Todos'], ['hit', 'Acertados'], ['miss', 'Errados']];
 
@@ -117,6 +118,7 @@ function matchList(matches: Match[], tz: string): string {
 
 export function predictionsView(data: SiteData, tz: string): string {
   const body = state.tab === 'como' ? howItWorks(data.elo)
+    : state.tab === 'torneo' ? tournamentView(data.tournament, tz)
     : `${seg('phits', HITS_TABS, state.hits, 'Aciertos', true)}
        ${state.hits === 'resumen' ? summary(data.elo) : matchList(data.schedule.matches, tz)}`;
   return `
