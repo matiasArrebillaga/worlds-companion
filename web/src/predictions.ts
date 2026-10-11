@@ -23,3 +23,14 @@ export function gameOdds(m: Match): { short: string; p: number } | null {
     ? { short: m.team1.short, p: p.p_team1_game }
     : { short: m.team2.short, p: 1 - p.p_team1_game };
 }
+
+// Debajo de esta chance, que gane se marca como sorpresa (el favorito tenía más de 65%)
+export const UPSET_BELOW = 0.35;
+
+// Si ganó el que el modelo daba como no favorito y con poca chance, la chance que tenía; si no, null.
+// Igual que en verdict(), solo cuentan las predicciones guardadas antes del partido
+export function upsetChance(m: Match): number | null {
+  if (m.status !== 'finished' || !m.winner || !m.prediction?.frozen) return null;
+  const p = m.winner === 'team1' ? m.prediction.p_team1_series : 1 - m.prediction.p_team1_series;
+  return p < UPSET_BELOW ? p : null;
+}

@@ -149,7 +149,7 @@ function vsWorldsModule(data: SiteData): string {
   const [min, max] = [0.2, 0.9];
   const body = rows.map(({ team, season, vs, diff }) => `
     <div class="lrow">${who('', `<a href="#/equipo/${encodeURIComponent(team.id)}">${escapeHtml(team.short)}</a>`, `${escapeHtml(team.region ?? '—')} · ${vs.games} PJ`, 'tm')}
-      ${dumbbell(season.winrate ?? 0, vs.winrate ?? 0, min, max, vs.winrate_low, vs.winrate_high)}
+      ${dumbbell(season.winrate ?? 0, vs.winrate ?? 0, min, max, vs.winrate_low, vs.winrate_high, ['Temporada', 'Vs. clasificados'])}
       <span class="v ${diff! < 0 ? 'neg' : 'pos'}">${signed(diff! * 100)}<small>pts · GD@15 ${signed(vs.gd15 ?? null)}</small></span></div>`).join('');
   return `<section class="mod">${head}
     <div class="legend"><span><i class="lg-hollow"></i>Temporada</span><span><i class="lg-solid"></i>Solo vs. clasificados</span><span><i class="lg-band"></i>Rango 95%</span></div>

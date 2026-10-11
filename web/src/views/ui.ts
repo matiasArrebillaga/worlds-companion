@@ -1,5 +1,6 @@
 import { escapeHtml } from '../html';
 import { sortBy } from '../stats';
+import { rangeTip } from '../tooltip';
 
 // Piezas visuales compartidas por Estadísticas y Meta: barras, rangos, tabla aireada y recuadros.
 // En PC la tabla es una tabla; en el celular (CSS) cada fila pasa a ser una tarjeta con un dato por baldosa.
@@ -64,16 +65,20 @@ export function whisker(low: number | null | undefined, high: number | null | un
     ? `<span class="ci ${low > 0.5 ? 'up' : high < 0.5 ? 'down' : ''}" style="left:${x(low)}%;width:${(place(high, min, max) - place(low, min, max)).toFixed(1)}%"></span>`
     : '';
   const dot = point != null ? `<span class="pt" style="left:${x(point)}%"></span>` : '';
-  return `<span class="wh" aria-hidden="true"><span class="ref" style="left:${x(0.5)}%"></span>${range}${dot}</span>`;
+  // El dibujo es decorativo para lectores de pantalla (el texto va al lado); con el mouse muestra el dato exacto
+  return `<span class="wh" aria-hidden="true" data-tip="${escapeHtml(rangeTip(low, high, point))}"><span class="ref" style="left:${x(0.5)}%"></span>${range}${dot}</span>`;
 }
 
-// Mancuerna: rombo hueco = antes, rombo lleno = después; banda opcional = rango del 95% del después
-export function dumbbell(before: number, after: number, min: number, max: number, low?: number | null, high?: number | null): string {
+// Mancuerna: rombo hueco = antes, rombo lleno = después; banda opcional = rango del 95% del después.
+// labels: cómo se llaman el antes y el después en el tooltip (todas las mancuernas del sitio son porcentajes)
+export function dumbbell(before: number, after: number, min: number, max: number, low?: number | null, high?: number | null,
+  labels: [string, string] = ['Antes', 'Después']): string {
   const x = (v: number) => place(v, min, max);
   const band = low != null && high != null ? `<span class="band" style="left:${x(low).toFixed(1)}%;width:${(x(high) - x(low)).toFixed(1)}%"></span>` : '';
   const left = Math.min(x(before), x(after));
   const width = Math.abs(x(after) - x(before));
-  return `<span class="db" aria-hidden="true"><span class="ref" style="left:${x(0.5).toFixed(1)}%"></span>${band}` +
+  const tip = `${labels[0]} ${Math.round(before * 100)}% → ${rangeTip(low, high, after, labels[1])}`;
+  return `<span class="db" aria-hidden="true" data-tip="${escapeHtml(tip)}"><span class="ref" style="left:${x(0.5).toFixed(1)}%"></span>${band}` +
     `<span class="ln" style="left:${left.toFixed(1)}%;width:${width.toFixed(1)}%"></span>` +
     `<span class="d a" style="left:${x(before).toFixed(1)}%"></span><span class="d b" style="left:${x(after).toFixed(1)}%"></span></span>`;
 }

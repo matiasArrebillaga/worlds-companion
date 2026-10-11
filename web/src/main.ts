@@ -9,6 +9,7 @@ import { canGoBack, markNewStep, parseHash, rememberScroll, savedScroll, syncDep
 import { renderLive, renderUpdated, setActiveTab, showToast, withTransition } from './views/layout';
 import { finishedSince, resultLine } from './changes';
 import { escapeHtml } from './html';
+import { installTooltip } from './tooltip';
 import { verdict } from './predictions';
 import type { Match } from './types';
 import { renderMatch } from './views/match';
@@ -120,6 +121,7 @@ function refreshUpdated(data: SiteData): void {
 }
 
 async function start(): Promise<void> {
+  installTooltip();
   view.innerHTML = SKELETON;
   let data: SiteData;
   try {

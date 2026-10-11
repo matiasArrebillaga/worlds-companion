@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findById, fmt, formRanking, pct, periodOf, signed, sortBy, starterByRole, teamByName, vsWorldsRows } from './stats';
+import { advantage, findById, fmt, formRanking, pct, periodOf, signed, sortBy, starterByRole, teamByName, vsWorldsRows } from './stats';
 import type { PlayerEntry, TeamEntry, TeamStats } from './types';
 
 describe('periodOf', () => {
@@ -72,5 +72,19 @@ describe('signed', () => {
     expect(signed(0.32, 2)).toBe('+0.32');
     expect(signed(-0.1, 2)).toBe('−0.10');
     expect(signed(null, 2)).toBe('—');
+  });
+});
+
+describe('advantage', () => {
+  it('points to the better side and scales the gap', () => {
+    expect(advantage(1712, 1662, 100)).toEqual({ side: 'a', width: 50 });
+    expect(advantage(0.58, 0.68, 0.2)?.side).toBe('b');
+    expect(advantage(0.58, 0.68, 0.2)?.width).toBeCloseTo(50);
+  });
+
+  it('caps at the full side and skips ties or missing data', () => {
+    expect(advantage(2000, 1600, 100)).toEqual({ side: 'a', width: 100 });
+    expect(advantage(0.5, 0.5, 0.2)).toBeNull();
+    expect(advantage(null, 0.5, 0.2)).toBeNull();
   });
 });

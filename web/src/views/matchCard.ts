@@ -1,6 +1,6 @@
 import { formatPercent, formatTime, PHASE_LABELS, roundLabel } from '../format';
 import { escapeHtml } from '../html';
-import { favorite, gameOdds, verdict } from '../predictions';
+import { favorite, gameOdds, upsetChance, verdict } from '../predictions';
 import { teamHref, teamMark, teamRegionColor } from '../theme/regions';
 import type { Match, Team } from '../types';
 
@@ -32,14 +32,31 @@ export function stretchLink(m: { id: string | null; team1: Team | null; team2: T
   return `<a class="stretch" href="#/partido/${encodeURIComponent(m.id)}"${label}>${text}</a>`;
 }
 
-function teamSide(m: Match, side: Side): string {
+// Rombito dorado chico junto a la sigla del favorito del modelo (vacío si no lo es o no hay predicción)
+export function favMark(m: Match, side: Side): string {
+  return favorite(m) === side ? '<i class="fv" title="Favorito del modelo" aria-hidden="true"></i>' : '';
+}
+
+// La sigla con el rombito del favorito del lado de adentro (hacia el VS)
+export function teamWithFav(m: Match, side: Side): string {
   const name = teamLink(m[side]);
+  return side === 'team1' ? `${name}${favMark(m, side)}` : `${favMark(m, side)}${name}`;
+}
+
+function teamSide(m: Match, side: Side): string {
+  const name = teamWithFav(m, side);
   const lost = m.winner && m.winner !== side ? ' lost' : '';
   const cls = side === 'team2' ? `team r${lost}` : `team${lost}`;
   // El resultado (V/D) va del lado de afuera de cada equipo
   return side === 'team1'
     ? `<div class="${cls}">${result(m, side)}${name}</div>`
     : `<div class="${cls}">${name}${result(m, side)}</div>`;
+}
+
+// "Sorpresa · tenía 28%": ganó el que el modelo daba con menos de 35%
+export function upsetTag(m: Match): string {
+  const p = upsetChance(m);
+  return p === null ? '' : `<span class="upset">Sorpresa · tenía ${formatPercent(p)}</span>`;
 }
 
 function head(m: Match, time: string): string {
@@ -56,9 +73,10 @@ export function predictionBlock(m: Match): string {
   const p1 = formatPercent(p.p_team1_series);
   const p2 = formatPercent(1 - p.p_team1_series);
   const v = verdict(m);
-  const verdictHtml = v === 'hit'
+  const verdictText = v === 'hit'
     ? '<span class="verdict hit">✓ El modelo acertó</span>'
     : v === 'miss' ? '<span class="verdict miss">✗ El modelo falló</span>' : '';
+  const verdictHtml = verdictText ? `<div class="verdicts">${verdictText}${upsetTag(m)}</div>` : '';
   const label = `Probabilidad de ganar la serie: ${escapeHtml(m.team1.short)} ${p1}, ${escapeHtml(m.team2.short)} ${p2}`;
   const odds = gameOdds(m);
   const oddsHtml = odds

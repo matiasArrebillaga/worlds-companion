@@ -1,14 +1,25 @@
 import type { SiteData } from '../data';
 import { escapeHtml } from '../html';
-import { findById, fmt, pct, ROLE_LABELS, starterByRole, teamByName } from '../stats';
+import { advantage, findById, fmt, pct, ROLE_LABELS, starterByRole, teamByName } from '../stats';
 import type { ChampionCount, PlayerEntry, Role, TeamEntry } from '../types';
-import { predictionBlock } from './matchCard';
+import { drawEloChart } from '../charts/eloChart';
+import { firstDay } from '../schedule';
+import { favMark, predictionBlock } from './matchCard';
 import { champHex } from './player';
 import { notFound } from './team';
-import { backLink } from './ui';
+import { backLink, how } from './ui';
 
-function mirror(label: string, left: string, right: string): string {
-  return `<div class="mirror"><span class="num">${left}</span><span class="label">${label}</span><span class="num">${right}</span></div>`;
+// Fila espejo: el dato de cada equipo a los costados y, si el dato tiene un "mejor", una barra desde el centro
+// hacia el que saca ventaja (su valor en dorado). edge = valores numéricos y la diferencia que ya es grande
+function mirror(label: string, left: string, right: string, edge?: [number | null, number | null, number]): string {
+  const adv = edge ? advantage(edge[0], edge[1], edge[2]) : null;
+  const bar = adv ? `<i style="width:${adv.width.toFixed(0)}%"></i>` : '';
+  return `<div class="mirror">
+    <span class="num${adv?.side === 'a' ? ' lead' : ''}">${left}</span>
+    <span class="mbar l" aria-hidden="true">${adv?.side === 'a' ? bar : ''}</span>
+    <span class="label">${label}</span>
+    <span class="mbar r" aria-hidden="true">${adv?.side === 'b' ? bar : ''}</span>
+    <span class="num${adv?.side === 'b' ? ' lead' : ''}">${right}</span></div>`;
 }
 
 function duel(role: Role, a: PlayerEntry | undefined, b: PlayerEntry | undefined): string {
@@ -46,19 +57,23 @@ export function renderMatch(el: HTMLElement, data: SiteData, _tz: string, param:
     <section class="stack">
       ${backLink('#/')}
       <span class="eyebrow">Cara a cara · Bo${m.best_of}</span>
-      <h1><a href="#/equipo/${encodeURIComponent(a.id)}">${escapeHtml(a.short)}</a> vs <a href="#/equipo/${encodeURIComponent(b.id)}">${escapeHtml(b.short)}</a></h1>
+      <h1 class="vs-title"><a href="#/equipo/${encodeURIComponent(a.id)}">${escapeHtml(a.short)}</a>${favMark(m, 'team1')} vs ${favMark(m, 'team2')}<a href="#/equipo/${encodeURIComponent(b.id)}">${escapeHtml(b.short)}</a></h1>
       ${predictionBlock(m)}
     </section>
     <section class="stack"><h2>Temporada 2026</h2><div class="bezel"><div class="core">
-      ${mirror('Elo', fmt(a.rating), fmt(b.rating))}
+      ${mirror('Elo', fmt(a.rating), fmt(b.rating), [a.rating, b.rating, 100])}
       ${mirror('Récord', `${sa.wins}-${sa.games - sa.wins}`, `${sb.wins}-${sb.games - sb.wins}`)}
-      ${mirror('% victorias', pct(sa.winrate), pct(sb.winrate))}
+      ${mirror('% victorias', pct(sa.winrate), pct(sb.winrate), [sa.winrate, sb.winrate, 0.2])}
       ${mirror('Duración (min)', fmt(sa.avg_minutes, 1), fmt(sb.avg_minutes, 1))}
-      ${mirror('Oro/min', fmt(sa.gold_per_min), fmt(sb.gold_per_min))}
-      ${mirror('1ª sangre', pct(sa.first_blood), pct(sb.first_blood))}
-      ${mirror('1er dragón', pct(sa.first_dragon), pct(sb.first_dragon))}
-      ${mirror('1ª torre', pct(sa.first_tower), pct(sb.first_tower))}
-    </div></div></section>
+      ${mirror('Oro/min', fmt(sa.gold_per_min), fmt(sb.gold_per_min), [sa.gold_per_min, sb.gold_per_min, 100])}
+      ${mirror('1ª sangre', pct(sa.first_blood), pct(sb.first_blood), [sa.first_blood, sb.first_blood, 0.2])}
+      ${mirror('1er dragón', pct(sa.first_dragon), pct(sb.first_dragon), [sa.first_dragon, sb.first_dragon, 0.2])}
+      ${mirror('1ª torre', pct(sa.first_tower), pct(sb.first_tower), [sa.first_tower, sb.first_tower, 0.2])}
+    </div></div>
+    ${how('La barra sale del centro hacia el equipo que saca ventaja en ese dato; llega al borde con 100 de Elo, 100 de oro por minuto o 20 puntos de % de diferencia. La duración y el récord no tienen barra: no hay un "mejor".')}</section>
+    <section class="stack"><h2>Elo en 2026</h2>
+      <div class="legend"><span><i class="lg-a"></i>${escapeHtml(a.short)}</span><span><i class="lg-b"></i>${escapeHtml(b.short)}</span></div>
+      <div class="chart-box"><canvas aria-label="Evolución del Elo de ${escapeHtml(a.short)} y ${escapeHtml(b.short)} en 2026" role="img"></canvas></div></section>
     <section class="stack"><h2>Duelos por rol</h2>
       ${roles.map((r) => duel(r, starterByRole(a, data.players.players, r), starterByRole(b, data.players.players, r))).join('')}</section>
     <section class="grid g2">
@@ -69,5 +84,16 @@ export function renderMatch(el: HTMLElement, data: SiteData, _tz: string, param:
       ${meetings.length ? meetings.map((s) => `<div class="row"><span class="t">${escapeHtml(s.date.slice(5))}</span><span class="m">${escapeHtml(s.page.split('/')[0])}</span><span class="num">${escapeHtml(a.short)} ${s.wins}-${s.losses}</span></div>`).join('')
         : '<div class="state"><b>No se enfrentaron en 2026</b></div>'}
     </section>`;
-  return () => {};
+
+  // Elo de los dos equipos en un mismo gráfico (Chart.js carga aparte; se destruye al salir)
+  let alive = true;
+  let destroy: () => void = () => {};
+  const canvas = el.querySelector('canvas');
+  if (canvas) {
+    drawEloChart(canvas, [
+      { label: a.short, history: a.elo_history, series: a.series },
+      { label: b.short, history: b.elo_history, series: b.series },
+    ], firstDay(data.schedule.matches)).then((d) => { if (alive) destroy = d; else d(); });
+  }
+  return () => { alive = false; destroy(); };
 }

@@ -1,4 +1,5 @@
 import { drawEloChart } from '../charts/eloChart';
+import { firstDay } from '../schedule';
 import type { SiteData } from '../data';
 import { escapeHtml } from '../html';
 import { logoImg } from '../theme/regions';
@@ -73,7 +74,7 @@ export function renderTeam(el: HTMLElement, data: SiteData, _tz: string, param: 
   let alive = true;
   const canvas = el.querySelector('canvas');
   if (canvas && team.elo_history.length) {
-    drawEloChart(canvas, team.elo_history).then((d) => { if (alive) destroy = d; else d(); });
+    drawEloChart(canvas, [{ label: team.short, history: team.elo_history, series: team.series }], firstDay(data.schedule.matches)).then((d) => { if (alive) destroy = d; else d(); });
   }
   const teardown = () => { alive = false; destroy(); el.onclick = null; };
   // El cleanup que guarda main.ts es este; al cambiar de período apunta al de la nueva vista,

@@ -3,13 +3,14 @@ import type { SiteData } from '../data';
 import { countdownParts, formatDateTimeLong, formatDayHeading, formatDayShort, formatTime, localDayKey, pad2, PHASE_LABELS, roundLabel } from '../format';
 import { escapeHtml } from '../html';
 import { go, pick } from '../router';
+import { drawCalibrationChart } from '../charts/calibrationChart';
 import { withTransition } from './layout';
 import { dayKeyOf, featuredMatch, groupByDay, recentResults } from '../schedule';
 import { PENDING, swissRounds, swissStandings } from '../swiss';
 import { teamMark, teamRegionColor } from '../theme/regions';
 import type { Match, Team } from '../types';
 import { bracketGrid, recordTint, stageButtons } from './bracketGrid';
-import { matchCard, predictionBlock, stretchLink, teamLink } from './matchCard';
+import { matchCard, predictionBlock, stretchLink, teamWithFav, upsetTag } from './matchCard';
 import { BO1_NOTE, handlePredictionsClick, predictionsView } from './predictions';
 
 // Calendario: la página de inicio. Lista (línea de tiempo centrada en el próximo partido),
@@ -58,9 +59,9 @@ function featureCard(m: Match, tz: string): string {
       <div class="core">
         <div class="match-head">${pill}<span class="label">${when} · Bo${m.best_of}</span></div>
         <div class="teams">
-          <div class="team">${teamLink(m.team1)}</div>
+          <div class="team">${teamWithFav(m, 'team1')}</div>
           ${middle}
-          <div class="team r">${teamLink(m.team2)}</div>
+          <div class="team r">${teamWithFav(m, 'team2')}</div>
         </div>
         ${predictionBlock(m)}
         ${m.status === 'upcoming' ? '<div class="countdown" data-countdown aria-label="Cuenta regresiva"></div>' : ''}
@@ -99,7 +100,7 @@ function resultRow(m: Match, tz: string): string {
   const [winner, loser] = m.winner === 'team1' ? [m.team1, m.team2] : [m.team2, m.team1];
   const [hi, lo] = m.winner === 'team1' ? m.score : [m.score[1], m.score[0]];
   const day = dayKeyOf(m, tz);
-  return `<div class="row"><span class="t">${day ? escapeHtml(formatDayShort(day)) : ''}</span><span class="m">${escapeHtml(winner.short)} <em>a</em> ${escapeHtml(loser.short)}</span><span class="label">${hi}–${lo}</span></div>`;
+  return `<div class="row"><span class="t">${day ? escapeHtml(formatDayShort(day)) : ''}</span><span class="m">${escapeHtml(winner.short)} <em>a</em> ${escapeHtml(loser.short)}${upsetTag(m)}</span><span class="label">${hi}–${lo}</span></div>`;
 }
 
 // Columna lateral (solo PC): los partidos de hoy y los últimos resultados
@@ -209,6 +210,17 @@ function seg(options: [string, string][], selected: string, label: string): stri
   return `<div class="seg" role="group" aria-label="${label}">${buttons}</div>`;
 }
 
+// Gráfico de calibración de Predicciones › Aciertos, si está en pantalla (Chart.js carga aparte)
+let stopChart: () => void = () => {};
+function startCalibration(el: HTMLElement, data: SiteData): () => void {
+  const canvas = el.querySelector<HTMLCanvasElement>('canvas[data-calibration]');
+  if (!canvas) return () => {};
+  let alive = true;
+  let destroy: () => void = () => {};
+  drawCalibrationChart(canvas, data.elo.accuracy.calibration).then((d) => { if (alive) destroy = d; else d(); });
+  return () => { alive = false; destroy(); };
+}
+
 // Cuenta regresiva del próximo partido, si tiene hora confirmada
 function startCountdown(el: HTMLElement, featured: Match | null): () => void {
   const box = el.querySelector<HTMLElement>('[data-countdown]');
@@ -251,6 +263,8 @@ export function renderCalendar(el: HTMLElement, data: SiteData, tz: string, rout
 
   stopTimer();
   stopTimer = sub === 'lista' ? startCountdown(el, featured) : () => {};
+  stopChart();
+  stopChart = startCalibration(el, data);
 
   el.onclick = (event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button');
@@ -298,6 +312,8 @@ export function renderCalendar(el: HTMLElement, data: SiteData, tz: string, rout
   return () => {
     stopTimer();
     stopTimer = () => {};
+    stopChart();
+    stopChart = () => {};
     el.onclick = null;
   };
 }

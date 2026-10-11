@@ -6,6 +6,7 @@ import { favorite, verdict } from '../predictions';
 import { pick } from '../router';
 import { dayKeyOf } from '../schedule';
 import type { CalibrationBucket, Elo, Match } from '../types';
+import { upsetTag } from './matchCard';
 import { tournamentView } from './tournament';
 import { how } from './ui';
 
@@ -91,7 +92,9 @@ function summary(elo: Elo): string {
     </div>
     <h2>Calibración</h2>
     <p class="muted">Si el modelo está bien calibrado, los favoritos al 60–70% ganan entre el 60 y el 70% de las veces. Con pocos partidos estos números saltan mucho.</p>
-    <div class="calib">${a.calibration.map(calibrationRow).join('')}</div>`;
+    <div class="chart-box calib-chart"><canvas data-calibration role="img" aria-label="Calibración: chance predicha del favorito contra cuántas veces ganó, por franja"></canvas></div>
+    ${how('Cada punto es una franja de partidos (favoritos al 50–60%, al 60–70%…). Horizontal: la chance que el modelo le daba al favorito, en promedio. Vertical: cuántas veces ganó de verdad. Sobre la línea dorada, el modelo acertó la medida; debajo, se confió de más; arriba, se quedó corto. El tamaño del punto es la cantidad de partidos: un punto chico lejos de la línea puede ser pura suerte.')}
+    <details class="how"><summary>Ver los números</summary><div class="calib">${a.calibration.map(calibrationRow).join('')}</div></details>`;
 }
 
 // Una fila por partido evaluado: quién era favorito, cómo terminó y si el modelo acertó
@@ -104,7 +107,7 @@ function hitRow(m: Match, tz: string): string {
   return `
     <div class="hit-row">
       <span class="d">${day ? escapeHtml(formatDayShort(day)) : '—'}</span>
-      <span class="m">${escapeHtml(m.team1.short)} vs ${escapeHtml(m.team2.short)}<small>Favorito: ${escapeHtml(m[fav]!.short)} ${formatPercent(p)} · ${escapeHtml(roundLabel(m.round))} · Bo${m.best_of}</small></span>
+      <span class="m">${escapeHtml(m.team1.short)} vs ${escapeHtml(m.team2.short)}${upsetTag(m)}<small>Favorito: ${escapeHtml(m[fav]!.short)} ${formatPercent(p)} · ${escapeHtml(roundLabel(m.round))} · Bo${m.best_of}</small></span>
       <span class="s">${m.score ? `${m.score[0]}–${m.score[1]}` : ''}</span>
       <span class="mark ${v}">${v === 'hit' ? '✓ Acertó' : '✗ Falló'}</span>
     </div>`;
@@ -120,7 +123,8 @@ function matchList(matches: Match[], tz: string): string {
   const rows = visible.map((m) => hitRow(m, tz)).join('');
   return `
     ${seg('pfilter', FILTERS, state.filter, 'Filtrar partidos', true)}
-    ${rows ? `<div class="hits">${rows}</div>` : empty('No hay partidos con este filtro', 'Probá con "Todos".')}`;
+    ${rows ? `<div class="hits">${rows}</div>` : empty('No hay partidos con este filtro', 'Probá con "Todos".')}
+    ${how('"Sorpresa" = ganó el equipo al que el modelo le daba menos de 35%. No es un error del modelo: si los favoritos tienen 70%, 3 de cada 10 tienen que perder. Si nunca hubiera sorpresas, el modelo estaría siendo demasiado prudente con los favoritos. Lo que importa es si las sorpresas aparecen tan seguido como dicen los porcentajes: eso lo mide la calibración del Resumen.', '¿Qué es una sorpresa?')}`;
 }
 
 // tab y stage vienen de la URL; si faltan o no valen: Aciertos y la fase que se está jugando

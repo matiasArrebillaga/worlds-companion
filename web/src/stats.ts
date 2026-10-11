@@ -68,3 +68,10 @@ export function teamByName<T extends { name: string }>(teams: T[], name: string)
 export function starterByRole<P extends { id: string; role: Role }>(team: { roster: string[] }, players: P[], role: Role): P | undefined {
   return players.find((p) => team.roster.includes(p.id) && p.role === role);
 }
+
+// Quién saca ventaja en un dato del Cara a cara y cuánto: largo de la barra (0–100) = diferencia / escala.
+// La escala es la diferencia que ya se considera grande (100 de Elo, 20 puntos de %). null si empatan o falta un dato
+export function advantage(a: number | null, b: number | null, scale: number): { side: 'a' | 'b'; width: number } | null {
+  if (a === null || b === null || a === b) return null;
+  return { side: a > b ? 'a' : 'b', width: Math.min(100, (Math.abs(a - b) / scale) * 100) };
+}

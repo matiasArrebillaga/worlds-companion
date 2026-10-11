@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { favorite, gameOdds, verdict } from './predictions';
+import { favorite, gameOdds, upsetChance, verdict } from './predictions';
 import type { Match, Prediction } from './types';
 
 const pred = (p: number, frozen = true): Prediction => ({ p_team1_game: p, p_team1_series: p, model_version: 'elo-1', frozen });
@@ -46,5 +46,24 @@ describe('gameOdds', () => {
   it('is only for Bo5 with both teams and a prediction', () => {
     expect(gameOdds(match({ best_of: 3, prediction: pred(0.6) }))).toBeNull();
     expect(gameOdds(match({ best_of: 5 }))).toBeNull();
+  });
+});
+
+describe('upsetChance', () => {
+  const done = (p: number, winner: 'team1' | 'team2', frozen = true) =>
+    match({ status: 'finished', winner, score: [2, 1], prediction: pred(p, frozen) });
+
+  it('returns the winner chance when it was below 35%', () => {
+    expect(upsetChance(done(0.72, 'team2'))).toBeCloseTo(0.28);
+    expect(upsetChance(done(0.2, 'team1'))).toBeCloseTo(0.2);
+  });
+
+  it('is null when the favorite won or the underdog was close', () => {
+    expect(upsetChance(done(0.72, 'team1'))).toBeNull();
+    expect(upsetChance(done(0.6, 'team2'))).toBeNull(); // 40%: no es sorpresa
+  });
+
+  it('ignores predictions that were not frozen', () => {
+    expect(upsetChance(done(0.9, 'team2', false))).toBeNull();
   });
 });

@@ -155,7 +155,7 @@ function miragesModule(rows: ChampionEntry[]): string {
   if (!odd.length) return '';
   const body = odd.map((c) => `
     <div class="lrow">${who(champHex(c.champion), escapeHtml(c.champion), `${c.wins}-${c.picks - c.wins}`)}
-      ${dumbbell(c.winrate ?? 0, c.winrate_adj ?? 0, 0, 1)}<span class="v">${pct(c.winrate_adj ?? null)}<small>${pct(c.winrate)} crudo</small></span></div>`).join('');
+      ${dumbbell(c.winrate ?? 0, c.winrate_adj ?? 0, 0, 1, null, null, ['Crudo', 'Ajustado'])}<span class="v">${pct(c.winrate_adj ?? null)}<small>${pct(c.winrate)} crudo</small></span></div>`).join('');
   return `<section class="mod s2"><header class="mh"><h2>Espejismos</h2><span class="q">Los que más cambian al ajustar</span></header>
     <div class="legend"><span><i class="lg-hollow"></i>Crudo</span><span><i class="lg-solid"></i>Ajustado</span></div>
     <div><div class="lrow head"><span></span>${axis([0, 0.5, 1], 0, 1, pct)}<span></span></div>${body}</div>
@@ -178,7 +178,7 @@ function shiftsModule(rows: ChampionEntry[]): string {
   if (!up.length && !down.length) return `<section class="mod">${head}<div class="state"><b>Aparece con las primeras partidas de Worlds</b><span>Compara la presencia de cada campeón en Worlds con la que tenía en la guía.</span></div></section>`;
   const list = (title: string, items: typeof up) => (items.length ? `<span class="label">${title}</span>${items.map((x) => `
     <div class="lrow">${who(champHex(x.champion), escapeHtml(x.champion), `${pct(x.before)} → ${pct(x.after)}`)}
-      ${dumbbell(x.before, x.after, 0, 1)}<span class="v ${x.delta < 0 ? 'neg' : 'pos'}">${signed(x.delta * 100)}<small>pts</small></span></div>`).join('')}` : '');
+      ${dumbbell(x.before, x.after, 0, 1, null, null, ['Guía', 'Worlds'])}<span class="v ${x.delta < 0 ? 'neg' : 'pos'}">${signed(x.delta * 100)}<small>pts</small></span></div>`).join('')}` : '');
   return `<section class="mod">${head}
     <div class="legend"><span><i class="lg-hollow"></i>Guía</span><span><i class="lg-solid"></i>Worlds</span></div>
     <div>${list('Suben', up)}${list('Bajan', down)}</div>

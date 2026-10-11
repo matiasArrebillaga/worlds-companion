@@ -35,3 +35,8 @@ export function recentResults(matches: Match[], limit: number): Match[] {
     .sort((a, b) => (b.start_utc ?? b.date ?? '').localeCompare(a.start_utc ?? a.date ?? ''))
     .slice(0, limit);
 }
+
+// Primer día del torneo (YYYY-MM-DD), para marcar dónde empieza Worlds en los gráficos
+export function firstDay(matches: Match[]): string | null {
+  return matches.map((m) => m.date).filter((d): d is string => !!d).sort()[0] ?? null;
+}

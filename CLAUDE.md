@@ -103,6 +103,10 @@ cd web && npm run build         # build de producción
   equipo y por jugador.
 - **Meta**: Campeones (draft, rendimiento y resultado) | Panorama (lados, ritmo, regiones, ruido vs. señal, espejismos, flex,
   cambios del parche).
+- La pestaña elegida va en la URL (atrás, recargar y compartir la conservan): `#/bracket/<fase>`,
+  `#/predicciones/<pestaña>/<fase>`, `#/equipos/<pestaña>`, `#/meta/<pestaña>`. Filtros y orden quedan en memoria.
+  Atrás/adelante vuelven al mismo lugar del scroll; equipo, jugador y partido tienen "Volver".
+- Favorito del modelo: rombito dorado junto a la sigla (sin texto extra); "Sorpresa" si ganó el que tenía < 35%.
 - Buscador en las tablas de Equipos, Jugadores y Campeones: ignora tildes, mayúsculas y signos, encuentra ligas
   ("lck") y conserva el puesto real de cada fila. Al escribir solo se reemplazan los resultados, no el campo.
 - **Partido**: head-to-head.
