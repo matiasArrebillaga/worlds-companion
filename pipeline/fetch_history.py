@@ -2,7 +2,7 @@
 
 Uso: python -m pipeline.fetch_history           # baja solo los años que falten en data/raw/
      python -m pipeline.fetch_history --force   # vuelve a bajar todo
-2024 y 2025 se usan para el backtest. Del año actual no se baja Worlds: lo hace pipeline.fetch cada hora.
+2019–2025 se usan para los backtests. Del año actual no se baja Worlds: lo hace pipeline.fetch cada hora.
 """
 import sys
 
@@ -11,7 +11,7 @@ from pipeline.fetch import MATCH_FIELDS, RAW_DIR, write_if_changed
 from pipeline.history import (CURRENT_YEAR, GAME_FIELDS, LEAGUE_REGIONS, TOURNAMENT_FIELDS, history_files,
                               select_tournaments, worlds_prefix)
 
-YEARS = (2024, 2025, CURRENT_YEAR)
+YEARS = (2019, 2020, 2021, 2022, 2023, 2024, 2025, CURRENT_YEAR)
 
 
 def pages_to_fetch(tournaments: list[dict], year: int) -> list[str]:

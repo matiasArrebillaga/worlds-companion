@@ -23,6 +23,13 @@ LEAGUE_REGIONS: dict[str, str | None] = {
     "Pacific Championship Series": "APAC",
     "Vietnam Championship Series": "VN",
     "LoL Japan League": "JP",
+    # Ligas que ya no existen o que no van a Worlds: solo para el historial de años anteriores (backtest)
+    "LoL Master Series": "APAC",
+    "League of Legends SEA Tour": "APAC",
+    "Oceanic Pro League": "OCE",
+    "LoL Circuit Oceania": "OCE",
+    "Turkish Championship League": "TR",
+    "LoL Continental League": "CIS",
     "League of Legends Championship of The Americas": None,
     "First Stand": None,
     "Mid-Season Invitational": None,
