@@ -465,9 +465,35 @@ footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line
       <tr><td>Momentum dentro del torneo</td><td>Peso negativo: <b>regresión a la media</b>. Lo que sobresalió por suerte tiende a volver</td></tr>
       <tr><td>Momentum dentro de la serie</td><td>No generaliza (sección 8)</td></tr>
       <tr><td>K más alto en torneos</td><td>Peor (sección 3)</td></tr>
+      <tr><td>Arrastrar el rating de la temporada anterior</td><td>Mejora las ligas, pero no los internacionales (abajo)</td></tr>
+      <tr><td>Rating de región compartido</td><td>Persigue el ruido: empeora los cruces entre regiones</td></tr>
     </tbody>
   </table></div>
   <p>La lección general: el Elo ya es un promedio con memoria que se actualiza después de cada partida, y la mayoría de las ideas de "momentum" ya están adentro. Correlación no es causalidad, y una señal que aparece en un año y desaparece en el siguiente probablemente era ruido.</p>
+
+  <h3>La última prueba: cambiar cómo aprende el Elo</h3>
+  <p>Todo lo anterior agregaba variables <em>encima</em> del Elo. La última prueba (<code>notebooks/experiment_elo_learning.ipynb</code>) cambió el Elo mismo, con dos ideas:</p>
+  <ul>
+    <li><b>Arrastre entre temporadas.</b> Hoy cada año arranca de cero: 1500 más el ajuste de la región. Con <var>K</var> = 10 eso pesa más de lo que parece: cada partida borra apenas ~1,4% del punto de partida, así que después de 100 partidas todavía queda ~24%. La idea es arrancar con una parte de lo que cada equipo terminó por encima o por debajo de su región el año anterior: <span class="m">inicio = 1500 + ajuste + carry · (final del año pasado − inicio del año pasado)</span>. Se arrastra solo una parte (<b>regresión a la media</b>) porque entre temporadas cambian los rosters y el meta.</li>
+    <li><b>Rating de región compartido.</b> Hoy, si un equipo de la LEC le gana a uno de la LCK en el MSI, solo se mueven esos dos. La idea es que cada partida entre regiones también mueva un poco un rating que comparten todos los equipos de cada región.</li>
+  </ul>
+  <h3>Validación walk-forward</h3>
+  <p>En lugar de un solo corte (ajustar con 2024 y probar en 2025), se usaron ocho temporadas de Leaguepedia (2019–2026). Para cada año de prueba, de 2022 a 2026, se ajustó todo solo con los dos años anteriores y se predijo ese año partido por partida. Imita lo que pasa en la realidad (ajustar con el pasado, predecir lo que viene) y da <b>cinco pruebas fuera de la muestra</b> en vez de una. Si una mejora aparece por suerte en un año, difícilmente se repite en los otros cuatro.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Variante</th><th class="num">Años que mejora</th><th class="num">Δ Brier (todas)</th><th>Veredicto</th></tr></thead>
+    <tbody>
+      <tr><td>Arrastre</td><td class="num">5 de 5</td><td class="num">−0,0033</td><td>Pasa solo con el Elo y también con la forma por rol encima</td></tr>
+      <tr><td>Región compartida</td><td class="num">1 de 5</td><td class="num">+0,0004</td><td>Descartada: empeora los cruces (+0,006)</td></tr>
+      <tr><td>Las dos juntas</td><td class="num">5 de 5</td><td class="num">−0,0031</td><td>No le gana al arrastre solo: queda la más simple</td></tr>
+    </tbody>
+  </table></div>
+  <p>El arrastre es real: mejora los cinco años, sobrevive a la forma por rol y conviene arrastrar entre el 50 y el 80% de la temporada anterior. Pero contra elo-2 <b>empeora justo los partidos entre regiones</b>, que son los de Worlds. Por eso el sitio sigue con elo-2.</p>
+  <div class="why"><b>Lo que enseñó: ligas e internacionales piden K distintos</b>
+    <p>Ajustado con <em>todas</em> las partidas, el Elo elige <var>K</var> = 30–40: dentro de una liga los equipos se enfrentan seguido y conviene seguir la forma reciente. Ajustado solo con los cruces entre regiones, elige <var>K</var> = 4–10: son pocos partidos, y una racha en la liga local dice poco de cómo te va contra otra región. elo-2 ya está del lado correcto para Worlds (<var>K</var> = 10, sección 3). Cualquier cambio que suba <var>K</var> para ganar en las ligas lo paga en los internacionales. Elegir con qué partidas se mide un modelo es elegir para qué sirve.</p>
+  </div>
+  <div class="warn"><b>Por qué no alcanza para cambiar</b>
+    <p>Los internacionales son 200–300 partidas por año. Una mejora real de 0,002 de Brier queda escondida bajo un ruido de ±0,005, así que puede existir una mejora chica que estos datos no llegan a ver. Una variante extra, ajustada con los cruces, se diseñó después de mirar los resultados (el jardín de los senderos que se bifurcan): por eso tuvo su propia regla, fijada antes de correrla, y no la pasó.</p>
+  </div>
 
   <!-- 12 -->
   <h2 id="calc"><span class="n">12</span>Calculadora</h2>
@@ -614,7 +640,7 @@ footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line
   <p>Un campeón es flex si se jugó al menos 2 veces en 2 roles o más. Con una sola vez en otro rol puede ser un pick raro, no un flex: el mínimo de 2 evita contar anécdotas.</p>
 
   <footer>
-    <p>Código: <code>models/elo.py</code>, <code>models/features.py</code>, <code>models/role_form.py</code>, <code>models/tournament.py</code>, <code>pipeline/stats.py</code>, <code>pipeline/meta.py</code>, <code>notebooks/backtest.ipynb</code>. Datos: Leaguepedia (CC-BY-SA) y Oracle's Elixir. Números al 10/10/2026.</p>
+    <p>Código: <code>models/elo.py</code>, <code>models/features.py</code>, <code>models/role_form.py</code>, <code>models/tournament.py</code>, <code>pipeline/stats.py</code>, <code>pipeline/meta.py</code>, <code>notebooks/backtest.ipynb</code>, <code>notebooks/experiment_elo_learning.ipynb</code>. Datos: Leaguepedia (CC-BY-SA) y Oracle's Elixir. Números al 10/10/2026.</p>
     <p>Worlds Companion no está respaldado por Riot Games y no refleja las opiniones de Riot Games ni de nadie involucrado oficialmente en la producción o gestión de League of Legends. League of Legends y Riot Games son marcas registradas de Riot Games, Inc.</p>
     <p>Worlds Companion se creó bajo la política «Legal Jibber Jabber» de Riot Games usando recursos propiedad de Riot Games. Riot Games no respalda ni patrocina este proyecto.</p>
   </footer>
