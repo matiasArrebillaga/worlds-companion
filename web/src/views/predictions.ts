@@ -61,6 +61,7 @@ function howItWorks(elo: Elo): string {
       <h2>Reglas</h2>
       <p>Cada predicción se guarda antes del partido y nunca se edita. Si el modelo cambia, cambia su versión (actual: ${escapeHtml(elo.model_version)}) y los aciertos se cuentan por separado.</p>
       ${BO1_NOTE}
+      <p class="muted">¿Querés aprender más? <a href="modelo.html" target="_blank" rel="noopener">Apunte completo del modelo y de la estadística del sitio →</a></p>
     </div>`;
 }
 

@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"></head><body>
+<title>El modelo elo-2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@600;700&family=Plus+Jakarta+Sans:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: una columna de lectura tipo apunte de cátedra, con fórmulas en bloques y laboratorios interactivos.
+   Solo modo oscuro, con la paleta "hextech de transmisión" del sitio (CLAUDE.md). */
+:root {
+  color-scheme: dark;
+  --bg: #090D18; --sunken: #05070E; --card: #111A2E; --raised: #1C2842;
+  --line: #2A3858; --line-ctl: #6A7AA3;
+  --fg: #F5F7FC; --fg2: #A6B1C8; --fg3: #6F7B96;
+  --gold: #D4AE52; --cyan: #45CCD4; --win: #52C285; --loss: #F0606A; --blue: #4F95F0; --red: #F07F55;
+  --display: "Saira Condensed", "Arial Narrow", sans-serif;
+  --body: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  --ease: cubic-bezier(.32,.72,0,1);
+}
+* { box-sizing: border-box; }
+html, body { background: var(--bg); color: var(--fg); }
+body { margin: 0; font: 16px/1.7 var(--body); -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 46rem; margin: 0 auto; padding-inline: 16px; padding-block: 2.5rem 4rem; display: grid; gap: 1.1rem; }
+h1, h2, h3 { font-family: var(--display); text-transform: uppercase; letter-spacing: .04em; line-height: 1.1; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.2rem, 7vw, 3.2rem); color: var(--fg); }
+h2 { font-size: 1.7rem; color: var(--gold); margin-top: 2.2rem; display: flex; gap: .6rem; align-items: baseline; }
+h2 .n { font-family: var(--mono); font-size: .95rem; color: var(--fg2); letter-spacing: 0; }
+h3 { font-size: 1.2rem; color: var(--cyan); margin-top: .8rem; }
+p { margin: 0; }
+ul, ol { margin: 0; padding-left: 1.3rem; display: grid; gap: .35rem; }
+.lede { color: var(--fg2); font-size: 1.08rem; }
+.eyebrow { font: 600 .78rem var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--cyan); }
+.part { margin-top: 3rem; padding-top: 1.4rem; border-top: 1px solid var(--line); display: grid; gap: .6rem; }
+.part h2 { margin-top: 0; color: var(--fg); font-size: 2rem; }
+b, strong { color: var(--fg); }
+em { color: var(--fg); }
+code, .m { font-family: var(--mono); font-size: .9em; font-variant-numeric: tabular-nums; }
+a { color: var(--cyan); }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 1rem 0; width: 100%; }
+
+/* Fórmulas */
+.eq { background: var(--sunken); border: 1px solid var(--line); padding: 1rem 1.2rem; overflow-x: auto;
+      font: 1.05rem/1.9 var(--mono); text-align: center; white-space: nowrap;
+      clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); }
+.eq .lbl { display: block; font: .72rem var(--mono); color: var(--fg2); text-transform: uppercase; letter-spacing: .12em; text-align: left; }
+.frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; line-height: 1.3; margin: 0 .15em; }
+.frac > span:first-child { border-bottom: 1px solid var(--fg2); padding: 0 .3em; }
+.frac > span:last-child { padding: 0 .3em; }
+var { font-style: italic; color: var(--gold); font-family: var(--mono); }
+sub, sup { font-size: .7em; }
+
+/* Recuadros del profe */
+.note, .warn, .why { padding: .9rem 1.1rem; border-left: 3px solid var(--cyan); background: var(--card); display: grid; gap: .4rem; }
+.warn { border-left-color: var(--loss); }
+.why { border-left-color: var(--gold); }
+.note > b:first-child, .warn > b:first-child, .why > b:first-child { font: 600 .74rem var(--mono); letter-spacing: .12em; text-transform: uppercase; }
+.note > b:first-child { color: var(--cyan); } .warn > b:first-child { color: var(--loss); } .why > b:first-child { color: var(--gold); }
+
+/* Tablas */
+.tbl { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+th, td { padding: .5rem .7rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { font: 600 .74rem var(--mono); text-transform: uppercase; letter-spacing: .1em; color: var(--fg2); }
+td.num, th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* Índice */
+nav.toc { background: var(--card); padding: 1rem 1.2rem; display: grid; gap: .5rem; }
+nav.toc .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: .4rem 1.5rem; }
+nav.toc ol { display: block; margin: 0; padding-left: 1.6rem; }
+nav.toc .lbl { font: .72rem var(--mono); color: var(--fg2); text-transform: uppercase; letter-spacing: .12em; }
+nav.toc a { color: var(--fg); text-decoration: none; }
+nav.toc a:hover, nav.toc a:focus-visible { color: var(--cyan); text-decoration: underline; }
+
+/* Diagrama del flujo */
+.flow { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; font: .82rem var(--mono); }
+.flow span { background: var(--raised); border: 1px solid var(--line-ctl); padding: .35rem .6rem; }
+.flow i { color: var(--gold); font-style: normal; }
+
+/* Laboratorios (calculadora, Monte Carlo, proporciones) */
+.calc { background: var(--card); padding: 1.2rem; display: grid; gap: 1rem; border: 1px solid var(--line); min-width: 0; }
+.calc .ttl { font: 600 .74rem var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--cyan); }
+.row { display: grid; grid-template-columns: 7.5rem 1fr 4.2rem; gap: .7rem; align-items: center; }
+.row label { font: .85rem var(--mono); color: var(--fg2); }
+.row output { font: 600 .9rem var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
+input[type=range] { width: 100%; accent-color: var(--cyan); min-width: 0; }
+.results { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: .6rem; }
+.res { background: var(--sunken); padding: .7rem .8rem; display: grid; gap: .1rem; min-width: 0; }
+.res span { font: .7rem var(--mono); text-transform: uppercase; letter-spacing: .1em; color: var(--fg2); }
+.res b { font: 600 1.35rem var(--mono); font-variant-numeric: tabular-nums; }
+.res.hi b { color: var(--gold); }
+.bar { height: 8px; background: var(--sunken); position: relative; }
+.bar i { position: absolute; inset: 0 auto 0 0; background: linear-gradient(90deg, var(--gold), var(--cyan)); transition: width .3s var(--ease); }
+.small { font-size: .85rem; color: var(--fg2); }
+.controls { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; }
+.field { display: grid; gap: .25rem; }
+.field label { font: .75rem var(--mono); color: var(--fg2); text-transform: uppercase; letter-spacing: .08em; }
+input[type=number], select { background: var(--sunken); color: var(--fg); border: 1px solid var(--line-ctl); padding: .45rem .6rem; font: 600 .95rem var(--mono); width: 6.5rem; }
+select { width: auto; }
+.seg { display: inline-flex; border: 1px solid var(--line-ctl); flex-wrap: wrap; }
+.seg button { font: 600 .78rem var(--mono); letter-spacing: .06em; color: var(--fg2); background: transparent; border: 0; padding: .55rem .75rem; cursor: pointer; transition: background .2s var(--ease), color .2s var(--ease); }
+.seg button[aria-pressed="true"] { color: var(--bg); background: var(--gold); }
+.btn { font: 700 .9rem var(--display); letter-spacing: .1em; text-transform: uppercase; background: var(--gold); color: var(--bg); border: 0; padding: .65rem 1rem; cursor: pointer;
+       clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); }
+.btn.ghost { background: transparent; color: var(--fg2); box-shadow: inset 0 0 0 1px var(--line-ctl); clip-path: none; }
+/* Pista 0–100% con marcas de cada corrida y una línea en el valor exacto */
+.track { position: relative; height: 2.6rem; background: var(--sunken); border: 1px solid var(--line); }
+.track .exact { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--gold); transform: translateX(-1px); }
+.track .dot { position: absolute; top: 50%; width: 9px; height: 9px; border-radius: 50%; background: var(--cyan); opacity: .75; transform: translate(-50%, -50%); }
+.track .dot.last { background: var(--fg); opacity: 1; box-shadow: 0 0 0 3px rgba(69, 204, 212, .35); }
+.axis { display: flex; justify-content: space-between; font: .7rem var(--mono); color: var(--fg3); }
+
+footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line); display: grid; gap: .5rem; font-size: .8rem; color: var(--fg2); }
+@media (max-width: 30rem) { .row { grid-template-columns: 1fr 3.8rem; } .row input { grid-column: 1 / -1; grid-row: 2; } }
+@media (prefers-reduced-motion: reduce) { .bar i, .seg button { transition: none; } }
+</style>
+
+<div class="wrap">
+  <span class="eyebrow">Worlds Companion · apunte de cátedra</span>
+  <h1>El modelo elo-2</h1>
+  <p class="lede">Cómo el sitio calcula la probabilidad de cada partido de Worlds 2026, cómo simula el torneo entero para los pick'ems y qué estadística hay detrás de las tablas de Equipos y Meta. Está escrito para alguien que se maneja con funciones, logaritmos y derivadas, pero que no tuvo un curso de probabilidad y estadística. Cada parámetro tiene su valor real, de dónde sale y qué pasaría si fuera distinto.</p>
+
+  <div class="flow" aria-label="Flujo del modelo">
+    <span>Elo de cada equipo</span><i>+</i><span>forma de los 5 jugadores</span><i>→</i><span>p por partida</span><i>→</i><span>p de la serie (Bo1/3/5)</span><i>→</i><span>torneo (Monte Carlo)</span>
+  </div>
+
+  <nav class="toc" aria-label="Contenido">
+    <span class="eyebrow">Contenido</span>
+    <div class="cols">
+      <div>
+        <span class="lbl">Parte I · El modelo de predicción</span>
+        <ol>
+          <li><a href="#prob">Qué es una probabilidad</a></li>
+          <li><a href="#elo">El rating Elo</a></li>
+          <li><a href="#k">Cómo se actualiza: K</a></li>
+          <li><a href="#region">Ajustes por región</a></li>
+          <li><a href="#logodds">Log-odds: el idioma común</a></li>
+          <li><a href="#forma">Forma de los jugadores</a></li>
+          <li><a href="#pesos">Cómo se eligieron los pesos</a></li>
+          <li><a href="#serie">De partida a serie</a></li>
+          <li><a href="#torneo">Del partido al torneo</a></li>
+          <li><a href="#eval">¿Cómo sabemos si funciona?</a></li>
+          <li><a href="#descartado">Lo que se probó y se descartó</a></li>
+          <li><a href="#calc">Calculadora</a></li>
+        </ol>
+      </div>
+      <div>
+        <span class="lbl">Parte II · Las estadísticas del sitio</span>
+        <ol start="13">
+          <li><a href="#wilson">Intervalos de confianza</a></li>
+          <li><a href="#ajustado">% de victorias ajustado</a></li>
+          <li><a href="#ruido">Ruido vs. señal</a></li>
+          <li><a href="#lados">Lados, ritmo y regiones</a></li>
+          <li><a href="#justas">Comparaciones justas y datos faltantes</a></li>
+        </ol>
+      </div>
+    </div>
+  </nav>
+
+  <div class="part"><span class="eyebrow">Parte I</span><h2>El modelo de predicción</h2></div>
+
+  <!-- 1 -->
+  <h2 id="prob"><span class="n">01</span>Qué es una probabilidad</h2>
+  <p>Empecemos por lo que el modelo <em>no</em> hace: no dice quién va a ganar. Dice algo como "T1 gana esta partida con probabilidad 0,64". ¿Qué significa eso si la partida se juega una sola vez?</p>
+  <p>La lectura más útil es la <b>frecuentista</b>: si pudiéramos repetir muchas partidas en las mismas condiciones, el favorito ganaría alrededor del 64% de ellas. No podemos repetir <em>esta</em> partida, pero sí podemos juntar todas las veces que el modelo dijo "64%" y contar cuántas acertó. Si en esas situaciones el favorito ganó el 64% de las veces, el modelo está <b>calibrado</b>. Esa es la vara con la que se lo juzga, y vuelve en la sección 10.</p>
+  <div class="why"><b>Por qué no alcanza con decir "gana A"</b>
+    <p>Un modelo que dice "gana A" en un 51-49 y en un 90-10 está tirando información. Con 0,51 casi da igual; con 0,90, que pierda A es una sorpresa grande. Esa diferencia es la que después permite medir al modelo y corregirlo.</p>
+  </div>
+  <p>Dos reglas que vamos a usar todo el tiempo:</p>
+  <ul>
+    <li>Las probabilidades viven en <span class="m">[0, 1]</span>, y la de que gane A más la de que gane B suman 1 (en LoL no hay empates).</li>
+    <li>Si dos eventos son <b>independientes</b>, la probabilidad de que pasen los dos es el producto. Ganar dos partidas seguidas con 0,6 cada una tiene probabilidad <span class="m">0,6 × 0,6 = 0,36</span>.</li>
+  </ul>
+
+  <!-- 2 -->
+  <h2 id="elo"><span class="n">02</span>El rating Elo</h2>
+  <p>Cada equipo tiene un número, su <b>rating</b> <var>R</var>. Lo que importa nunca es el rating solo sino la <b>diferencia</b> entre dos equipos. La probabilidad de que A le gane una partida a B es:</p>
+  <div class="eq"><span class="lbl">Probabilidad de victoria (models/elo.py · win_probability)</span>
+    <var>p</var><sub>A</sub> = <span class="frac"><span>1</span><span>1 + 10<sup>(<var>R</var><sub>B</sub> − <var>R</var><sub>A</sub>) / 400</sup></span></span>
+  </div>
+  <p>Es una <b>función logística</b>: una curva en forma de S que va de 0 a 1. Tres propiedades, todas fáciles de verificar:</p>
+  <ul>
+    <li>Si <var>R</var><sub>A</sub> = <var>R</var><sub>B</sub>, el exponente es 0, <span class="m">10⁰ = 1</span> y <var>p</var> = 1/2.</li>
+    <li>Es simétrica: <var>p</var><sub>A</sub> + <var>p</var><sub>B</sub> = 1. Probalo sumando las dos fracciones.</li>
+    <li>Solo depende de <var>R</var><sub>A</sub> − <var>R</var><sub>B</sub>. Sumarle 1000 a todos los equipos no cambia ninguna predicción, así que el 1500 inicial es una convención.</li>
+  </ul>
+  <h3>Parámetro: la escala 400</h3>
+  <p>El 400 dice cuántos puntos de rating hacen falta para que las chances cambien en un factor de 10. Con 400 puntos de ventaja, el favorito gana 10 de cada 11 partidas (≈ 91%). Es la escala clásica del ajedrez y la dejamos fija: si la cambiáramos, todos los ratings se reescalarían en proporción y las predicciones serían las mismas. No es un parámetro que haya que ajustar, es una unidad de medida, como elegir metros o centímetros.</p>
+  <div class="tbl"><table>
+    <thead><tr><th class="num">Diferencia de rating</th><th class="num">p del favorito</th><th>Lectura</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0</td><td class="num">50%</td><td>moneda</td></tr>
+      <tr><td class="num">70</td><td class="num">60%</td><td>favorito leve</td></tr>
+      <tr><td class="num">100</td><td class="num">64%</td><td>la regla que usa el sitio para orientarse</td></tr>
+      <tr><td class="num">200</td><td class="num">76%</td><td>favorito claro</td></tr>
+      <tr><td class="num">300</td><td class="num">85%</td><td>la distancia inicial entre Corea y una región menor</td></tr>
+      <tr><td class="num">400</td><td class="num">91%</td><td>10 de cada 11</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Parámetro: el rating inicial 1500</h3>
+  <p>Todo equipo nuevo arranca en <span class="m">1500</span> más el ajuste de su región (sección 4). Por lo que vimos arriba, el número en sí no importa: solo fija el "cero" de la escala.</p>
+
+  <!-- 3 -->
+  <h2 id="k"><span class="n">03</span>Cómo se actualiza: K = 10</h2>
+  <p>Después de cada partida los ratings cambian. Si <var>S</var> es el resultado (1 si A ganó, 0 si perdió) y <var>p</var> la probabilidad que daba el modelo <em>antes</em> de jugar:</p>
+  <div class="eq"><span class="lbl">Actualización (models/elo.py · run_elo)</span>
+    <var>R</var><sub>A</sub> ← <var>R</var><sub>A</sub> + <var>K</var> · (<var>S</var> − <var>p</var>)
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <var>R</var><sub>B</sub> ← <var>R</var><sub>B</sub> − <var>K</var> · (<var>S</var> − <var>p</var>)
+  </div>
+  <p>El término <span class="m">S − p</span> es la <b>sorpresa</b>: resultado menos expectativa. Si A tenía 0,60 y ganó, la sorpresa es <span class="m">+0,40</span> y sube <span class="m">10 × 0,40 = 4</span> puntos. Si perdió, la sorpresa es <span class="m">−0,60</span> y baja 6. Ganar lo esperado mueve poco y perder lo esperado mueve mucho. Lo que sube uno lo baja el otro, así que el total de puntos se conserva.</p>
+  <div class="note"><b>Para el que sabe cálculo</b>
+    <p>La actualización de Elo es un paso de <b>descenso por gradiente estocástico</b>. Si medimos el error de una predicción con la pérdida logarítmica <span class="m">L = −[S ln p + (1−S) ln(1−p)]</span> y derivamos respecto de <var>R</var><sub>A</sub>, queda <span class="m">∂L/∂R<sub>A</sub> = −(ln 10 / 400)(S − p)</span>. Moverse en contra del gradiente es exactamente sumar algo proporcional a <span class="m">S − p</span>. <var>K</var> es la <b>tasa de aprendizaje</b>.</p>
+  </div>
+  <h3>Por qué K = 10 y no otro</h3>
+  <p><var>K</var> regula un equilibrio:</p>
+  <ul>
+    <li><b>K grande</b>: el rating reacciona rápido a los cambios reales (un equipo que mejoró), pero también persigue el ruido. Una racha de suerte de tres partidas lo dispara.</li>
+    <li><b>K chico</b>: el rating es estable y promedia mucha historia, pero tarda en enterarse de que un equipo cambió.</li>
+  </ul>
+  <p>No hay forma teórica de elegirlo, así que se eligió con datos (<code>notebooks/backtest.ipynb</code>): se probaron varios valores sobre la temporada 2024 y se quedó el que mejor predijo. Después se confirmó en 2025, que el modelo no había visto.</p>
+  <div class="warn"><b>Probado y descartado: K más alto en los torneos internacionales</b>
+    <p>La idea era que dentro de un Worlds un equipo que se adaptó al meta debería subir más rápido. En los datos, un K mayor en torneos predijo <em>peor</em>: lo que se gana en velocidad se pierde persiguiendo rachas cortas.</p>
+  </div>
+
+  <!-- 4 -->
+  <h2 id="region"><span class="n">04</span>Ajustes por región</h2>
+  <p>Hay un problema de fondo: los equipos coreanos juegan casi siempre contra coreanos y los chinos contra chinos. Las ligas son islas. El Elo solo compara dentro de cada isla, y un 1600 en Corea no es lo mismo que un 1600 en Brasil.</p>
+  <p>La solución es darle a cada región un punto de partida distinto:</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Región</th><th class="num">Rating inicial</th><th class="num">Ajuste</th></tr></thead>
+    <tbody>
+      <tr><td>KR (LCK)</td><td class="num">1800</td><td class="num">+300</td></tr>
+      <tr><td>CN (LPL)</td><td class="num">1700</td><td class="num">+200</td></tr>
+      <tr><td>EU (LEC) · NA (LTA Norte)</td><td class="num">1600</td><td class="num">+100</td></tr>
+      <tr><td>BR, APAC, VN, JP, LAT</td><td class="num">1500</td><td class="num">0</td></tr>
+    </tbody>
+  </table></div>
+  <p>Estos números también se eligieron con el backtest. Para eso se usaron solo las partidas <b>entre regiones distintas</b> (MSI, Worlds, First Stand): son las únicas que ponen a prueba si el ajuste es correcto. Dentro de una liga el ajuste se cancela, porque todos los equipos tienen el mismo.</p>
+  <div class="why"><b>Qué hace este parámetro, en el fondo</b>
+    <p>Es una <b>creencia previa</b> (en estadística, un <em>prior</em>): antes de ver un solo partido de 2026, ya creemos que un equipo coreano promedio le gana al 85% a uno de una región menor. Después, los torneos internacionales de 2026 corrigen esa creencia partida a partida. Sin el ajuste, el modelo se habría equivocado en las 217 partidas entre regiones de 2025 con un Brier de 0,2349 en lugar de 0,2216 (sección 10). La misma idea de "creencia previa que los datos corrigen" vuelve en la sección 14, con los campeones.</p>
+  </div>
+
+  <!-- 5 -->
+  <h2 id="logodds"><span class="n">05</span>Log-odds: el idioma común</h2>
+  <p>Ahora queremos sumarle al Elo información sobre los jugadores. Pero no podemos sumar directamente a una probabilidad: si <var>p</var> = 0,9 y le sumamos 0,2, nos salimos de [0, 1]. Hace falta una escala sin bordes.</p>
+  <p>Los <b>odds</b> (las "chances" de las apuestas) son <span class="m">p / (1 − p)</span>: con 0,75 son 3 a 1. Van de 0 a ∞. Su logaritmo, el <b>log-odds</b> o <b>logit</b>, va de −∞ a +∞, vale 0 en la moneda y es antisimétrico:</p>
+  <div class="eq"><span class="lbl">Logit y su inversa (la sigmoide)</span>
+    <var>z</var> = ln <span class="frac"><span><var>p</var></span><span>1 − <var>p</var></span></span>
+    &nbsp;&nbsp;⟺&nbsp;&nbsp;
+    <var>p</var> = <span class="frac"><span>1</span><span>1 + <var>e</var><sup>−<var>z</var></sup></span></span>
+  </div>
+  <p>Y acá aparece algo lindo. Si reemplazás la fórmula del Elo en el logit, queda una recta:</p>
+  <div class="eq"><span class="lbl">El Elo en log-odds</span>
+    <var>z</var><sub>Elo</sub> = <span class="frac"><span>ln 10</span><span>400</span></span> · (<var>R</var><sub>A</sub> − <var>R</var><sub>B</sub>) ≈ 0,00576 · Δ<var>R</var>
+  </div>
+  <p>El Elo ya es, en el fondo, un modelo lineal en log-odds. Así que lo natural es sumar las demás cosas también en log-odds y recién al final volver a probabilidad con la sigmoide. Eso es exactamente lo que hace elo-2.</p>
+
+  <!-- 6 -->
+  <h2 id="forma"><span class="n">06</span>Forma de los jugadores</h2>
+  <p>El Elo sabe de resultados, pero no de <em>cómo</em> se gana. Un equipo puede ganar con un mid que está jugando en un nivel altísimo y un top que viene flojo. Para captar eso usamos los datos por jugador de Oracle's Elixir. El cálculo tiene tres pasos.</p>
+
+  <h3>Paso 1 · Siete métricas por partida</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Métrica</th><th>Qué mide</th></tr></thead>
+    <tbody>
+      <tr><td>Diferencia de oro @15</td><td>oro del jugador menos el de su rival directo al minuto 15</td></tr>
+      <tr><td>Diferencia de experiencia @15</td><td>lo mismo con la experiencia</td></tr>
+      <tr><td>Diferencia de CS @15</td><td>lo mismo con las unidades farmeadas</td></tr>
+      <tr><td>Participación en kills (KP)</td><td>(kills + asistencias) / kills del equipo</td></tr>
+      <tr><td>Muertes (con signo cambiado)</td><td>−muertes, para que "más alto" siempre sea "mejor"</td></tr>
+      <tr><td>% del daño del equipo</td><td>qué parte del daño a campeones hizo él</td></tr>
+      <tr><td>Eficiencia</td><td>% del daño / % del oro: separa "jugar mal" de "jugar con pocos recursos"</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Paso 2 · Pasar todo a la misma unidad: el z-score</h3>
+  <p>Las métricas están en unidades distintas (oro, porcentajes, muertes) y no se pueden promediar así nomás. La herramienta estándar es el <b>z-score</b>: cuántos <b>desvíos estándar</b> está un valor por encima del promedio.</p>
+  <div class="eq"><span class="lbl">z-score</span>
+    <var>z</var> = <span class="frac"><span><var>x</var> − <var>μ</var></span><span><var>σ</var></span></span>
+  </div>
+  <p><var>μ</var> es la <b>media</b> (el promedio) y <var>σ</var> el <b>desvío estándar</b>: la raíz del promedio de las distancias al cuadrado a la media. Es la medida típica de "cuánto se dispersan los datos". Un z de +1 es "un desvío mejor que el promedio"; en datos con forma de campana, eso deja por debajo a alrededor del 84% de los casos.</p>
+  <p>Detalle clave: <b><var>μ</var> y <var>σ</var> se calculan por rol</b>, con todas las partidas de 2024 y 2025. Dos kills son poco para un mid y mucho para un support. Ejemplo real con los números guardados del mid: la diferencia de oro @15 tiene <var>μ</var> = 0 y <var>σ</var> ≈ 853, así que un mid con +1280 de oro al 15 tiene <var>z</var> ≈ +1,5 en esa métrica. El rendimiento del jugador en la partida es el <b>promedio de sus siete z-scores</b> (de los que haya: la LPL de 2024-25 no trae datos al minuto 15, y un dato faltante se ignora, nunca se toma como 0).</p>
+
+  <h3>Paso 3 · Forma = promedio móvil exponencial</h3>
+  <p>Una partida sola es ruidosa. La <b>forma</b> es un promedio de las partidas recientes en el que las últimas pesan más. Se llama <b>promedio móvil exponencial</b> (EWMA, por sus siglas en inglés) y se actualiza así después de cada partida con rendimiento <var>x</var>:</p>
+  <div class="eq"><span class="lbl">EWMA (models/features.py · Ewma)</span>
+    <var>f</var> ← <var>f</var> + <var>α</var> · (<var>x</var> − <var>f</var>)
+    &nbsp;&nbsp;&nbsp; con &nbsp;&nbsp;&nbsp;
+    <var>α</var> = 1 − 0,5<sup>1/10</sup> ≈ 0,067
+  </div>
+  <p>Fijate que tiene la misma forma que la actualización del Elo: sumar una fracción de la sorpresa. Si desarrollás la recursión, la partida de hace <var>k</var> partidas pesa <span class="m">α(1 − α)<sup>k</sup></span>: los pesos decaen geométricamente.</p>
+  <h3>Parámetro: la media vida = 10 partidas</h3>
+  <p><var>α</var> se elige a partir de la <b>media vida</b>: el número de partidas después del cual una partida pesa la mitad que la última. Con media vida 10, <span class="m">(1 − α)<sup>10</sup> = 0,5</span>. La última partida pesa 6,7%, la de hace 10 pesa 3,3% y la de hace 20, 1,7%. Es el mismo dilema que con <var>K</var>: una media vida corta sigue mejor los cambios de nivel, pero es más ruidosa.</p>
+  <h3>Parámetro: arrancar en 0</h3>
+  <p>Un jugador sin historial arranca con forma 0, es decir, "promedio de su rol", y se va alejando de ahí a medida que juega. Esto se llama <b>contracción hacia la media</b> (<em>shrinkage</em>). Es lo prudente con <b>muestras chicas</b>: un novato con dos partidas buenas probablemente no es una estrella, tuvo dos partidas buenas. Este número es el que aparece como "forma del modelo" en las páginas de jugadores y en Equipos → Análisis.</p>
+
+  <h3>La fórmula completa</h3>
+  <div class="eq"><span class="lbl">Probabilidad de que A le gane una partida a B (elo-2)</span>
+    <var>z</var> = <var>z</var><sub>Elo</sub> + Σ<sub>rol</sub> <var>w</var><sub>rol</sub> · <span class="frac"><span><var>f</var><sub>A,rol</sub> − <var>f</var><sub>B,rol</sub></span><span><var>s</var><sub>rol</sub></span></span>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <var>p</var> = <span class="frac"><span>1</span><span>1 + <var>e</var><sup>−<var>z</var></sup></span></span>
+  </div>
+  <p>Para cada rol se compara al jugador de A con el de B (top contra top, mid contra mid). La diferencia se divide por una escala <var>s</var> y se multiplica por un peso <var>w</var>.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Rol</th><th class="num">Peso <var>w</var></th><th class="num">Escala <var>s</var></th><th class="num">w / s</th></tr></thead>
+    <tbody>
+      <tr><td>Top</td><td class="num">0,254</td><td class="num">0,219</td><td class="num">1,16</td></tr>
+      <tr><td>Mid</td><td class="num">0,221</td><td class="num">0,234</td><td class="num">0,94</td></tr>
+      <tr><td>Bot (ADC)</td><td class="num">0,202</td><td class="num">0,206</td><td class="num">0,98</td></tr>
+      <tr><td>Jungla</td><td class="num">0,172</td><td class="num">0,234</td><td class="num">0,73</td></tr>
+      <tr><td>Support</td><td class="num">0,157</td><td class="num">0,210</td><td class="num">0,75</td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li><b>Escala <var>s</var></b>: el desvío estándar de las diferencias de forma en ese rol. Dividir por <var>s</var> pone a todos los roles en la misma unidad, así los pesos se pueden comparar entre sí: <var>w</var> es "cuántos log-odds mueve una diferencia de forma típica".</li>
+    <li><b>Peso <var>w</var></b>: lo aprendió el modelo con los datos (sección 7). El top es el que más mueve la predicción; jungla y support, los que menos. Ojo: eso <em>no</em> dice que el jungla importe menos en el juego. Dice que las siete métricas captan peor lo que hace un jungla.</li>
+    <li><b>La columna w / s</b> es el efecto por unidad de forma cruda: una ventaja de 0,1 en la forma del top suma <span class="m">0,116</span> al log-odds.</li>
+  </ul>
+  <div class="why"><b>Por qué el Elo entra con peso fijo 1</b>
+    <p>Al Elo no se le da un peso propio: entra completo y los pesos de los roles solo miden lo que la forma agrega <em>encima</em>. Así, si la forma no aportara nada, el modelo volvería a ser el Elo puro.</p>
+  </div>
+  <div class="note"><b>Supuesto: la última alineación</b>
+    <p>Antes de un partido no sabemos quién va a jugar. Se supone que cada equipo repite su última alineación, que casi siempre es la titular. Si un equipo mete un suplente, la predicción no lo ve hasta después de esa partida.</p>
+  </div>
+
+  <!-- 7 -->
+  <h2 id="pesos"><span class="n">07</span>Cómo se eligieron los pesos</h2>
+  <p>Los cinco pesos se ajustaron con una <b>regresión logística</b> sobre todas las partidas de 2024 y 2025. Para que se entienda qué es eso:</p>
+  <ol>
+    <li>Para cada partida pasada armamos el log-odds del Elo y las cinco diferencias de forma, todo calculado <b>solo con partidas anteriores</b> a esa.</li>
+    <li>Con unos pesos <var>w</var> cualesquiera, la fórmula de la sección 6 da una <var>p</var> para cada partida.</li>
+    <li>La <b>verosimilitud</b> mide qué tan probables eran los resultados que realmente pasaron según esos pesos: el producto de <var>p</var> en las partidas que ganó A y de <span class="m">1 − p</span> en las que perdió.</li>
+    <li>Buscamos los <var>w</var> que la hacen máxima. En la práctica se minimiza menos el logaritmo (la pérdida logarítmica de la sección 3) con un optimizador numérico, BFGS.</li>
+  </ol>
+  <p>En la jerga, el Elo entra como <b>offset</b>: un término fijo de la regresión con coeficiente 1, que no se estima.</p>
+  <h3>Parámetro: la penalización λ = 0,001</h3>
+  <p>A la pérdida se le suma <span class="m">λ · Σ w²</span>. Esto se llama <b>regularización L2</b> y castiga los pesos grandes. Sirve contra el <b>sobreajuste</b>: con suficientes parámetros, un modelo puede memorizar el ruido de los datos de entrenamiento y después predecir peor en datos nuevos. Con λ = 0,001 la penalización es muy suave, porque con 5 pesos y miles de partidas ese riesgo es bajo.</p>
+  <h3>Detalle técnico: antisimetría</h3>
+  <p>Las diferencias de forma se dividen por <var>s</var> pero <b>no se centran</b> (no se les resta la media). Así, si los dos jugadores tienen la misma forma, la diferencia sigue valiendo 0. Y si das vuelta los equipos, el ajuste cambia de signo y la predicción queda en <span class="m">1 − p</span>, como tiene que ser.</p>
+  <h3>Parámetro ajustado pero no usado: el lado azul</h3>
+  <p>La regresión también estima un <b>término independiente</b>: la ventaja de jugar del lado azul. El sitio no lo usa, porque antes de la serie no se sabe qué lado le toca a cada uno. Se estima igual para que no "contamine" los pesos de los roles.</p>
+
+  <!-- 8 -->
+  <h2 id="serie"><span class="n">08</span>De partida a serie</h2>
+  <p>En Worlds se juegan series al mejor de 1, 3 o 5 (Bo1, Bo3, Bo5). Si <var>p</var> es la probabilidad de ganar <em>una</em> partida, ¿cuál es la de ganar la serie?</p>
+  <p>Hay que llegar primero a <var>n</var> victorias (2 en un Bo3, 3 en un Bo5). Para ganar <var>n</var> a <var>j</var>, la última partida tiene que ser una victoria y en las <span class="m">n − 1 + j</span> anteriores tiene que haber exactamente <var>j</var> derrotas, en cualquier orden. Contamos los órdenes con un número combinatorio:</p>
+  <div class="eq"><span class="lbl">Probabilidad de la serie (models/elo.py · series_probability)</span>
+    <var>P</var><sub>serie</sub> = Σ<sub><var>j</var>=0</sub><sup><var>n</var>−1</sup> C(<var>n</var>−1+<var>j</var>, <var>j</var>) · <var>p</var><sup><var>n</var></sup> · (1−<var>p</var>)<sup><var>j</var></sup>
+  </div>
+  <p>Para un Bo5 son tres términos: 3-0 (1 orden), 3-1 (3 órdenes) y 3-2 (6 órdenes). Con <var>p</var> = 0,57 por partida, el favorito gana el 60% de los Bo3 y el 63% de los Bo5. <b>Las series largas amplifican la ventaja</b>: cuantas más partidas, menos pesa la suerte. Por eso los Bo1 de la fase suiza son los más impredecibles.</p>
+  <div class="warn"><b>El supuesto fuerte: independencia</b>
+    <p>La fórmula multiplica probabilidades, así que supone que cada partida es independiente de la anterior. En la realidad hay ajustes de draft entre partidas, cambio de lado y presión. Lo probamos: medimos si ganar la partida anterior predice ganar la siguiente (<em>momentum</em>). En 2024 apareció un efecto chico, pero no mejoró las predicciones de Worlds 2025 ni del MSI 2026. Buena parte del supuesto "momentum" era en realidad el lado: el perdedor elige lado y suele elegir azul. Conclusión: el supuesto no es exacto, pero alcanza para predecir.</p>
+  </div>
+
+  <!-- 9 -->
+  <h2 id="torneo"><span class="n">09</span>Del partido al torneo</h2>
+  <p>Las predicciones de partido contestan "¿quién gana esta serie?". Para un pick'em hace falta otra cosa: quién sale 3-0, quién pasa la suiza, quién sale campeón. Eso depende de cruces que todavía no existen. La pestaña Predicciones → Torneo lo resuelve de dos formas que contestan preguntas distintas (<code>models/tournament.py</code>).</p>
+
+  <h3>Camino más probable (chalk)</h3>
+  <p>En cada partido avanza el favorito, y con esos ganadores se arma el cruce siguiente. Da un pick por partido, que es justo lo que se carga en un pick'em. En el Play-In, por ejemplo, el modelo le da a C9 un 46,4% contra KC en el Bo5, así que el pick es KC y es KC el que pasa a la final de ganadores del cuadro proyectado.</p>
+  <div class="warn"><b>Error común: leer el chalk como "lo que va a pasar"</b>
+    <p>Para que el cuadro entero salga así tienen que acertarse todos los picks a la vez, y eso es un producto de probabilidades (sección 1). Siete series de eliminatoria con 70% cada una salen todas bien con probabilidad <span class="m">0,7⁷ ≈ 8%</span>. Cada pick es la mejor apuesta en su partido, pero el cuadro completo casi seguro va a tener errores.</p>
+  </div>
+
+  <h3>Monte Carlo</h3>
+  <p>¿Con qué chance GEN sale campeón? Para calcularlo a mano habría que sumar todos los caminos posibles: cada resultado de la suiza, cada sorteo de cruces, cada serie de eliminatoria. Son demasiados. El método de <b>Monte Carlo</b> lo resuelve jugando: se juega el torneo entero muchas veces y se cuenta.</p>
+  <ol>
+    <li>En cada serie se tira un número al azar entre 0 y 1. Si sale menor que la probabilidad del equipo 1, gana el equipo 1; si no, el 2. Así, un equipo con 70% gana 7 de cada 10 de esos sorteos.</li>
+    <li>Se juega así el torneo completo: Play-In, cinco rondas de suiza y eliminatoria.</li>
+    <li>Se repite <span class="m">N = 10.000</span> veces y se cuenta cuántas veces pasó cada cosa.</li>
+  </ol>
+  <div class="eq"><span class="lbl">Estimación por Monte Carlo</span>
+    <var>p̂</var> = <span class="frac"><span>torneos en los que pasó</span><span><var>N</var></span></span>
+    &nbsp;&nbsp;&nbsp; ej.: GEN campeón en 6.023 de 10.000 → 60,2%
+  </div>
+  <h3>¿Cuánto error tiene?</h3>
+  <p>Cada torneo simulado es un ensayo con dos resultados posibles ("pasó" o "no pasó"), como tirar una moneda cargada. La cantidad de veces que pasa sigue una distribución <b>binomial</b>, y el desvío típico del porcentaje estimado, el <b>error estándar</b>, es:</p>
+  <div class="eq"><span class="lbl">Error estándar de una proporción</span>
+    SE = <span class="frac"><span>√(<var>p</var>(1 − <var>p</var>))</span><span>√<var>N</var></span></span>
+    &nbsp;&nbsp;≤&nbsp;&nbsp; <span class="frac"><span>0,5</span><span>√10.000</span></span> = 0,005
+  </div>
+  <p>El peor caso es <var>p</var> = 0,5, y aun así el error estándar es medio punto: el valor que sale está casi siempre a menos de un punto (<span class="m">1,96 · SE</span>) del que daría una cantidad infinita de simulaciones. El error baja con la <b>raíz</b> de <var>N</var>: para reducirlo a la mitad hacen falta cuatro veces más simulaciones. Por eso 10.000 es un buen equilibrio entre precisión y tiempo de cálculo.</p>
+  <div class="warn"><b>Precisión no es exactitud</b>
+    <p>Ese medio punto es solo el error del sorteo. No incluye el error del modelo: si el Elo sobrevalora a un equipo, diez millones de simulaciones van a dar, con muchísima precisión, un número equivocado. Las simulaciones heredan todos los supuestos de las secciones 2 a 8.</p>
+  </div>
+
+  <div class="calc" id="mc-box">
+    <span class="ttl">Laboratorio · Monte Carlo de una serie</span>
+    <p class="small">Simulá una serie muchas veces y compará con la fórmula exacta de la sección 8. Cada clic es una corrida nueva y deja una marca en la pista: con N chico las marcas se desparraman; con N grande se amontonan sobre la línea dorada.</p>
+    <div class="row"><label for="mc-p">p por partida</label><input id="mc-p" type="range" min="0.3" max="0.9" step="0.01" value="0.6"><output id="mc-po"></output></div>
+    <div class="controls">
+      <div class="field"><span class="small">Formato</span><div class="seg" role="group" aria-label="Formato de la serie" id="mc-bo">
+        <button type="button" data-bo="1" aria-pressed="false">Bo1</button><button type="button" data-bo="3" aria-pressed="true">Bo3</button><button type="button" data-bo="5" aria-pressed="false">Bo5</button>
+      </div></div>
+      <div class="field"><span class="small">Simulaciones (N)</span><div class="seg" role="group" aria-label="Cantidad de simulaciones" id="mc-n">
+        <button type="button" data-n="10" aria-pressed="false">10</button><button type="button" data-n="100" aria-pressed="true">100</button><button type="button" data-n="1000" aria-pressed="false">1.000</button><button type="button" data-n="10000" aria-pressed="false">10.000</button>
+      </div></div>
+    </div>
+    <div class="controls"><button type="button" class="btn" id="mc-run">Simular</button><button type="button" class="btn ghost" id="mc-clear">Borrar marcas</button></div>
+    <div>
+      <div class="track" id="mc-track" aria-hidden="true"><span class="exact" id="mc-exact"></span></div>
+      <div class="axis"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+    </div>
+    <div class="results" aria-live="polite">
+      <div class="res hi"><span>Exacto (fórmula)</span><b id="mc-ex"></b></div>
+      <div class="res"><span>Simulado</span><b id="mc-sim">—</b></div>
+      <div class="res"><span>Diferencia</span><b id="mc-diff">—</b></div>
+      <div class="res"><span>± 1,96 · SE</span><b id="mc-se"></b></div>
+    </div>
+  </div>
+
+  <h3>Las reglas de la simulación</h3>
+  <ul>
+    <li><b>Lo real manda.</b> Los partidos ya jugados y los cruces ya publicados se respetan; solo se sortea lo que falta.</li>
+    <li><b>Suiza.</b> Cinco rondas. Se cruzan equipos con el mismo récord, al azar y sin repetir rival. La serie es Bo3 cuando clasifica o elimina a alguien (uno de los dos llega con 2 victorias o 2 derrotas) y Bo1 en el resto.</li>
+    <li><b>Cuartos.</b> Hasta que se publiquen, los 8 clasificados se sortean al azar. Por eso la eliminatoria muestra chances por ronda (Cuartos, Semis, Final, Campeón) y recién después del sorteo un cuadro de picks.</li>
+    <li><b>Semilla fija (2026).</b> Los números "al azar" de una computadora salen de una fórmula que arranca de una <b>semilla</b>. Con la misma semilla y los mismos datos sale exactamente el mismo resultado, así el cron horario no cambia los porcentajes por pura suerte del sorteo.</li>
+    <li><b>Supuestos.</b> Las series son independientes entre sí y los ratings no cambian dentro de una simulación: un equipo que arrasa en la suiza simulada no sube su Elo para la eliminatoria. Las reglas exactas de emparejamiento de Riot no están en los datos, así que el sorteo es una aproximación.</li>
+  </ul>
+  <h3>Cómo se leen las cajas de la suiza</h3>
+  <p>Cada caja es un récord al empezar una ronda (por ejemplo, 2-0 antes de la ronda 3) y lista la chance de cada equipo de llegar ahí. La suma de esas chances es la cantidad de equipos que hay en la caja en promedio: en el 2-0 de la ronda 3 siempre hay exactamente 4, así que las chances suman 4,0 (GEN 66%, BLG 54%, DK 43%…). Se resaltan tantos equipos como lugares tiene la caja. Las cajas finales (3-0 … 2-3) muestran la chance de cada récord final.</p>
+  <div class="note"><b>Torneo no cuenta para Aciertos</b>
+    <p>Las chances del torneo se recalculan en cada build con los resultados nuevos. Solo las predicciones de partido se congelan antes de jugarse y se evalúan.</p>
+  </div>
+
+  <!-- 10 -->
+  <h2 id="eval"><span class="n">10</span>¿Cómo sabemos si funciona?</h2>
+  <h3>El Brier score</h3>
+  <div class="eq"><span class="lbl">Brier score</span>
+    Brier = <span class="frac"><span>1</span><span><var>N</var></span></span> Σ<sub><var>i</var></sub> (<var>p</var><sub><var>i</var></sub> − <var>S</var><sub><var>i</var></sub>)<sup>2</sup>
+  </div>
+  <p>Es el error cuadrático medio entre la probabilidad y el resultado (0 o 1). Vale 0 si el modelo acierta todo con total seguridad. Decir siempre 0,5 da exactamente 0,25, así que <b>0,25 es la moneda</b> y todo lo que esté por debajo es mejor que tirar una moneda. Castiga mucho la confianza equivocada: decir 0,95 y perder cuesta 0,90; decir 0,6 y perder cuesta 0,36.</p>
+  <p>A diferencia de la precisión ("¿acertó el ganador?"), el Brier premia la <em>calibración</em>. Un modelo que dice 0,51 en todo y acierta el 70% tiene buena precisión pero mal Brier.</p>
+  <h3>La regla de oro: datos que el modelo no vio</h3>
+  <p>Medir al modelo con los mismos datos con que se lo ajustó es hacerse trampa: premia el sobreajuste. Por eso se separan los datos. Con unos se ajusta (<b>entrenamiento</b>) y con otros, posteriores y nunca vistos, se evalúa (<b>validación</b>). Esto es un <b>backtest</b>: simular que estábamos en el pasado y ver qué habría predicho el modelo.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Prueba</th><th class="num">Partidas</th><th class="num">Comparación</th><th class="num">Resultado</th></tr></thead>
+    <tbody>
+      <tr><td>Elo: ajustado con 2024, probado en 2025 (partidas entre regiones)</td><td class="num">217</td><td class="num">sin ajuste regional 0,2349</td><td class="num">Brier 0,2216</td></tr>
+      <tr><td>Elo en las series de Worlds 2025</td><td class="num">41 series</td><td class="num">Brier 0,1871</td><td class="num">70,7% de aciertos</td></tr>
+      <tr><td>elo-2 en el MSI 2026 (no visto por el ajuste)</td><td class="num">71</td><td class="num">solo Elo 0,1953</td><td class="num">Brier 0,1828</td></tr>
+    </tbody>
+  </table></div>
+  <p>Agregar la forma bajó el Brier del MSI 2026 alrededor de un 6%. También se confirmó con un <b>intervalo de confianza por bootstrap</b>: se re-sortean las series muchas veces para ver cuánto podría variar la mejora por pura suerte de la muestra.</p>
+  <div class="warn"><b>Error común: muestras chicas</b>
+    <p>71 partidas son pocas. Un Brier de 0,18 contra 0,19 en 71 partidas podría ser suerte; por eso el bootstrap y por eso también se revisó en First Stand y EWC. En Worlds pasa lo mismo: después de la fase suiza vamos a tener unas pocas decenas de partidas, y el % de aciertos va a saltar mucho. No hay que sacar conclusiones con 10 partidas.</p>
+  </div>
+  <h3>Dónde se equivoca</h3>
+  <p>El 61% de los errores son partidas que el modelo daba entre 50% y 60%, o sea, cuando casi no tenía favorito. Equivocarse ahí no es un error grave, es la naturaleza de una moneda cargada apenas. En las eliminatorias de Worlds el modelo estuvo bien calibrado; en la fase de grupos o suiza fue un poco sobreconfiado.</p>
+  <h3>Las reglas del sitio</h3>
+  <p>Cada predicción se guarda en <code>data/predictions.jsonl</code> antes de que empiece el partido, con su fecha y la versión del modelo, y nunca se edita ni se borra. Si el modelo cambia, sube la versión y los aciertos se cuentan por separado. Así nadie puede "acertar" mirando el resultado.</p>
+
+  <!-- 11 -->
+  <h2 id="descartado"><span class="n">11</span>Lo que se probó y se descartó</h2>
+  <p>Cada idea se probó con una <b>regla de decisión fijada antes de mirar los resultados</b>: se adopta solo si mejora fuera de la muestra. Si uno prueba veinte ideas y se queda con la que mejor dio, alguna va a "funcionar" por azar. Fijar la regla antes evita ese autoengaño, que en estadística se conoce como el <em>jardín de los senderos que se bifurcan</em>.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Idea</th><th>Resultado</th></tr></thead>
+    <tbody>
+      <tr><td>Calibración por temperatura (estirar o achicar las probabilidades)</td><td>No mejoró fuera de la muestra</td></tr>
+      <tr><td>Estilo de equipo (agresividad, duración, objetivos) y sus interacciones</td><td>Sin señal</td></tr>
+      <tr><td>Sorpresa acumulada en las últimas 10 partidas</td><td>Mejora mínima en 2025 y empeora en Worlds 2025</td></tr>
+      <tr><td>Tendencia del Elo (21 días)</td><td>Casi lo mismo que la anterior (correlación 0,86) y rinde menos</td></tr>
+      <tr><td>Momentum dentro del torneo</td><td>Peso negativo: <b>regresión a la media</b>. Lo que sobresalió por suerte tiende a volver</td></tr>
+      <tr><td>Momentum dentro de la serie</td><td>No generaliza (sección 8)</td></tr>
+      <tr><td>K más alto en torneos</td><td>Peor (sección 3)</td></tr>
+    </tbody>
+  </table></div>
+  <p>La lección general: el Elo ya es un promedio con memoria que se actualiza después de cada partida, y la mayoría de las ideas de "momentum" ya están adentro. Correlación no es causalidad, y una señal que aparece en un año y desaparece en el siguiente probablemente era ruido.</p>
+
+  <!-- 12 -->
+  <h2 id="calc"><span class="n">12</span>Calculadora</h2>
+  <p>Mové los controles y fijate cómo cada parámetro cambia la predicción. Valores iniciales de ejemplo: A tiene 70 puntos más de Elo, su top viene 0,40 mejor que el de B y su mid 0,15 peor.</p>
+  <div class="calc" id="calc-box">
+    <div class="row"><label for="d-elo">Δ Elo (A − B)</label><input id="d-elo" type="range" min="-400" max="400" step="5" value="70"><output id="o-elo"></output></div>
+    <hr>
+    <p class="small">Diferencia de forma por rol (jugador de A menos jugador de B). Una forma de 0,3 ya es un jugador que viene muy bien.</p>
+    <div class="row"><label for="f-top">Top</label><input id="f-top" type="range" min="-1" max="1" step="0.05" value="0.4"><output id="o-top"></output></div>
+    <div class="row"><label for="f-jng">Jungla</label><input id="f-jng" type="range" min="-1" max="1" step="0.05" value="0"><output id="o-jng"></output></div>
+    <div class="row"><label for="f-mid">Mid</label><input id="f-mid" type="range" min="-1" max="1" step="0.05" value="-0.15"><output id="o-mid"></output></div>
+    <div class="row"><label for="f-bot">Bot</label><input id="f-bot" type="range" min="-1" max="1" step="0.05" value="0"><output id="o-bot"></output></div>
+    <div class="row"><label for="f-sup">Support</label><input id="f-sup" type="range" min="-1" max="1" step="0.05" value="0"><output id="o-sup"></output></div>
+    <hr>
+    <div class="results" aria-live="polite">
+      <div class="res"><span>Solo Elo</span><b id="r-elo"></b></div>
+      <div class="res"><span>Log-odds total z</span><b id="r-z"></b></div>
+      <div class="res hi"><span>Partida (elo-2)</span><b id="r-p"></b></div>
+      <div class="res"><span>Bo3</span><b id="r-bo3"></b></div>
+      <div class="res hi"><span>Bo5</span><b id="r-bo5"></b></div>
+    </div>
+    <div class="bar" aria-hidden="true"><i id="bar"></i></div>
+    <p class="small" id="explain"></p>
+  </div>
+  <p class="small">Los pesos y escalas son los de <code>models/role_form.json</code> (ajustados con 2024 y 2025). Con los valores iniciales: el Elo da 59,9%; la forma suma 0,32 log-odds y la partida queda en 67,4%; el Bo3 sube a 75% y el Bo5 a 80%.</p>
+
+  <div class="part" id="parte-2"><span class="eyebrow">Parte II</span><h2>Las estadísticas del sitio</h2>
+    <p class="lede">Las tablas de Equipos y Meta no predicen nada: describen lo que pasó. Pero describir bien también tiene trampas, sobre todo con pocas partidas. Estas son las herramientas que usa el sitio para no confundir suerte con nivel.</p>
+  </div>
+
+  <!-- 13 -->
+  <h2 id="wilson"><span class="n">13</span>Intervalos de confianza</h2>
+  <p>Un campeón que ganó 3 de 3 tiene 100% de victorias, y nadie cree que sea invencible. El número solo no alcanza: hace falta decir <em>cuánto</em> podemos confiar en él. Para eso está el <b>intervalo de confianza</b>: un rango de valores plausibles para el porcentaje "real", el que veríamos con infinitas partidas.</p>
+  <p>Que sea "del 95%" quiere decir algo preciso: si repitiéramos el procedimiento con muchas muestras distintas, el rango atraparía al valor real en 95 de cada 100. No quiere decir que haya un 95% de probabilidad de que el valor esté en <em>este</em> rango en particular, aunque en la práctica se lea así.</p>
+  <h3>El intervalo de libro y por qué falla</h3>
+  <p>El intervalo que aparece en casi todos los libros (intervalo de Wald) es el porcentaje más o menos 1,96 errores estándar, la misma cuenta de la sección 9:</p>
+  <div class="eq"><span class="lbl">Intervalo de Wald</span>
+    <var>p̂</var> ± 1,96 · √(<var>p̂</var>(1 − <var>p̂</var>) / <var>n</var>)
+  </div>
+  <p>Con muchas partidas anda bien. Con pocas, se rompe:</p>
+  <ul>
+    <li><b>3 de 3</b>: <var>p̂</var> = 1, así que <span class="m">1 − p̂ = 0</span> y el intervalo es [100%, 100%]. Tres partidas y certeza total.</li>
+    <li><b>1 de 10</b>: 10% ± 18,6 da [−8,6%, 28,6%]. Un porcentaje negativo.</li>
+  </ul>
+  <h3>El intervalo de Wilson</h3>
+  <p>El sitio usa el <b>intervalo de Wilson</b> (<code>pipeline/stats.py · wilson</code>). La idea es la misma, pero en lugar de usar el error estándar del dato observado, despeja qué valores reales serían compatibles con lo que vimos. El resultado corre el centro hacia 50% y nunca se sale de [0, 1]:</p>
+  <div class="eq"><span class="lbl">Intervalo de Wilson (z = 1,96)</span>
+    <span class="frac"><span><var>p̂</var> + <span class="frac"><span><var>z</var>²</span><span>2<var>n</var></span></span> ± <var>z</var> √(<span class="frac"><span><var>p̂</var>(1−<var>p̂</var>)</span><span><var>n</var></span></span> + <span class="frac"><span><var>z</var>²</span><span>4<var>n</var>²</span></span>)</span><span>1 + <span class="frac"><span><var>z</var>²</span><span><var>n</var></span></span></span></span>
+  </div>
+  <p>Con 3 de 3 da [43,9%, 100%]: "puede ser muy bueno, pero también uno del montón". Con 1 de 10 da [1,8%, 40,4%].</p>
+  <p>Aparece en los % de victorias de equipos y campeones, en el % del lado azul y en el de cada región. Ejemplo real: Rumble ganó 46 de sus 77 partidas en la guía de parches (59,7%), con rango [48,6%, 70,0%]. El rango todavía toca el 50%: con estas partidas no se puede descartar que sea un campeón promedio.</p>
+  <div class="why"><b>Cómo se usa para comparar</b>
+    <p>Si los rangos de dos equipos se superponen mucho, con estos datos no se puede decir cuál es mejor. Es una regla práctica, no un test formal (dos intervalos pueden superponerse un poco y la diferencia ser real), pero evita el error más común: tomar 62% contra 58% como una diferencia cuando cada uno tiene ±15 puntos de incertidumbre.</p>
+  </div>
+
+  <!-- 14 -->
+  <h2 id="ajustado"><span class="n">14</span>% de victorias ajustado</h2>
+  <p>Si se ordena la tabla de campeones por % de victorias crudo, arriba quedan los que jugaron 5 partidas y tuvieron suerte. El intervalo de Wilson avisa del problema, pero no da un número para ordenar. Para eso está el <b>% ajustado</b> (<code>pipeline/meta.py · adjust_winrates</code>):</p>
+  <div class="eq"><span class="lbl">% de victorias ajustado</span>
+    <span class="frac"><span>victorias + <var>k</var>/2</span><span>picks + <var>k</var></span></span>
+    &nbsp;&nbsp;&nbsp; con &nbsp;&nbsp;&nbsp; <var>k</var> = 269
+  </div>
+  <p>Es como sumarle a cada campeón <var>k</var> partidas imaginarias, la mitad ganadas. También se puede leer como un promedio ponderado entre el dato del campeón y el 50%: el dato pesa <span class="m">picks / (picks + k)</span>. Un campeón con <var>k</var> picks propios pesa lo mismo que el 50%.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Campeón (guía 16.17–16.18)</th><th class="num">Récord</th><th class="num">Crudo</th><th class="num">Peso del dato</th><th class="num">Ajustado</th></tr></thead>
+    <tbody>
+      <tr><td>Lux</td><td class="num">5-0</td><td class="num">100%</td><td class="num">2%</td><td class="num">50,9%</td></tr>
+      <tr><td>Zaahen</td><td class="num">1-7</td><td class="num">12,5%</td><td class="num">3%</td><td class="num">48,9%</td></tr>
+      <tr><td>Rumble</td><td class="num">46-31</td><td class="num">59,7%</td><td class="num">22%</td><td class="num">52,2%</td></tr>
+      <tr><td>Ezreal</td><td class="num">43-29</td><td class="num">59,7%</td><td class="num">21%</td><td class="num">52,1%</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Es la misma idea que el ajuste por región</h3>
+  <p>En estadística esto se llama <b>encogimiento bayesiano</b>. Partimos de una creencia previa, "los campeones son bastante parejos, cerca de 50%", y los datos la van corrigiendo. Con pocos datos manda la creencia; con muchos, mandan los datos. Es lo mismo que hacen los ajustes regionales del Elo (sección 4) y la forma que arranca en 0 (sección 6). Técnicamente es la media de la distribución <em>a posteriori</em> con un prior Beta(<var>k</var>/2, <var>k</var>/2).</p>
+  <h3>De dónde sale k = 269</h3>
+  <p><var>k</var> no se elige a ojo: depende de cuánto difieren <em>de verdad</em> los campeones. Si fueran todos muy distintos, un 60% sería creíble enseguida y <var>k</var> sería chico. Si son casi iguales, hacen falta muchas partidas para creerle a un número lejos de 50%, y <var>k</var> es grande. La fórmula es</p>
+  <div class="eq"><span class="lbl">Fuerza del prior (pipeline/meta.py · prior_picks)</span>
+    <var>k</var> = <span class="frac"><span><var>p̄</var>(1 − <var>p̄</var>)</span><span><var>τ</var>²</span></span> ≈ <span class="frac"><span>0,25</span><span><var>τ</var>²</span></span>
+  </div>
+  <p>donde <var>τ</var>² es la varianza de la fuerza real de los campeones, que se estima en la sección siguiente con toda la temporada de las ligas (campeones con 20 picks o más). Que <var>k</var> dé 269 significa <span class="m">τ ≈ 3</span> puntos: el campeón típico es apenas 3 puntos mejor o peor que el promedio. Las diferencias grandes que se ven en las tablas son casi todas azar.</p>
+  <div class="warn"><b>Espejismos</b>
+    <p>En Meta → Panorama, "espejismos" son los campeones (desde 5 picks) cuyo porcentaje más cambia al ajustarlo. Un 0% o 100% con 1 pick es obviamente azar; lo engañoso es un 73% con 15 picks, que parece sólido y no lo es. El ajuste no castiga a los buenos: con suficientes partidas el dato domina.</p>
+  </div>
+
+  <!-- 15 -->
+  <h2 id="ruido">
+    <span class="n">15</span>Ruido vs. señal</h2>
+  <p>Pregunta: ¿cuánto de la diferencia entre los porcentajes de los campeones es azar? Aunque todos fueran exactamente igual de buenos, veríamos diferencias. Una moneda perfecta tirada 20 veces no da siempre 10 caras: su porcentaje varía con un desvío de <span class="m">√(0,25/20) ≈ 11</span> puntos. Con <var>n</var> picks, el porcentaje de un campeón varía por azar con varianza <span class="m">p(1−p)/n</span>.</p>
+  <p>Entonces se puede comparar la dispersión que vemos con la que daría el puro azar (<code>pipeline/meta.py · winrate_noise</code>):</p>
+  <div class="eq"><span class="lbl">Estimador de momentos</span>
+    <var>S</var> = Σ <var>n</var><sub>i</sub>(<var>p̂</var><sub>i</sub> − <var>p̄</var>)²
+    &nbsp;&nbsp;·&nbsp;&nbsp;
+    azar = (<var>m</var> − 1) · <var>p̄</var>(1 − <var>p̄</var>)
+    &nbsp;&nbsp;·&nbsp;&nbsp;
+    <var>τ</var>² = <span class="frac"><span><var>S</var> − azar</span><span><var>N</var> − Σ<var>n</var><sub>i</sub>²/<var>N</var></span></span>
+  </div>
+  <ul>
+    <li><var>S</var> es la dispersión observada: cuánto se alejan los porcentajes del promedio, pesando más a los campeones con más picks.</li>
+    <li>"azar" es lo que valdría <var>S</var>, en promedio, si no hubiera ninguna diferencia real (<var>m</var> = cantidad de campeones).</li>
+    <li>Lo que sobra, <span class="m">S − azar</span>, es la señal. Dividido por el número de picks efectivo da <var>τ</var>², la varianza real.</li>
+  </ul>
+  <p>Es el mismo método que usan los meta-análisis para saber si estudios distintos miden un efecto distinto o solo tienen ruido (método de DerSimonian-Laird). <var>p̄</var> es siempre cerca de 50%, porque en cada partida ganan 5 picks y pierden 5.</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Guía 16.17–16.18 (campeones con 5+ picks)</th><th class="num">Valor</th></tr></thead>
+    <tbody>
+      <tr><td>Campeones / picks</td><td class="num">93 / 3013</td></tr>
+      <tr><td>Varianza observada de los %</td><td class="num">0,00931</td></tr>
+      <tr><td>Varianza que daría el azar</td><td class="num">0,00763</td></tr>
+      <tr><td><b>Parte que es ruido</b></td><td class="num"><b>82%</b></td></tr>
+      <tr><td>Desvío real entre campeones (τ)</td><td class="num">≈ 4,1 puntos</td></tr>
+    </tbody>
+  </table></div>
+  <p>De cada 10 unidades de dispersión en la tabla de campeones, 8 son azar. Por eso el sitio muestra rangos, ordena por el ajustado y publica este número en Meta → Panorama. En Worlds, con muchas menos partidas, la parte de ruido es todavía mayor.</p>
+
+  <!-- 16 -->
+  <h2 id="lados"><span class="n">16</span>Lados, ritmo y regiones</h2>
+  <h3>Lados: una variable de confusión</h3>
+  <p>¿El lado azul gana más? Parece fácil de medir: contar. Pero en un Bo3 o Bo5, el que perdió la partida anterior elige lado en la siguiente. El lado deja de ser al azar: depende de quién viene perdiendo, que suele ser el equipo más flojo. Eso es una <b>variable de confusión</b>: algo que influye a la vez en "qué lado le toca" y en "quién gana", y que puede crear una diferencia o esconderla.</p>
+  <p>La partida 1 de cada serie es la medición más limpia, porque nadie viene de perder. Por eso el sitio la muestra aparte (<code>pipeline/meta.py · side_stats</code>):</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Guía 16.17–16.18</th><th class="num">Partidas</th><th class="num">Gana el azul</th><th class="num">Rango 95%</th></tr></thead>
+    <tbody>
+      <tr><td>Todas</td><td class="num">305</td><td class="num">53,8%</td><td class="num">48,2 – 59,3%</td></tr>
+      <tr><td>Partida 1</td><td class="num">90</td><td class="num">47,8%</td><td class="num">37,8 – 58,0%</td></tr>
+      <tr><td>Partidas 2 en adelante</td><td class="num">215</td><td class="num">56,3%</td><td class="num">49,6 – 62,7%</td></tr>
+    </tbody>
+  </table></div>
+  <p>Los tres rangos incluyen el 50%: con esta muestra no se puede afirmar que algún lado tenga ventaja. Y la diferencia entre la partida 1 y el resto muestra por qué no conviene mezclarlas.</p>
+  <h3>Ritmo: mediana y cuartiles</h3>
+  <p>La duración típica se mide con la <b>mediana</b> (el valor del medio al ordenar las partidas), no con el promedio. Una partida eterna de 55 minutos mueve el promedio, pero no la mediana. Los <b>cuartiles</b> p25 y p75 marcan dónde está la mitad central: en la guía, la mediana es 31,6 minutos y la mitad de las partidas dura entre 28,3 y 35,4.</p>
+  <p>Las kills por minuto (0,88 en la guía) se calculan como <b>ratio de totales</b>: kills totales sobre minutos totales. El promedio de los ratios de cada partida haría pesar igual a una partida de 20 minutos que a una de 40. Lo mismo con el KDA de equipos y jugadores: (kills + asistencias totales) / muertes totales, con un mínimo de 1 muerte para que nadie tenga KDA infinito.</p>
+  <h3>Regiones: solo entre regiones</h3>
+  <p>El % de una región se calcula solo con partidas contra otras regiones. En un LCK contra LCK la región gana siempre el 50%, así que meter esas partidas acercaría todo a 50% sin decir nada. Con el rango de Wilson al lado, porque en Worlds son pocas partidas por región.</p>
+
+  <!-- 17 -->
+  <h2 id="justas"><span class="n">17</span>Comparaciones justas y datos faltantes</h2>
+  <h3>Temporada vs. "contra equipos de Worlds"</h3>
+  <p>Un 70% de victorias contra equipos de la VCS no es lo mismo que un 70% contra la LCK. El % de la temporada mezcla rivales de niveles muy distintos según la liga. Por eso Equipos → Análisis agrega una columna que usa solo partidas entre dos equipos clasificados a Worlds: todos medidos con la misma vara. El precio es que son muchas menos partidas y los rangos son más anchos. Es el dilema clásico entre <b>sesgo</b> (la temporada compara cosas distintas) y <b>varianza</b> (la columna justa tiene pocas partidas).</p>
+  <h3>La guía de parches</h3>
+  <p>Worlds se juega en el parche 16.20 y al principio no hay ninguna partida. Mientras Worlds tenga menos de 10, Meta muestra como guía los parches 16.17–16.18 de las ligas, los últimos que jugaron antes del torneo. Es otra muestra (otro parche, otras ligas, otros rivales): sirve para orientarse, no es lo mismo. Cuando hay datos de Worlds, la sección "cambios del parche" compara la presencia de cada campeón en la guía con la de Worlds.</p>
+  <h3>Un dato faltante no es un cero</h3>
+  <p>Oracle's Elixir a veces publica partidas sin bans o sin el orden de los picks, y a parte de la LPL le falta la diferencia de oro al minuto 15. Contar esos casos como 0 bajaría los promedios sin razón. Cada métrica usa como denominador solo las partidas donde el dato existe. Por ejemplo, la presencia de un campeón es % de picks (sobre todas las partidas) más % de bans (sobre las partidas que tienen bans).</p>
+  <h3>Flex</h3>
+  <p>Un campeón es flex si se jugó al menos 2 veces en 2 roles o más. Con una sola vez en otro rol puede ser un pick raro, no un flex: el mínimo de 2 evita contar anécdotas.</p>
+
+  <footer>
+    <p>Código: <code>models/elo.py</code>, <code>models/features.py</code>, <code>models/role_form.py</code>, <code>models/tournament.py</code>, <code>pipeline/stats.py</code>, <code>pipeline/meta.py</code>, <code>notebooks/backtest.ipynb</code>. Datos: Leaguepedia (CC-BY-SA) y Oracle's Elixir. Números al 10/10/2026.</p>
+    <p>Worlds Companion no está respaldado por Riot Games y no refleja las opiniones de Riot Games ni de nadie involucrado oficialmente en la producción o gestión de League of Legends. League of Legends y Riot Games son marcas registradas de Riot Games, Inc.</p>
+    <p>Worlds Companion se creó bajo la política «Legal Jibber Jabber» de Riot Games usando recursos propiedad de Riot Games. Riot Games no respalda ni patrocina este proyecto.</p>
+  </footer>
+</div>
+
+<script>
+// Mismos números que models/role_form.json y models/elo.py
+const ROLES = { top: [0.254, 0.2194], jng: [0.1715, 0.2341], mid: [0.2211, 0.2341], bot: [0.2021, 0.2064], sup: [0.1572, 0.2102] };
+const $ = (id) => document.getElementById(id);
+const pct = (x) => (x * 100).toFixed(1).replace('.', ',') + '%';
+const num = (x, d = 2) => (x >= 0 ? '+' : '−') + Math.abs(x).toFixed(d).replace('.', ',');
+const comb = (n, k) => { let r = 1; for (let i = 1; i <= k; i++) r = r * (n - k + i) / i; return r; };
+// Probabilidad exacta de ganar la serie (models/elo.py · series_probability)
+function series(p, bestOf) {
+  const n = Math.floor(bestOf / 2) + 1;
+  let s = 0;
+  for (let j = 0; j < n; j++) s += comb(n - 1 + j, j) * p ** n * (1 - p) ** j;
+  return s;
+}
+
+// ---------- Calculadora (sección 12) ----------
+function update() {
+  const dElo = +$('d-elo').value;
+  const pElo = 1 / (1 + 10 ** (-dElo / 400));
+  const zElo = Math.log(pElo / (1 - pElo));
+  let adj = 0;
+  for (const [role, [w, s]] of Object.entries(ROLES)) {
+    const d = +$('f-' + role).value;
+    $('o-' + role).textContent = num(d);
+    adj += w * d / s;
+  }
+  const z = zElo + adj;
+  const p = 1 / (1 + Math.exp(-z));
+  $('o-elo').textContent = (dElo > 0 ? '+' : dElo < 0 ? '−' : '') + Math.abs(dElo);
+  $('r-elo').textContent = pct(pElo);
+  $('r-z').textContent = num(z);
+  $('r-p').textContent = pct(p);
+  $('r-bo3').textContent = pct(series(p, 3));
+  $('r-bo5').textContent = pct(series(p, 5));
+  $('bar').style.width = (p * 100) + '%';
+  $('explain').textContent = `Elo en log-odds: ${num(zElo)}. La forma suma ${num(adj)}. Total z = ${num(z)}, que pasado por la sigmoide da ${pct(p)} por partida para A (y ${pct(1 - p)} para B).`;
+}
+document.querySelectorAll('#calc-box input').forEach((el) => el.addEventListener('input', update));
+update();
+
+// ---------- Monte Carlo de una serie (sección 9) ----------
+const mc = { bo: 3, n: 100, runs: [] };
+const MAX_MARKS = 30;
+// Juega una serie partida por partida, como la simulación del torneo
+function playSeries(p, bestOf) {
+  const need = Math.floor(bestOf / 2) + 1;
+  let w = 0, l = 0;
+  while (w < need && l < need) { if (Math.random() < p) w++; else l++; }
+  return w === need;
+}
+function mcExact() { return series(+$('mc-p').value, mc.bo); }
+function mcDraw() {
+  const p = +$('mc-p').value, exact = mcExact();
+  $('mc-po').textContent = pct(p);
+  $('mc-ex').textContent = pct(exact);
+  $('mc-se').textContent = '± ' + (196 * Math.sqrt(exact * (1 - exact) / mc.n)).toFixed(1).replace('.', ',') + ' pts';
+  $('mc-exact').style.left = (exact * 100) + '%';
+  const track = $('mc-track');
+  track.querySelectorAll('.dot').forEach((d) => d.remove());
+  mc.runs.forEach((f, i) => {
+    const dot = document.createElement('span');
+    dot.className = 'dot' + (i === mc.runs.length - 1 ? ' last' : '');
+    dot.style.left = (f * 100) + '%';
+    track.appendChild(dot);
+  });
+}
+function mcRun() {
+  const p = +$('mc-p').value;
+  let wins = 0;
+  for (let i = 0; i < mc.n; i++) if (playSeries(p, mc.bo)) wins++;
+  const f = wins / mc.n, exact = mcExact();
+  mc.runs.push(f);
+  if (mc.runs.length > MAX_MARKS) mc.runs.shift();
+  $('mc-sim').textContent = pct(f);
+  $('mc-diff').textContent = num((f - exact) * 100, 1) + ' pts';
+  mcDraw();
+}
+// Cambiar p o el formato cambia el valor exacto: las marcas viejas ya no sirven
+function mcReset() { mc.runs = []; $('mc-sim').textContent = '—'; $('mc-diff').textContent = '—'; mcDraw(); }
+function segGroup(id, attr, onPick) {
+  $(id).querySelectorAll('button').forEach((btn) => btn.addEventListener('click', () => {
+    $(id).querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+    onPick(+btn.dataset[attr]);
+  }));
+}
+segGroup('mc-bo', 'bo', (v) => { mc.bo = v; mcReset(); });
+segGroup('mc-n', 'n', (v) => { mc.n = v; mcDraw(); });
+$('mc-p').addEventListener('input', mcReset);
+$('mc-run').addEventListener('click', mcRun);
+$('mc-clear').addEventListener('click', mcReset);
+mcRun();  // una corrida inicial, así la pista no arranca vacía
+</script>
+</body></html>

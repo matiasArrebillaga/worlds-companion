@@ -97,6 +97,8 @@ cd web && npm run build         # build de producción
     Eliminatoria: hasta el sorteo, columnas Cuartos/Semis/Final/Campeón con la chance de llegar; después, cuadro de
     picks. Los más probables van resaltados (tantos como lugares). Chances por Monte Carlo.
     Sale de `tournament.json`, se recalcula en cada build y no cuenta para Aciertos.
+    Cómo funciona termina con un link al apunte completo `web/public/modelo.html` (modelo + estadística del sitio).
+    Es el mismo HTML que el artefacto https://claude.ai/artifact/EGrK1XZGqehxXodqSoWX9X: si cambia uno, actualizar el otro.
 - **Equipos** (`#/equipos`): Equipos | Jugadores | Análisis (temporada vs. contra equipos de Worlds, forma del modelo), con páginas por
   equipo y por jugador.
 - **Meta**: Campeones (draft, rendimiento y resultado) | Panorama (lados, ritmo, regiones, ruido vs. señal, espejismos, flex,
