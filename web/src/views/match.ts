@@ -5,6 +5,7 @@ import type { ChampionCount, PlayerEntry, Role, TeamEntry } from '../types';
 import { predictionBlock } from './matchCard';
 import { champHex } from './player';
 import { notFound } from './team';
+import { backLink } from './ui';
 
 function mirror(label: string, left: string, right: string): string {
   return `<div class="mirror"><span class="num">${left}</span><span class="label">${label}</span><span class="num">${right}</span></div>`;
@@ -43,6 +44,7 @@ export function renderMatch(el: HTMLElement, data: SiteData, _tz: string, param:
   const roles: Role[] = ['top', 'jng', 'mid', 'bot', 'sup'];
   el.innerHTML = `
     <section class="stack">
+      ${backLink('#/')}
       <span class="eyebrow">Cara a cara · Bo${m.best_of}</span>
       <h1><a href="#/equipo/${encodeURIComponent(a.id)}">${escapeHtml(a.short)}</a> vs <a href="#/equipo/${encodeURIComponent(b.id)}">${escapeHtml(b.short)}</a></h1>
       ${predictionBlock(m)}

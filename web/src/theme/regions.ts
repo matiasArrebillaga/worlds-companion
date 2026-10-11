@@ -17,6 +17,18 @@ export function setTeams(teams: RatedTeam[]): void {
   byTeam = new Map(teams.map((t) => [t.name, { region: t.region, logo: t.logo }]));
 }
 
+// Página de cada equipo (los partidos traen el nombre; la página usa el id de teams.json)
+let pageOf = new Map<string, string>();
+
+export function setTeamPages(teams: { id: string; name: string }[]): void {
+  pageOf = new Map(teams.map((t) => [t.name, `#/equipo/${encodeURIComponent(t.id)}`]));
+}
+
+// null si el equipo no tiene página (no está en teams.json)
+export function teamHref(teamName: string): string | null {
+  return pageOf.get(teamName) ?? null;
+}
+
 export function regionColor(region: string | null | undefined): string {
   return `var(--region-${region && KNOWN.has(region) ? region.toLowerCase() : 'other'})`;
 }

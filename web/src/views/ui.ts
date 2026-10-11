@@ -82,6 +82,12 @@ export function axis(ticks: number[], min: number, max: number, format: (v: numb
   return `<div class="axis" aria-hidden="true">${ticks.map((t) => `<span style="left:${place(t, min, max)}%">${format(t)}</span>`).join('')}</div>`;
 }
 
+// "Volver" de las páginas de equipo, jugador y partido. Instalado como app no hay botón atrás del navegador.
+// main.ts usa history.back() si se llegó navegando dentro del sitio; si no (link compartido), va a `fallback`
+export function backLink(fallback: string): string {
+  return `<a class="back" href="${fallback}" data-back><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>Volver</a>`;
+}
+
 // Notas largas plegadas: la explicación está, pero no compite con los datos
 export function how(text: string, question = '¿Cómo se lee?'): string {
   return `<details class="how"><summary>${question}</summary><p>${text}</p></details>`;

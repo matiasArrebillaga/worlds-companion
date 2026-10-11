@@ -1,5 +1,6 @@
 import type { SiteData } from '../data';
 import { escapeHtml } from '../html';
+import { go, pick } from '../router';
 import { logoImg, REGION_LEAGUES } from '../theme/regions';
 import { minutes } from '../meta';
 import { FEW_GAMES, fmt, formRanking, PERIODS, pct, periodOf, ROLE_LABELS, signed, sortBy, vsWorldsRows, type Period } from '../stats';
@@ -19,7 +20,6 @@ const LIMIT = 20; // filas visibles antes de "Mostrar todos" (jugadores y forma)
 
 // Estado de la vista mientras la página esté abierta; cada tabla recuerda su orden
 const state = {
-  tab: 'equipos' as Tab,
   period: 'season' as Period,
   role: 'all' as Role | 'all',
   sort: { equipos: 'rating', jugadores: 'kda' } as Record<Table, string>,
@@ -173,27 +173,35 @@ function formModule(data: SiteData): string {
     ${how('La forma que usa el modelo de predicción (elo-2): en cada partida se compara al jugador con el promedio de su rol (oro, experiencia y CS al minuto 15, participación en kills, muertes, daño y eficiencia), en desvíos estándar (z-score), y se hace una media móvil que pesa más las partidas recientes. +0.30 = 0,3 desvíos por encima del pro promedio del rol. Ojo: el promedio mezcla todas las ligas, así que no corrige por el nivel de la liga.')}</section>`;
 }
 
-export function renderStats(el: HTMLElement, data: SiteData): () => void {
-  const body = state.tab === 'equipos' ? teamsView(data)
-    : state.tab === 'jugadores' ? playersView(data)
+// tabParam viene de la URL ('#/equipos/jugadores'); sin pestaña o con una que no existe, Equipos
+export function renderStats(el: HTMLElement, data: SiteData, tabParam: string | null): () => void {
+  const tab = pick(tabParam, TABS.map(([id]) => id), 'equipos');
+  const body = tab === 'equipos' ? teamsView(data)
+    : tab === 'jugadores' ? playersView(data)
     : `<div class="board">${vsWorldsModule(data)}${formModule(data)}</div>`;
   const periods = PERIODS.map(([id, label]) => `<button type="button" data-period="${id}" aria-pressed="${id === state.period}">${label}</button>`).join('');
   el.innerHTML = `
     <section class="stack">
       <span class="eyebrow">Datos de Oracle's Elixir</span>
       <h1>Equipos</h1>
-      <div class="subhead">${subtabs('tab', TABS, state.tab, 'Secciones de estadísticas')}
-        ${state.tab === 'analisis' ? '' : `<div class="seg small" role="group" aria-label="Período">${periods}</div>`}</div>
+      <div class="subhead">${subtabs('tab', TABS, tab, 'Secciones de estadísticas')}
+        ${tab === 'analisis' ? '' : `<div class="seg small" role="group" aria-label="Período">${periods}</div>`}</div>
     </section>
     <section class="stack">${body}</section>`;
 
-  const table: Table | null = state.tab === 'analisis' ? null : state.tab;
+  const table: Table | null = tab === 'analisis' ? null : tab;
   el.onclick = (event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button');
     if (!button) return;
     const d = button.dataset;
-    if (d.tab) state.tab = d.tab as Tab;
-    else if (d.period) state.period = d.period as Period;
+    if (d.tab) {
+      // La pestaña entra al historial: "atrás" vuelve a la anterior
+      go(`#/equipos/${d.tab}`);
+      renderStats(el, data, d.tab);
+      el.querySelector<HTMLButtonElement>(`button[data-tab="${d.tab}"]`)?.focus();
+      return;
+    }
+    if (d.period) state.period = d.period as Period;
     else if (d.role) state.role = d.role as Role | 'all';
     else if (d.all) state.showAll[d.all] = !state.showAll[d.all];
     else if (d.dir !== undefined && table) state.dir[table] = state.dir[table] === 'desc' ? 'asc' : 'desc';
@@ -201,7 +209,7 @@ export function renderStats(el: HTMLElement, data: SiteData): () => void {
       state.dir[table] = state.sort[table] === d.sort && state.dir[table] === 'desc' ? 'asc' : 'desc';
       state.sort[table] = d.sort;
     } else return;
-    renderStats(el, data);
+    renderStats(el, data, tab);
   };
   el.oninput = (event) => {
     const input = event.target as HTMLInputElement;
@@ -214,7 +222,7 @@ export function renderStats(el: HTMLElement, data: SiteData): () => void {
     if (select.dataset.sortselect === undefined || !table) return;
     state.sort[table] = select.value;
     state.dir[table] = 'desc';
-    renderStats(el, data);
+    renderStats(el, data, tab);
     el.querySelector<HTMLSelectElement>('#sort-select')?.focus();
   };
   return () => { el.onclick = null; el.onchange = null; el.oninput = null; };

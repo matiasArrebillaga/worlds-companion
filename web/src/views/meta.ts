@@ -1,6 +1,7 @@
 import type { SiteData } from '../data';
 import { PHASE_LABELS } from '../format';
 import { escapeHtml } from '../html';
+import { go, pick } from '../router';
 import { defaultSample, flexPicks, minutes, mirages, paceRows, PHASES, presenceShifts, range, sampleOptions, sideVerdict } from '../meta';
 import { FEW_GAMES, fmt, pct, ROLE_LABELS, signed, sortBy } from '../stats';
 import type { ChampionEntry, MetaSample, SampleId, SideSplit, WinrateNoise } from '../types';
@@ -14,7 +15,7 @@ const TABS: [Tab, string][] = [['campeones', 'Campeones'], ['panorama', 'Panoram
 const NOISE_MIN_PICKS = 5; // igual que en pipeline/meta.py
 
 // Estado mientras la página esté abierta; la muestra se elige la primera vez según los datos
-const state = { tab: 'campeones' as Tab, sample: null as SampleId | null, view: 'principal' as View, sort: 'presence', dir: 'desc' as Dir,
+const state = { sample: null as SampleId | null, view: 'principal' as View, sort: 'presence', dir: 'desc' as Dir,
   query: '' };
 
 function empty(): string {
@@ -195,14 +196,16 @@ function panorama(s: MetaSample, rows: ChampionEntry[], noise: WinrateNoise | nu
   return `<div class="board">${kpis}${sidesModule(s)}${paceModule(s)}${noiseModule(noise, k)}${miragesModule(rows)}${flexModule(rows)}${regionsModule(s)}${shiftsModule(rows)}</div>`;
 }
 
-export function renderMeta(el: HTMLElement, data: SiteData): () => void {
+// tabParam viene de la URL ('#/meta/panorama'); sin pestaña o con una que no existe, Campeones
+export function renderMeta(el: HTMLElement, data: SiteData, tabParam: string | null): () => void {
+  const tab = pick(tabParam, TABS.map(([id]) => id), 'campeones');
   const options = sampleOptions(data.meta);
   if (!state.sample || !options.some(([id]) => id === state.sample)) state.sample = defaultSample(data.meta);
   const sample = data.meta.samples?.[state.sample];
   const champs = data.champions?.samples?.[state.sample] ?? [];
   const k = data.champions?.prior_picks;
   const body = !sample ? empty()
-    : state.tab === 'campeones' ? champions(champs, k)
+    : tab === 'campeones' ? champions(champs, k)
     : panorama(sample, champs, data.champions?.analysis?.[state.sample], k);
   const samples = options.length > 1
     ? `<div class="seg small" role="group" aria-label="Muestra">${options.map(([id, label]) => `<button type="button" data-sample="${id}" aria-pressed="${id === state.sample}">${escapeHtml(label)}</button>`).join('')}</div>`
@@ -215,7 +218,7 @@ export function renderMeta(el: HTMLElement, data: SiteData): () => void {
     <section class="stack">
       <span class="eyebrow">Parche ${escapeHtml(data.meta.worlds_patch ?? '—')} · datos de Oracle's Elixir</span>
       <h1>Meta</h1>
-      <div class="subhead">${subtabs('tab', TABS, state.tab, 'Secciones del meta')}${samples}</div>
+      <div class="subhead">${subtabs('tab', TABS, tab, 'Secciones del meta')}${samples}</div>
       ${guide}
     </section>
     <section class="stack">${body}</section>`;
@@ -224,15 +227,21 @@ export function renderMeta(el: HTMLElement, data: SiteData): () => void {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button');
     if (!button) return;
     const d = button.dataset;
-    if (d.tab) state.tab = d.tab as Tab;
-    else if (d.sample) state.sample = d.sample as SampleId;
+    if (d.tab) {
+      // La pestaña entra al historial: "atrás" vuelve a la anterior
+      go(`#/meta/${d.tab}`);
+      renderMeta(el, data, d.tab);
+      el.querySelector<HTMLButtonElement>(`button[data-tab="${d.tab}"]`)?.focus();
+      return;
+    }
+    if (d.sample) state.sample = d.sample as SampleId;
     else if (d.view) { state.view = d.view as View; state.dir = 'desc'; }
     else if (d.dir !== undefined) state.dir = state.dir === 'desc' ? 'asc' : 'desc';
     else if (d.sort) {
       state.dir = state.sort === d.sort && state.dir === 'desc' ? 'asc' : 'desc';
       state.sort = d.sort;
     } else return;
-    renderMeta(el, data);
+    renderMeta(el, data, tab);
   };
   el.oninput = (event) => {
     const input = event.target as HTMLInputElement;
@@ -245,7 +254,7 @@ export function renderMeta(el: HTMLElement, data: SiteData): () => void {
     if (select.dataset.sortselect === undefined) return;
     state.sort = select.value;
     state.dir = 'desc';
-    renderMeta(el, data);
+    renderMeta(el, data, tab);
     el.querySelector<HTMLSelectElement>('#sort-select')?.focus();
   };
   return () => { el.onclick = null; el.onchange = null; el.oninput = null; };

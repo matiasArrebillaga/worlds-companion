@@ -5,23 +5,27 @@ import { setTeams } from './theme/regions';
 import { localDayKey, resolveTimeZone } from './format';
 import { dayKeyOf } from './schedule';
 import { renderCalendar } from './views/calendar';
-import { parseHash, tabFor } from './router';
+import { canGoBack, markNewStep, parseHash, rememberScroll, savedScroll, syncDepth, tabFor, type Route } from './router';
 import { renderUpdated, setActiveTab } from './views/layout';
 import { renderMatch } from './views/match';
 import { renderMeta } from './views/meta';
 import { renderPlayer } from './views/player';
 import { renderStats } from './views/stats';
 import { renderTeam } from './views/team';
+import { setTeamPages } from './theme/regions';
 
-type View = (el: HTMLElement, data: SiteData, tz: string, param: string | null) => () => void;
+type View = (el: HTMLElement, data: SiteData, tz: string, route: Route) => () => void;
 
+// La pestaña de cada sección va en la URL: '#/bracket/suiza', '#/equipos/jugadores', '#/meta/panorama'
 const ROUTES: Record<string, View> = {
-  '#/': renderCalendar,
-  '#/equipos': (el, data) => renderStats(el, data),
-  '#/equipo': renderTeam,
-  '#/jugador': renderPlayer,
-  '#/partido': renderMatch,
-  '#/meta': (el, data) => renderMeta(el, data),
+  '#/': (el, data, tz) => renderCalendar(el, data, tz, { sub: 'lista' }),
+  '#/bracket': (el, data, tz, r) => renderCalendar(el, data, tz, { sub: 'bracket', stage: r.param }),
+  '#/predicciones': (el, data, tz, r) => renderCalendar(el, data, tz, { sub: 'predicciones', tab: r.param, stage: r.sub }),
+  '#/equipos': (el, data, _tz, r) => renderStats(el, data, r.param),
+  '#/equipo': (el, data, tz, r) => renderTeam(el, data, tz, r.param),
+  '#/jugador': (el, data, tz, r) => renderPlayer(el, data, tz, r.param),
+  '#/partido': (el, data, tz, r) => renderMatch(el, data, tz, r.param),
+  '#/meta': (el, data, _tz, r) => renderMeta(el, data, r.param),
 };
 
 const view = document.getElementById('view') as HTMLElement;
@@ -30,27 +34,48 @@ let cleanup: () => void = () => {};
 
 const REFRESH_EVERY_MS = 5 * 60_000;
 
-function currentRoute() {
+function currentRoute(): Route {
   const route = parseHash(location.hash);
-  return route.path in ROUTES ? route : { path: '#/', param: null };
+  return route.path in ROUTES ? route : { path: '#/', param: null, sub: null };
 }
 
 function render(data: SiteData): void {
   setTeams(data.elo.teams);
+  setTeamPages(data.teams.teams);
   setChampionIcons(data.champions.icons);
   cleanup();
-  const { path, param } = currentRoute();
-  cleanup = ROUTES[path](view, data, tz, param);
+  const r = currentRoute();
+  cleanup = ROUTES[r.path](view, data, tz, r);
 }
 
-// Navegar: arriba de todo, o a lo de hoy (próximo partido o ronda en curso) si la vista lo marca
-function route(data: SiteData): void {
+// Navegar. Si es "atrás" o "adelante" y ya habíamos estado ahí, se vuelve al mismo lugar del scroll;
+// si es una navegación nueva, arriba de todo o a lo de hoy (próximo partido o ronda en curso) si la vista lo marca
+function route(data: SiteData, restore = false): void {
   setActiveTab(tabFor(currentRoute().path));
   render(data);
+  const saved = restore ? savedScroll(location.hash) : undefined;
   const today = view.querySelector('#hoy');
-  if (today) today.scrollIntoView({ block: 'start' });
+  if (saved !== undefined) window.scrollTo(0, saved);
+  else if (today) today.scrollIntoView({ block: 'start' });
   else window.scrollTo(0, 0);
 }
+
+// Un clic en un link interno es una navegación nueva; un hashchange sin clic es atrás/adelante
+let linkClicked = false;
+document.addEventListener('click', (event) => {
+  const link = (event.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="#"]');
+  if (!link) return;
+  // "Volver": si llegamos navegando dentro del sitio, se vuelve de verdad (con el scroll y el orden de antes)
+  if (link.dataset.back !== undefined && canGoBack()) {
+    event.preventDefault();
+    history.back();
+    return;
+  }
+  // Un link a la misma dirección no dispara hashchange: no cuenta como navegación
+  linkClicked = link.hash !== (location.hash || '#/');
+});
+history.scrollRestoration = 'manual';
+syncDepth();
 
 // Con la página abierta, buscar datos nuevos cada 5 minutos y redibujar sin mover el scroll
 async function refreshIfNewer(data: SiteData): Promise<SiteData> {
@@ -86,7 +111,14 @@ async function start(): Promise<void> {
     data = await refreshIfNewer(data);
     refreshUpdated(data);
   }, REFRESH_EVERY_MS);
-  window.addEventListener('hashchange', () => route(data));
+  window.addEventListener('hashchange', (event) => {
+    // Todavía no se redibujó: el scroll es el de la página que se deja
+    rememberScroll(new URL(event.oldURL).hash, window.scrollY);
+    if (linkClicked) markNewStep();
+    else syncDepth();
+    route(data, !linkClicked);
+    linkClicked = false;
+  });
   route(data);
 }
 

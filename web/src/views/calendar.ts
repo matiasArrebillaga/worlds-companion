@@ -1,24 +1,40 @@
-import { currentStage, KNOCKOUT_LAYOUT, PLAYIN_LAYOUT, slotMatches, type Stage } from '../bracket';
+import { currentStage, KNOCKOUT_LAYOUT, PLAYIN_LAYOUT, slotMatches, STAGES, type Stage } from '../bracket';
 import type { SiteData } from '../data';
 import { countdownParts, formatDateTimeLong, formatDayHeading, formatDayShort, formatTime, localDayKey, pad2, PHASE_LABELS, roundLabel } from '../format';
 import { escapeHtml } from '../html';
+import { go, pick } from '../router';
 import { dayKeyOf, featuredMatch, groupByDay, recentResults } from '../schedule';
 import { PENDING, swissRounds, swissStandings } from '../swiss';
 import { teamMark, teamRegionColor } from '../theme/regions';
 import type { Match, Team } from '../types';
 import { bracketGrid, recordTint, stageButtons } from './bracketGrid';
-import { matchCard, predictionBlock, teamTag } from './matchCard';
+import { matchCard, predictionBlock, stretchLink, teamLink } from './matchCard';
 import { BO1_NOTE, handlePredictionsClick, predictionsView } from './predictions';
 
 // Calendario: la página de inicio. Lista (línea de tiempo centrada en el próximo partido),
 // Bracket (Play-In · Suiza · Eliminatoria) y Predicciones
 type Sub = 'lista' | 'bracket' | 'predicciones';
 const SUBS: [Sub, string][] = [['lista', 'Lista'], ['bracket', 'Bracket'], ['predicciones', 'Predicciones']];
+const STAGE_IDS = STAGES.map(([id]) => id);
 
-// La sub-vista y el equipo resaltado en la suiza se recuerdan mientras la página esté abierta
-let sub: Sub = 'lista';
-// Fase del Bracket; null = la que se está jugando (hasta que el usuario elija otra)
-let stage: Stage | null = null;
+// Lo que se ve sale de la URL (main.ts): '#/' Lista, '#/bracket/<fase>', '#/predicciones/<pestaña>/<fase>'.
+// stage null = la fase que se está jugando; tab null = Aciertos
+export interface CalendarRoute {
+  sub: Sub;
+  stage?: string | null;
+  tab?: string | null;
+}
+
+function hashOf(r: CalendarRoute): string {
+  if (r.sub === 'bracket') return r.stage ? `#/bracket/${r.stage}` : '#/bracket';
+  if (r.sub === 'predicciones') {
+    const tab = r.tab ?? 'aciertos';
+    return `#/predicciones/${tab}${tab === 'torneo' && r.stage ? `/${r.stage}` : ''}`;
+  }
+  return '#/';
+}
+
+// El equipo resaltado en la suiza se recuerda mientras la página esté abierta
 let picked: string | null = null;
 // Reloj de la cuenta regresiva de la vista actual (se frena al redibujar o al salir)
 let stopTimer: () => void = () => {};
@@ -41,13 +57,13 @@ function featureCard(m: Match, tz: string): string {
       <div class="core">
         <div class="match-head">${pill}<span class="label">${when} · Bo${m.best_of}</span></div>
         <div class="teams">
-          <div class="team">${teamTag(m.team1)}</div>
+          <div class="team">${teamLink(m.team1)}</div>
           ${middle}
-          <div class="team r">${teamTag(m.team2)}</div>
+          <div class="team r">${teamLink(m.team2)}</div>
         </div>
         ${predictionBlock(m)}
         ${m.status === 'upcoming' ? '<div class="countdown" data-countdown aria-label="Cuenta regresiva"></div>' : ''}
-        ${m.team1 && m.team2 ? `<div class="foot"><a href="#/partido/${encodeURIComponent(m.id)}">Cara a cara</a></div>` : ''}
+        ${m.team1 && m.team2 ? `<div class="foot">${stretchLink(m, 'Cara a cara')}</div>` : ''}
       </div>
     </article>`;
 }
@@ -176,8 +192,7 @@ function swissView(matches: Match[]): string {
 
 // ---------- Bracket: Play-In · Suiza · Eliminatoria ----------
 
-function bracketView(matches: Match[], tz: string): string {
-  const current = stage ?? currentStage(matches);
+function bracketView(matches: Match[], tz: string, current: Stage): string {
   const body = current === 'suiza' ? swissView(matches)
     : current === 'playin'
       ? `<p class="muted">Doble eliminación, todo Bo5: pasa solo el campeón.</p>${bracketGrid(PLAYIN_LAYOUT, slotMatches(matches, PLAYIN_LAYOUT), tz)}`
@@ -198,20 +213,30 @@ function startCountdown(el: HTMLElement, featured: Match | null): () => void {
   const box = el.querySelector<HTMLElement>('[data-countdown]');
   if (!box || !featured?.start_utc) return () => {};
   const start = Date.parse(featured.start_utc);
+  let timer = 0;
   const tick = () => {
-    const { h, m, s } = countdownParts(start - Date.now());
+    const left = start - Date.now();
+    if (left <= 0) {
+      // Llegó la hora: el resultado recién aparece con la próxima actualización de datos
+      box.innerHTML = '<span class="pill cyan"><span class="dot" aria-hidden="true"></span>Por empezar</span>';
+      window.clearInterval(timer);
+      return;
+    }
+    const { h, m, s } = countdownParts(left);
     box.innerHTML = `<div><b>${pad2(h)}</b><span class="label">h</span></div><div><b>${pad2(m)}</b><span class="label">min</span></div><div><b>${pad2(s)}</b><span class="label">s</span></div>`;
   };
   tick();
-  const timer = window.setInterval(tick, 1000);
+  if (Date.now() < start) timer = window.setInterval(tick, 1000);
   return () => window.clearInterval(timer);
 }
 
-export function renderCalendar(el: HTMLElement, data: SiteData, tz: string): () => void {
+export function renderCalendar(el: HTMLElement, data: SiteData, tz: string, route: CalendarRoute): () => void {
   const matches = data.schedule.matches;
   const featured = featuredMatch(matches, new Date());
-  const body = sub === 'bracket' ? bracketView(matches, tz)
-    : sub === 'predicciones' ? predictionsView(data, tz)
+  const { sub } = route;
+  const stage = pick(route.stage ?? null, STAGE_IDS, currentStage(matches));
+  const body = sub === 'bracket' ? bracketView(matches, tz, stage)
+    : sub === 'predicciones' ? predictionsView(data, tz, route.tab ?? null, route.stage ?? null)
     : listView(matches, tz, featured);
 
   el.innerHTML = `
@@ -240,24 +265,25 @@ export function renderCalendar(el: HTMLElement, data: SiteData, tz: string): () 
       });
       return;
     }
-    let focus: string;
+    // Vista nueva según el botón: las pestañas y fases entran al historial (go); los filtros solo redibujan
+    let next: CalendarRoute;
     if (button.dataset.sub) {
-      sub = button.dataset.sub as Sub;
-      focus = `button[data-sub="${sub}"]`;
+      next = { sub: button.dataset.sub as Sub };
     } else if (button.dataset.stage) {
-      stage = button.dataset.stage as Stage;
-      focus = `button[data-stage="${stage}"]`;
-    } else if (handlePredictionsClick(button)) {
-      const [key, value] = Object.entries(button.dataset)[0];
-      focus = `button[data-${key}="${value}"]`;
-    } else return;
-    renderCalendar(el, data, tz);
+      next = { sub: 'bracket', stage: button.dataset.stage };
+    } else {
+      const pred = handlePredictionsClick(button, route.tab ?? null, route.stage ?? null);
+      if (!pred) return;
+      next = { sub: 'predicciones', ...pred };
+    }
+    const [key, value] = Object.entries(button.dataset)[0];
+    go(hashOf(next));
+    renderCalendar(el, data, tz, next);
     // Volver el foco al botón elegido (el re-render reemplaza los botones)
-    el.querySelector<HTMLButtonElement>(focus)?.focus();
+    el.querySelector<HTMLButtonElement>(`button[data-${key}="${value}"]`)?.focus();
     // Al entrar a la lista o a la suiza, ir a lo de hoy (como al abrir la página)
-    const toSwiss = button.dataset.stage === 'suiza'
-      || (button.dataset.sub === 'bracket' && (stage ?? currentStage(matches)) === 'suiza');
-    if (button.dataset.sub === 'lista' || toSwiss) {
+    const toSwiss = next.sub === 'bracket' && pick(next.stage ?? null, STAGE_IDS, currentStage(matches)) === 'suiza';
+    if (button.dataset.stage === 'suiza' || (button.dataset.sub && (next.sub === 'lista' || toSwiss))) {
       el.querySelector('#hoy')?.scrollIntoView({ block: 'start' });
     }
   };

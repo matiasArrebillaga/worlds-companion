@@ -1,7 +1,7 @@
 import { formatPercent, formatTime, PHASE_LABELS, roundLabel } from '../format';
 import { escapeHtml } from '../html';
 import { favorite, gameOdds, verdict } from '../predictions';
-import { teamMark, teamRegionColor } from '../theme/regions';
+import { teamHref, teamMark, teamRegionColor } from '../theme/regions';
 import type { Match, Team } from '../types';
 
 type Side = 'team1' | 'team2';
@@ -19,8 +19,21 @@ export function teamTag(team: Team | null): string {
   return `<span class="tag" title="${escapeHtml(team.name)}" style="--rc:${teamRegionColor(team.name)}">${teamMark(team.name)}${escapeHtml(team.short)}</span>`;
 }
 
+// La sigla como link a la página del equipo (queda por encima del link que cubre la tarjeta)
+export function teamLink(team: Team | null): string {
+  const href = team ? teamHref(team.name) : null;
+  return href ? `<a class="tag-link" href="${href}">${teamTag(team)}</a>` : teamTag(team);
+}
+
+// Link que cubre toda la tarjeta o caja (con ::after): tocar en cualquier lado abre el Cara a cara
+export function stretchLink(m: { id: string | null; team1: Team | null; team2: Team | null }, text = ''): string {
+  if (!m.id || !m.team1 || !m.team2) return '';
+  const label = text ? '' : ` aria-label="Cara a cara: ${escapeHtml(m.team1.short)} vs ${escapeHtml(m.team2.short)}"`;
+  return `<a class="stretch" href="#/partido/${encodeURIComponent(m.id)}"${label}>${text}</a>`;
+}
+
 function teamSide(m: Match, side: Side): string {
-  const name = teamTag(m[side]);
+  const name = teamLink(m[side]);
   const lost = m.winner && m.winner !== side ? ' lost' : '';
   const cls = side === 'team2' ? `team r${lost}` : `team${lost}`;
   // El resultado (V/D) va del lado de afuera de cada equipo
@@ -69,7 +82,7 @@ export function matchCard(m: Match, tz: string): string {
         <div class="match-head">${head(m, time)}<span class="label">${escapeHtml(roundLabel(m.round))} · Bo${m.best_of}</span></div>
         <div class="teams">${teamSide(m, 'team1')}${middle}${teamSide(m, 'team2')}</div>
         ${predictionBlock(m)}
-        <div class="foot"><span>${PHASE_LABELS[m.phase]}${m.team1 && m.team2 ? ` · <a href="#/partido/${encodeURIComponent(m.id)}">Cara a cara</a>` : ''}</span><span>${footRight}</span></div>
+        <div class="foot"><span>${PHASE_LABELS[m.phase]}${m.team1 && m.team2 ? ` · ${stretchLink(m, 'Cara a cara')}` : ''}</span><span>${footRight}</span></div>
       </div>
     </article>`;
 }

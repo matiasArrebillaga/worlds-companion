@@ -609,3 +609,58 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
 .search::placeholder { color: var(--fg3); }
 .search:focus { outline: 2px solid var(--cyan); outline-offset: 1px; border-color: transparent; }
 @media (max-width: 859px) { .search { max-width: none; } }
+
+/* ================= Navegación =================
+   Volver, siglas que llevan al equipo, tarjetas que se tocan enteras, toques de 44 px y encabezados fijos. */
+html { -webkit-tap-highlight-color: transparent; }
+.back { justify-self: start; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 14px 0 8px;
+  border: 1px solid var(--line-ctl); color: var(--fg2); text-decoration: none;
+  font: 600 14px/1 var(--f-display); letter-spacing: .1em; text-transform: uppercase;
+  transition: color .25s var(--ease), border-color .25s var(--ease); }
+.back:hover { color: var(--fg); border-color: var(--gold); }
+.back svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Link que cubre la tarjeta o la caja entera; las siglas quedan por encima y llevan al equipo */
+.match, .feature .core, .grp.pk { position: relative; }
+.stretch::after { content: ""; position: absolute; inset: 0; }
+.grp.pk:has(.stretch:focus-visible) { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.tag-link { position: relative; z-index: 1; display: inline-flex; min-width: 0; color: inherit; text-decoration: none; }
+.tag-link::after { content: ""; position: absolute; left: 0; right: 0; bottom: -5px; height: 2px; background: var(--line-ctl);
+  transform: scaleX(0); transform-origin: left; transition: transform .35s var(--ease); }
+.tag-link:hover::after, .tag-link:focus-visible::after { transform: scaleX(1); }
+
+/* Toques: respuesta al apoyar el dedo (el destello azul de Android se apaga arriba) */
+.seg button:active, .chip:active, .more:active, .subtabs button:active { background: var(--raised); }
+.seg button[aria-pressed="true"]:active { background: var(--gold); filter: brightness(.9); }
+.bezel:has(.stretch) { transition: transform .35s var(--ease); }
+.bezel:has(.stretch):active { transform: scale(.985); }
+.tm { position: relative; }
+.tm::after { content: ""; position: absolute; inset: -6px -4px; } /* área de toque más grande sin agrandar la fila */
+@media (max-width: 859px) {
+  .seg button { min-height: 44px; }
+  .chip { min-height: 44px; }
+}
+
+/* Historial del jugador: tabla en PC; en el celular, una tarjeta por partida */
+@media (max-width: 859px) {
+  .hist, .hist tbody { display: block; }
+  .hist thead { display: none; }
+  .hist tbody { display: grid; gap: 8px; }
+  .hist tr { display: grid; grid-template-columns: 22px auto minmax(0, 1fr) auto; grid-template-areas: "r c o d" "r k s p";
+    gap: 6px 12px; align-items: center; padding: 10px 12px; background: var(--sunken); }
+  .hist td { padding: 0; border: 0; text-align: left; white-space: nowrap; }
+  .hist td.num { text-align: left; }
+  .hist td.r { grid-area: r; align-self: start; }
+  .hist td.c { grid-area: c; font-weight: 600; }
+  .hist td.o { grid-area: o; color: var(--fg2); overflow: hidden; text-overflow: ellipsis; }
+  .hist td.d { grid-area: d; text-align: right; color: var(--fg2); font-size: 12px; }
+  .hist td[data-label="KDA"] { grid-area: k; }
+  .hist td[data-label="CS/min"] { grid-area: s; }
+  .hist td[data-label="DPM"] { grid-area: p; text-align: right; }
+  .hist td[data-label]::before { content: attr(data-label) " "; font: 500 10.5px var(--f-data); letter-spacing: .06em; text-transform: uppercase; color: var(--fg2); }
+}
+
+/* PC: el encabezado de las tablas largas queda pegado debajo de la barra superior */
+@media (min-width: 880px) {
+  .airy thead tr:last-child th { position: sticky; top: 56px; z-index: 2; background: var(--bg); box-shadow: inset 0 -1px 0 var(--line-ctl); }
+}

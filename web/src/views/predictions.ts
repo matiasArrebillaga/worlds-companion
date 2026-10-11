@@ -1,8 +1,9 @@
-import { currentStage, type Stage } from '../bracket';
+import { currentStage, STAGES } from '../bracket';
 import type { SiteData } from '../data';
 import { formatDayShort, formatPercent, roundLabel } from '../format';
 import { escapeHtml } from '../html';
 import { favorite, verdict } from '../predictions';
+import { pick } from '../router';
 import { dayKeyOf } from '../schedule';
 import type { CalibrationBucket, Elo, Match } from '../types';
 import { tournamentView } from './tournament';
@@ -17,11 +18,12 @@ const TABS: [Tab, string][] = [['aciertos', 'Aciertos'], ['torneo', 'Torneo'], [
 const HITS_TABS: [HitsTab, string][] = [['resumen', 'Resumen'], ['partidos', 'Partidos']];
 const FILTERS: [Filter, string][] = [['all', 'Todos'], ['hit', 'Acertados'], ['miss', 'Errados']];
 
-// Lo elegido se recuerda mientras la página esté abierta
-// stage null = la fase que se está jugando (hasta que el usuario elija otra)
-const state: { tab: Tab; hits: HitsTab; filter: Filter; stage: Stage | null } = {
-  tab: 'aciertos', hits: 'resumen', filter: 'all', stage: null,
-};
+const TAB_IDS = TABS.map(([id]) => id);
+const STAGE_IDS = STAGES.map(([id]) => id);
+
+// La pestaña y la fase del Torneo van en la URL ('#/predicciones/torneo/suiza'); los filtros de Aciertos
+// se recuerdan mientras la página esté abierta
+const state: { hits: HitsTab; filter: Filter } = { hits: 'resumen', filter: 'all' };
 
 // Plegado como el resto de las explicaciones: está, pero solo se abre si el usuario quiere
 export const BO1_NOTE = how('Los Bo1 tienen alta varianza: una sola partida decide la serie, así que un favorito al 65% pierde una de cada tres. Mirá el porcentaje, no solo quién es el favorito.', '¿Por qué el favorito puede perder un Bo1?');
@@ -121,26 +123,30 @@ function matchList(matches: Match[], tz: string): string {
     ${rows ? `<div class="hits">${rows}</div>` : empty('No hay partidos con este filtro', 'Probá con "Todos".')}`;
 }
 
-export function predictionsView(data: SiteData, tz: string): string {
-  const body = state.tab === 'como' ? howItWorks(data.elo)
-    : state.tab === 'torneo' ? tournamentView(data.tournament, tz, state.stage ?? currentStage(data.schedule.matches))
+// tab y stage vienen de la URL; si faltan o no valen: Aciertos y la fase que se está jugando
+export function predictionsView(data: SiteData, tz: string, tabParam: string | null, stageParam: string | null): string {
+  const tab = pick(tabParam, TAB_IDS, 'aciertos');
+  const stage = pick(stageParam, STAGE_IDS, currentStage(data.schedule.matches));
+  const body = tab === 'como' ? howItWorks(data.elo)
+    : tab === 'torneo' ? tournamentView(data.tournament, tz, stage)
     : `${seg('phits', HITS_TABS, state.hits, 'Aciertos', true)}
        ${state.hits === 'resumen' ? summary(data.elo) : matchList(data.schedule.matches, tz)}`;
   return `
     <section class="stack">
       <span class="eyebrow">Modelo ${escapeHtml(data.elo.model_version)}</span>
-      ${seg('ptab', TABS, state.tab, 'Secciones de predicciones')}
+      ${seg('ptab', TABS, tab, 'Secciones de predicciones')}
       ${body}
     </section>`;
 }
 
-// Botones propios de esta sub-vista; devuelve true si cambió algo y hay que redibujar
-export function handlePredictionsClick(button: HTMLButtonElement): boolean {
+// Botones propios de esta sub-vista: devuelve la pestaña y la fase a mostrar (las mismas si solo cambió un
+// filtro), o null si el botón no es de acá
+export function handlePredictionsClick(button: HTMLButtonElement, tab: string | null, stage: string | null): { tab: string | null; stage: string | null } | null {
   const d = button.dataset;
-  if (d.ptab) state.tab = d.ptab as Tab;
-  else if (d.phits) state.hits = d.phits as HitsTab;
+  if (d.ptab) return { tab: d.ptab, stage: null };
+  if (d.tstage) return { tab: 'torneo', stage: d.tstage };
+  if (d.phits) state.hits = d.phits as HitsTab;
   else if (d.pfilter) state.filter = d.pfilter as Filter;
-  else if (d.tstage) state.stage = d.tstage as Stage;
-  else return false;
-  return true;
+  else return null;
+  return { tab, stage };
 }

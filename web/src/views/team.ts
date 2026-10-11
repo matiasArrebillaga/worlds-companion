@@ -4,6 +4,7 @@ import { escapeHtml } from '../html';
 import { logoImg } from '../theme/regions';
 import { findById, fmt, PERIODS, pct, periodOf, ROLE_LABELS, signed, type Period } from '../stats';
 import type { TeamEntry, TeamStats } from '../types';
+import { backLink } from './ui';
 
 let period: Period = 'season';
 
@@ -56,6 +57,7 @@ export function renderTeam(el: HTMLElement, data: SiteData, _tz: string, param: 
   const buttons = PERIODS.map(([id, label]) => `<button type="button" data-period="${id}" aria-pressed="${id === period}">${label}</button>`).join('');
   el.innerHTML = `
     <section class="stack">
+      ${backLink('#/equipos')}
       <span class="eyebrow">${escapeHtml(team.region ?? 'Equipo')} · Elo ${fmt(team.rating)}</span>
       <h1 class="team-title">${logoImg(team.logo)}${escapeHtml(team.short)}</h1>
       <p class="muted">${escapeHtml(team.name)}</p>

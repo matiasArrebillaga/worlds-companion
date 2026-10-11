@@ -4,7 +4,7 @@ import { formatTime } from '../format';
 import { escapeHtml } from '../html';
 import { PENDING } from '../swiss';
 import type { BracketMatch } from '../types';
-import { teamTag } from './matchCard';
+import { stretchLink, teamLink } from './matchCard';
 
 // Cuadro de un Play-In o una Eliminatoria, compartido entre Calendario › Bracket y Predicciones › Torneo.
 // En PC cada caja va en su lugar de la grilla, unida por conectores; en celular se apilan en orden.
@@ -35,7 +35,7 @@ function side(m: BracketMatch, which: 'team1' | 'team2'): string {
   else if (isPick) mark = '<span class="pick" title="Pick del modelo">✓</span>';
   const value = finished && m.score ? String(m.score[which === 'team1' ? 0 : 1]) : p === null ? '' : chance(p);
   const cls = `ln${finished && !isPick ? ' lose' : ''}${isPick && !finished ? ' picked' : ''}`;
-  return `<div class="${cls}">${mark}${team ? teamTag(team) : '<span class="muted">Por definir</span>'}<span class="s">${value}</span></div>`;
+  return `<div class="${cls}">${mark}${team ? teamLink(team) : '<span class="muted">Por definir</span>'}<span class="s">${value}</span></div>`;
 }
 
 export function bracketBox(m: BracketMatch, tz: string): string {
@@ -45,6 +45,7 @@ export function bracketBox(m: BracketMatch, tz: string): string {
       <div class="grp-h"><span>${escapeHtml(m.label)}</span><small>Bo${m.best_of}</small></div>
       <div class="mu">${side(m, 'team1')}${side(m, 'team2')}</div>
       <div class="pk-when">${escapeHtml(when)}</div>
+      ${stretchLink(m)}
     </div>`;
 }
 

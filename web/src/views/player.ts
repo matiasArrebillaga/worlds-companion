@@ -4,7 +4,7 @@ import { championIcon } from '../theme/champions';
 import { FEW_GAMES, findById, fmt, PERIODS, pct, periodOf, ROLE_LABELS, signed, type Period } from '../stats';
 import type { PlayerEntry, PlayerStats } from '../types';
 import { notFound } from './team';
-import { how } from './ui';
+import { backLink, how } from './ui';
 
 let period: Period = 'season';
 
@@ -37,15 +37,16 @@ function champions(s: PlayerStats): string {
 function history(p: PlayerEntry): string {
   const rows = p.history.map((g) => `
     <tr>
-      <td class="num">${escapeHtml(g.date.slice(5))}</td>
-      <td><span class="res ${g.won ? 'w' : 'l'}">${g.won ? 'V' : 'D'}</span></td>
-      <td>${escapeHtml(g.champion)}</td>
-      <td>vs ${escapeHtml(g.opponent)}${g.worlds ? ' <span class="pill gold">Worlds</span>' : ''}</td>
-      <td class="num">${g.kills}/${g.deaths}/${g.assists}</td>
-      <td class="num">${fmt(g.cs_min, 1)}</td>
-      <td class="num">${fmt(g.dpm)}</td>
+      <td class="num d">${escapeHtml(g.date.slice(5))}</td>
+      <td class="r"><span class="res ${g.won ? 'w' : 'l'}">${g.won ? 'V' : 'D'}</span></td>
+      <td class="c">${escapeHtml(g.champion)}</td>
+      <td class="o">vs ${escapeHtml(g.opponent)}${g.worlds ? ' <span class="pill gold">Worlds</span>' : ''}</td>
+      <td class="num" data-label="KDA">${g.kills}/${g.deaths}/${g.assists}</td>
+      <td class="num" data-label="CS/min">${fmt(g.cs_min, 1)}</td>
+      <td class="num" data-label="DPM">${fmt(g.dpm)}</td>
     </tr>`).join('');
-  return `<div class="table-wrap"><table class="rank"><thead><tr><th>Fecha</th><th>Res.</th><th>Campeón</th><th>Rival</th><th class="num">KDA</th><th class="num">CS/min</th><th class="num">DPM</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  // En el celular cada partida pasa a ser una tarjeta (CSS): nada se desliza de costado
+  return `<div class="table-wrap"><table class="rank hist"><thead><tr><th>Fecha</th><th>Res.</th><th>Campeón</th><th>Rival</th><th class="num">KDA</th><th class="num">CS/min</th><th class="num">DPM</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 export function renderPlayer(el: HTMLElement, data: SiteData, tz: string, param: string | null): () => void {
@@ -59,9 +60,10 @@ export function renderPlayer(el: HTMLElement, data: SiteData, tz: string, param:
   const buttons = PERIODS.map(([id, label]) => `<button type="button" data-period="${id}" aria-pressed="${id === period}">${label}</button>`).join('');
   el.innerHTML = `
     <section class="stack">
+      ${backLink('#/equipos/jugadores')}
       <span class="eyebrow">${ROLE_LABELS[p.role]} · <a href="#/equipo/${encodeURIComponent(p.team_id)}">${escapeHtml(team?.short ?? p.team)}</a>${p.starter ? '' : ' · suplente'}</span>
       <h1>${escapeHtml(p.name)}</h1>
-      ${p.form != null ? `<p class="muted">Forma según el modelo: <b>${signed(p.form, 2)}</b> desvíos sobre el promedio de su rol (<a href="#/equipos">ver ranking en Equipos › Análisis</a>)</p>` : ''}
+      ${p.form != null ? `<p class="muted">Forma según el modelo: <b>${signed(p.form, 2)}</b> desvíos sobre el promedio de su rol (<a href="#/equipos/analisis">ver ranking en Equipos › Análisis</a>)</p>` : ''}
       <div class="seg" role="group" aria-label="Período">${buttons}</div>
       ${s && s.games < FEW_GAMES ? how(`Solo ${s.games} partidas: con tan pocas, estos números dicen poco.`, '¿Cuánto confiar en estos números?') : ''}
       ${s ? kpis(s) : '<div class="state"><b>Todavía no jugó en Worlds 2026</b></div>'}
