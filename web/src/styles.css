@@ -591,3 +591,12 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
     border: 1px solid var(--line-ctl); border-left: 0; }
   .bk-line::after { content: ""; position: absolute; left: 50%; right: 0; top: var(--o); border-top: 1px solid var(--line-ctl); }
 }
+
+/* Torneo › Suiza y Eliminatoria con probabilidades: cajas como las de la suiza, con una lista de equipos y su chance.
+   Resaltados los más probables (el pick); los siguientes, atenuados. */
+.pr .ln, .sw-cols .pr .ln { grid-template-columns: minmax(0, 1fr) auto; padding: 4px 10px; }
+.pr .ln.picked, .pr-final .ln.picked { background: var(--gold-soft); box-shadow: inset 2px 0 0 var(--gold); }
+.pr .ln .tag, .pr-final .ln .tag { font-size: 1rem; }
+.pr-final { border-top: 1px solid var(--line); padding-block: 6px; display: grid; gap: 2px; }
+.pr-final > b { font: 700 13px var(--f-data); padding: 2px 10px; }
+.pr-final .ln { grid-template-columns: minmax(0, 1fr) auto; padding: 3px 10px; }

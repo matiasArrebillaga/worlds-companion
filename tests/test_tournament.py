@@ -73,3 +73,15 @@ def test_same_seed_same_result():
     main = [f"T{i}" for i in range(15)]
     prob = strength_model({name: 1.0 + i for i, name in enumerate(main + ["A", "B", "C", "D"])})
     assert t.simulate(PLAYIN, main, prob, n=200) == t.simulate(PLAYIN, main, prob, n=200)
+
+
+def test_swiss_structure_boxes_hold_the_right_number_of_teams():
+    main = [f"T{i}" for i in range(15)]
+    prob = strength_model({name: 1.0 + i for i, name in enumerate(main + ["A", "B", "C", "D"])})
+    sim = t.payload(PLAYIN, main, prob, short=lambda name: name, n=500)["swiss"]
+    expected = {g["record"]: g["expected"] for g in sim["rounds"][2]["groups"]}  # ronda 3
+    assert expected == {"2-0": 4, "1-1": 8, "0-2": 4}
+    assert sim["rounds"][1]["groups"][0]["best_of"] == 1  # 1-0 se juega al mejor de 1
+    assert sim["rounds"][2]["groups"][0]["best_of"] == 3  # 2-0 clasifica: Bo3
+    finals = {f["record"]: sum(x["p"] for x in f["teams"]) for f in sim["final"]}
+    assert abs(finals["3-0"] - 2) < 0.02 and abs(finals["0-3"] - 2) < 0.02

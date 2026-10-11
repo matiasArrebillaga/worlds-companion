@@ -1,7 +1,7 @@
 import { KNOCKOUT_LAYOUT, PLAYIN_LAYOUT, type Stage } from '../bracket';
 import { escapeHtml } from '../html';
-import type { BracketMatch, TournamentFile, TournamentTeam } from '../types';
-import { bracketGrid, chance, stageButtons } from './bracketGrid';
+import type { BracketMatch, TeamChance, TournamentFile, TournamentTeam } from '../types';
+import { bracketGrid, chance, recordTint, stageButtons } from './bracketGrid';
 import { teamTag } from './matchCard';
 import { how } from './ui';
 
@@ -41,28 +41,80 @@ function playinStage(t: TournamentFile, tz: string): string {
     ${table(t.playin.teams, [['p_win', 'Gana el Play-In']], new Map([['p_win', names(top(t.playin.teams, 'p_win', 1))]]))}`;
 }
 
+// Lista de equipos con su chance: los `slots` más probables resaltados (el pick), y unos pocos más, atenuados
+const EXTRA = 2;
+function chanceList(teams: TeamChance[], slots: number): string {
+  return teams.slice(0, slots + EXTRA).map((t, i) => `
+    <div class="ln${i < slots ? ' picked' : ' lose'}">${teamTag({ name: t.name, short: t.short })}<span class="s">${chance(t.p)}</span></div>`).join('');
+}
+
+// La suiza con la estructura de lolesports: por ronda, una caja por récord con la chance de cada equipo de llegar
+// a esa ronda con ese récord; al final, la chance de cada récord final
+const FINAL_SLOTS: Record<string, number> = { '3-0': 2, '3-1': 3, '3-2': 3, '0-3': 2, '1-3': 3, '2-3': 3 };
+
 function swissStage(t: TournamentFile): string {
   const swiss = t.swiss.teams;
   const s30 = top(swiss, 'p_3_0', 2);
   const s03 = top(swiss, 'p_0_3', 2);
   const adv = top(swiss, 'p_advance', 8);
-  return `
+  const summary = `
     <div class="pk-summary">
       <div><span class="label">3-0</span><b>${shorts(s30)}</b></div>
       <div><span class="label">0-3</span><b>${shorts(s03)}</b></div>
       <div><span class="label">Clasifican</span><b>${shorts(adv)}</b></div>
-    </div>
-    ${table(swiss, [['p_3_0', '3-0'], ['p_advance', 'Clasifica'], ['p_0_3', '0-3']],
-      new Map([['p_3_0', names(s30)], ['p_advance', names(adv)], ['p_0_3', names(s03)]]))}`;
+    </div>`;
+  if (!t.swiss.rounds || !t.swiss.final) return summary;
+  const columns = t.swiss.rounds.map((r) => `
+    <section class="sw-col">
+      <h2 class="day-title">Ronda ${r.round}</h2>
+      ${r.groups.map((g) => `
+        <div class="grp pr">
+          <div class="grp-h" style="${recordTint(g.record)}"><span>${g.record}</span><small>Bo${g.best_of}</small></div>
+          ${chanceList(g.teams, Math.round(g.expected))}
+        </div>`).join('')}
+    </section>`).join('');
+  const finalBox = (title: string, cls: 'q' | 'e', records: string[]) => `
+    <div class="grp end ${cls}"><div class="grp-h"><span>${title}</span></div>
+      ${records.map((rec) => {
+        const box = t.swiss.final!.find((f) => f.record === rec);
+        return `<div class="pr-final"><b>${rec}</b>${chanceList(box?.teams ?? [], FINAL_SLOTS[rec])}</div>`;
+      }).join('')}
+    </div>`;
+  return `${summary}
+    <p class="muted">Cada caja: chance de llegar a esa ronda con ese récord. Resaltados, los más probables (tantos como lugares tiene la caja, en promedio).</p>
+    <div class="sw-cols">${columns}
+      <section class="sw-col">
+        <h2 class="day-title">Final</h2>
+        ${finalBox('✓ Clasificados', 'q', ['3-0', '3-1', '3-2'])}
+        ${finalBox('✗ Eliminados', 'e', ['0-3', '1-3', '2-3'])}
+      </section>
+    </div>`;
 }
 
+// Eliminatoria: con los cuartos sorteados, el cuadro con los picks; antes, una columna por ronda con los
+// equipos que más chance tienen de llegar (cuartos 8 lugares, semis 4, final 2, campeón 1)
 function knockoutStage(t: TournamentFile, tz: string): string {
-  const bracket = t.knockout.bracket.length
-    ? bracketGrid(KNOCKOUT_LAYOUT, byKey(t.knockout.bracket), tz)
-    : '<p class="muted">Los picks partido por partido aparecen cuando se sorteen los cuartos.</p>';
-  return `${bracket}
-    ${table(t.knockout.teams, [['p_semis', 'Semis'], ['p_final', 'Final'], ['p_champion', 'Campeón']],
-      new Map([['p_champion', names(top(t.knockout.teams, 'p_champion', 1))]]))}`;
+  if (t.knockout.bracket.length) return bracketGrid(KNOCKOUT_LAYOUT, byKey(t.knockout.bracket), tz);
+  const teams = t.knockout.teams;
+  const advance = new Map(t.swiss.teams.map((r) => [r.name, r.p_advance ?? 0]));
+  const column = (title: string, slots: number, value: (r: TournamentTeam) => number) => {
+    const list = teams.map((r) => ({ name: r.name, short: r.short, p: value(r) }))
+      .filter((r) => r.p > 0).sort((a, b) => b.p - a.p);
+    return `
+      <section class="sw-col">
+        <h2 class="day-title">${title}</h2>
+        <div class="grp pr"><div class="grp-h"><span>${slots} ${slots === 1 ? 'lugar' : 'lugares'}</span><small>Bo5</small></div>
+          ${chanceList(list, slots)}</div>
+      </section>`;
+  };
+  return `
+    <p class="muted">Los picks partido por partido aparecen cuando se sorteen los cuartos. Mientras tanto: la chance de cada equipo de llegar a cada ronda.</p>
+    <div class="sw-cols">
+      ${column('Cuartos', 8, (r) => advance.get(r.name) ?? 0)}
+      ${column('Semis', 4, (r) => r.p_semis ?? 0)}
+      ${column('Final', 2, (r) => r.p_final ?? 0)}
+      ${column('Campeón', 1, (r) => r.p_champion ?? 0)}
+    </div>`;
 }
 
 export function tournamentView(t: TournamentFile | null, tz: string, stage: Stage): string {

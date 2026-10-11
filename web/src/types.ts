@@ -310,6 +310,21 @@ export interface TournamentFile {
   model_version: string;
   simulations: number;
   playin: { bracket: BracketMatch[]; teams: TournamentTeam[] };
-  swiss: { teams: TournamentTeam[] };
+  swiss: {
+    teams: TournamentTeam[];
+    rounds?: SwissProbRound[]; // por ronda, la chance de cada equipo de empezarla con cada récord
+    final?: { record: string; teams: TeamChance[] }[]; // chance de cada récord final (3-0 … 2-3)
+  };
   knockout: { bracket: BracketMatch[]; teams: TournamentTeam[] };
+}
+
+export interface TeamChance {
+  name: string;
+  short: string;
+  p: number;
+}
+
+export interface SwissProbRound {
+  round: number;
+  groups: { record: string; best_of: number; expected: number; teams: TeamChance[] }[];
 }

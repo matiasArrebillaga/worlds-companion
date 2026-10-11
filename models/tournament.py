@@ -140,9 +140,13 @@ def _pair(teams: list[str], met: dict[str, set], rng: random.Random) -> list[tup
     return list(zip(pool[::2], pool[1::2]))
 
 
-def play_swiss(teams: list[str], rounds: dict[int, list[dict]], decide, rng: random.Random) -> dict[str, list[int]]:
+def play_swiss(teams: list[str], rounds: dict[int, list[dict]], decide, rng: random.Random,
+               observe: Callable[[int, dict[str, tuple[int, int]]], None] | None = None) -> dict[str, list[int]]:
     """Juega las 5 rondas. Respeta los cruces publicados y los resultados reales; el resto se sortea entre
-    equipos con el mismo récord. Devuelve {equipo: [victorias, derrotas]}."""
+    equipos con el mismo récord. Devuelve {equipo: [victorias, derrotas]}.
+
+    `observe(ronda, récords)` recibe, antes de cada ronda, el récord de los equipos que siguen en juego.
+    """
     record = {t: [0, 0] for t in teams}
     met: dict[str, set] = {t: set() for t in teams}
     alive = lambda t: record[t][0] < TO_ADVANCE and record[t][1] < TO_ADVANCE  # noqa: E731
@@ -156,6 +160,8 @@ def play_swiss(teams: list[str], rounds: dict[int, list[dict]], decide, rng: ran
         met[b].add(a)
 
     for n in range(1, SWISS_ROUNDS + 1):
+        if observe:
+            observe(n, {t: (record[t][0], record[t][1]) for t in teams if alive(t)})
         fixed = set()
         for m in rounds.get(n, []):
             a, b = _team(m, "team1"), _team(m, "team2")
@@ -196,14 +202,22 @@ def simulate(schedule: list[dict], main_teams: list[str], prob: SeriesProb,
              n: int = SIMULATIONS, seed: int = SEED) -> dict[str, Counter]:
     """Juega el torneo n veces. `main_teams` son los clasificados directo a la suiza (sin el del Play-In).
 
-    Devuelve contadores por resultado: playin, swiss_3_0, swiss_advance, swiss_0_3, semis, final, champion.
+    Devuelve contadores por resultado: playin, swiss_3_0, swiss_advance, swiss_0_3, semis, final, champion;
+    además swiss_round[(ronda, victorias, derrotas, equipo)] (récord al empezar cada ronda) y
+    swiss_final[(victorias, derrotas, equipo)] (récord final).
     """
     rng = random.Random(seed)
     decide = sampler(prob, rng)
     playin = _by_key(schedule, PLAYIN_PREFIX)
     knockout = _by_key(schedule, KNOCKOUT_PREFIX)
     rounds = _swiss_rounds(schedule)
-    counts = {k: Counter() for k in ("playin", "swiss_3_0", "swiss_advance", "swiss_0_3", "semis", "final", "champion")}
+    counts = {k: Counter() for k in ("playin", "swiss_3_0", "swiss_advance", "swiss_0_3", "semis", "final", "champion",
+                                     "swiss_round", "swiss_final")}
+
+    def observe(round_n: int, records: dict[str, tuple[int, int]]) -> None:
+        for t, (w, l) in records.items():
+            counts["swiss_round"][(round_n, w, l, t)] += 1
+
     for _ in range(n):
         teams = list(main_teams)
         if playin:
@@ -211,7 +225,9 @@ def simulate(schedule: list[dict], main_teams: list[str], prob: SeriesProb,
             counts["playin"][qualifier] += 1
             if qualifier not in teams:
                 teams.append(qualifier)
-        record = play_swiss(teams, rounds, decide, rng)
+        record = play_swiss(teams, rounds, decide, rng, observe)
+        for t, (w, l) in record.items():
+            counts["swiss_final"][(w, l, t)] += 1
         advanced = [t for t, (w, _) in record.items() if w >= TO_ADVANCE]
         for t, (w, l) in record.items():
             if w >= TO_ADVANCE:
@@ -263,6 +279,36 @@ def chalk_bracket(matches: dict[str, dict], bracket: dict, labels: dict, prob: S
     return rows
 
 
+FINAL_RECORDS = [(3, 0), (3, 1), (3, 2), (0, 3), (1, 3), (2, 3)]
+MIN_SHARE = 0.005  # en las cajas no se listan los equipos con menos de medio punto de chance
+
+
+def swiss_structure(counts: dict[str, Counter], n: int, short: Callable[[str], str]) -> dict:
+    """La suiza en el formato de lolesports, con probabilidades: por ronda, una caja por récord con la chance de
+    cada equipo de empezar esa ronda con ese récord; al final, la chance de cada récord final (3-0 … 2-3)."""
+    def teams(entries: dict[str, int]) -> list[dict]:
+        out = [{"name": t, "short": short(t), "p": round(c / n, 4)} for t, c in entries.items() if c / n >= MIN_SHARE]
+        return sorted(out, key=lambda r: (-r["p"], r["short"]))
+
+    boxes: dict[tuple[int, int, int], dict[str, int]] = {}
+    for (round_n, w, l, t), c in counts["swiss_round"].items():
+        boxes.setdefault((round_n, w, l), {})[t] = c
+    rounds = []
+    for round_n in range(1, SWISS_ROUNDS + 1):
+        records = sorted({(w, l) for (r, w, l) in boxes if r == round_n}, key=lambda x: (-x[0], x[1]))
+        rounds.append({"round": round_n, "groups": [{
+            "record": f"{w}-{l}",
+            "best_of": 3 if TO_ADVANCE - 1 in (w, l) else 1,
+            "expected": round(sum(boxes[(round_n, w, l)].values()) / n, 2),  # cuántos equipos hay en promedio
+            "teams": teams(boxes[(round_n, w, l)]),
+        } for w, l in records]})
+    final: dict[tuple[int, int], dict[str, int]] = {}
+    for (w, l, t), c in counts["swiss_final"].items():
+        final.setdefault((w, l), {})[t] = c
+    return {"rounds": rounds,
+            "final": [{"record": f"{w}-{l}", "teams": teams(final.get((w, l), {}))} for w, l in FINAL_RECORDS]}
+
+
 def payload(schedule: list[dict], main_teams: list[str], prob: SeriesProb, short: Callable[[str], str],
             n: int = SIMULATIONS, seed: int = SEED) -> dict:
     """tournament.json: brackets del camino más probable + chances por equipo (en proporción, 0 a 1)."""
@@ -292,7 +338,8 @@ def payload(schedule: list[dict], main_teams: list[str], prob: SeriesProb, short
             "teams": rows(playin_teams, {"p_win": "playin"}, "p_win"),
         },
         "swiss": {"teams": rows(everyone, {"p_3_0": "swiss_3_0", "p_advance": "swiss_advance",
-                                           "p_0_3": "swiss_0_3"}, "p_advance")},
+                                           "p_0_3": "swiss_0_3"}, "p_advance"),
+                  **swiss_structure(counts, n, short)},
         "knockout": {
             # Picks por partido recién cuando se publiquen los cuartos (antes los cruces son un sorteo)
             "bracket": bracket(KNOCKOUT_PREFIX, KNOCKOUT_BRACKET, KNOCKOUT_LABELS) if quarters_known else [],

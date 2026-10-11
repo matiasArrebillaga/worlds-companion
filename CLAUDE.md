@@ -91,9 +91,11 @@ cd web && npm run build         # build de producción
     - Suiza: estructura de lolesports (columna por ronda, cajas por récord con Bo1/Bo3, Clasificados/Eliminados).
       En celular las rondas se apilan y la vista abre en la ronda en curso; nada se desliza de costado.
   - Predicciones: Aciertos (Resumen | Partidos acertados/errados) | Torneo | Cómo funciona.
-    Torneo (para los pick'ems): misma distribución que Bracket (Play-In · Suiza · Eliminatoria). En los cuadros, el
-    camino más probable (un pick por partido; eliminatorias cuando se sorteen los cuartos); en las tablas, chances por
-    equipo por Monte Carlo (gana el Play-In; 3-0 / clasifica / 0-3; semis / final / campeón).
+    Torneo (para los pick'ems): misma distribución y formato que Bracket (Play-In · Suiza · Eliminatoria), con
+    probabilidades. Play-In: cuadro con el camino más probable (pick y % por partido). Suiza: columnas por ronda con
+    la chance de cada equipo de llegar con cada récord, y Clasificados/Eliminados con la chance de cada récord final.
+    Eliminatoria: hasta el sorteo, columnas Cuartos/Semis/Final/Campeón con la chance de llegar; después, cuadro de
+    picks. Los más probables van resaltados (tantos como lugares). Chances por Monte Carlo.
     Sale de `tournament.json`, se recalcula en cada build y no cuenta para Aciertos.
 - **Equipos** (`#/equipos`): Equipos | Jugadores | Análisis (temporada vs. contra equipos de Worlds, forma del modelo), con páginas por
   equipo y por jugador.

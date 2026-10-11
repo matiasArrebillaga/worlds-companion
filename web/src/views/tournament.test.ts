@@ -13,7 +13,11 @@ const sample: TournamentFile = {
     ],
     teams: [{ ...team('KC'), p_win: 0.6 }, { ...team('FUR'), p_win: 0.4 }],
   },
-  swiss: { teams: [{ ...team('GEN'), p_3_0: 0.5, p_advance: 0.98, p_0_3: 0.001 }, { ...team('CFO'), p_3_0: 0, p_advance: 0.1, p_0_3: 0.7 }] },
+  swiss: {
+    teams: [{ ...team('GEN'), p_3_0: 0.5, p_advance: 0.98, p_0_3: 0.001 }, { ...team('CFO'), p_3_0: 0, p_advance: 0.1, p_0_3: 0.7 }],
+    rounds: [{ round: 2, groups: [{ record: '1-0', best_of: 1, expected: 1, teams: [{ ...team('GEN'), p: 0.83 }, { ...team('CFO'), p: 0.17 }] }] }],
+    final: [{ record: '3-0', teams: [{ ...team('GEN'), p: 0.56 }] }],
+  },
   knockout: { bracket: [], teams: [{ ...team('GEN'), p_semis: 0.9, p_final: 0.7, p_champion: 0.6 }] },
 };
 
@@ -29,14 +33,24 @@ describe('chance', () => {
 describe('tournamentView', () => {
   it('draws the Play-In with real results and projected picks', () => {
     const html = tournamentView(sample, 'UTC', 'playin');
-    expect(html).toContain('Si se cumple lo anterior'); // la gran final es proyectada
     expect(html).toContain('title="Victoria">V'); // la semi ya se jugó
-    expect(html).toContain('70%'); // KC en la gran final
+    expect(html).toContain('70%'); // KC en la gran final (proyectada)
     expect(html).toContain('Final de ganadores'); // lugar del cuadro todavía sin partido
+    expect(html).not.toContain('Si se cumple lo anterior');
   });
 
-  it('suggests the Swiss pick\'em', () => {
-    expect(tournamentView(sample, 'UTC', 'suiza')).toContain('Pick sugerido');
+  it('draws the Swiss structure with the chance of each record', () => {
+    const html = tournamentView(sample, 'UTC', 'suiza');
+    expect(html).toContain('Ronda 2');
+    expect(html).toContain('83%'); // GEN llega 1-0 a la ronda 2
+    expect(html).toContain('56%'); // GEN termina 3-0
+    expect(html).toContain('Clasificados');
+  });
+
+  it('shows the chance of reaching each knockout round before the draw', () => {
+    const html = tournamentView(sample, 'UTC', 'eliminatoria');
+    expect(html).toContain('Campeón');
+    expect(html).toContain('60%');
   });
 
   it('has an empty state without data', () => {

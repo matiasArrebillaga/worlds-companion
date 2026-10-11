@@ -2,6 +2,7 @@ import type { Layout, Stage } from '../bracket';
 import { STAGES } from '../bracket';
 import { formatTime } from '../format';
 import { escapeHtml } from '../html';
+import { PENDING } from '../swiss';
 import type { BracketMatch } from '../types';
 import { teamTag } from './matchCard';
 
@@ -13,6 +14,15 @@ export function chance(p: number): string {
   if (p > 0 && p < 0.005) return '<1%';
   if (p < 1 && p > 0.995) return '>99%';
   return `${Math.round(p * 100)}%`;
+}
+
+// Encabezado de la caja: más verde cuantas más victorias, más rojo cuantas más derrotas
+export function recordTint(record: string): string {
+  if (record === PENDING) return '--amt:0%';
+  const [w, l] = record.split('-').map(Number);
+  const balance = w - l;
+  if (balance === 0) return '--amt:0%';
+  return `--tint:var(${balance > 0 ? '--win' : '--loss'});--amt:${Math.min(60, Math.abs(balance) * 22)}%`;
 }
 
 function side(m: BracketMatch, which: 'team1' | 'team2'): string {
@@ -29,9 +39,7 @@ function side(m: BracketMatch, which: 'team1' | 'team2'): string {
 }
 
 export function bracketBox(m: BracketMatch, tz: string): string {
-  const when = m.status === 'finished' ? 'Final'
-    : m.status === 'projected' ? 'Si se cumple lo anterior'
-    : m.start_utc ? formatTime(m.start_utc, tz) : 'a confirmar';
+  const when = m.status === 'finished' ? 'Final' : m.start_utc ? formatTime(m.start_utc, tz) : 'a confirmar';
   return `
     <div class="grp pk">
       <div class="grp-h"><span>${escapeHtml(m.label)}</span><small>Bo${m.best_of}</small></div>

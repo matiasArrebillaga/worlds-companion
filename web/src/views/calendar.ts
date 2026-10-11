@@ -6,7 +6,7 @@ import { dayKeyOf, featuredMatch, groupByDay, recentResults } from '../schedule'
 import { PENDING, swissRounds, swissStandings } from '../swiss';
 import { teamMark, teamRegionColor } from '../theme/regions';
 import type { Match, Team } from '../types';
-import { bracketGrid, stageButtons } from './bracketGrid';
+import { bracketGrid, recordTint, stageButtons } from './bracketGrid';
 import { matchCard, predictionBlock, teamTag } from './matchCard';
 import { BO1_NOTE, handlePredictionsClick, predictionsView } from './predictions';
 
@@ -126,15 +126,6 @@ function teamLine(m: Match, side: 'team1' | 'team2'): string {
 function matchup(m: Match): string {
   const up = m.winner ? '' : ' up';
   return `<div class="mu${up}">${teamLine(m, 'team1')}<span class="vs">VS</span>${teamLine(m, 'team2')}</div>`;
-}
-
-// Encabezado de la caja: más verde cuantas más victorias, más rojo cuantas más derrotas
-function recordTint(record: string): string {
-  if (record === PENDING) return '--amt:0%';
-  const [w, l] = record.split('-').map(Number);
-  const balance = w - l;
-  if (balance === 0) return '--amt:0%';
-  return `--tint:var(${balance > 0 ? '--win' : '--loss'});--amt:${Math.min(60, Math.abs(balance) * 22)}%`;
 }
 
 function endBox(title: string, cls: 'q' | 'e', slots: [string, (w: number, l: number) => boolean][], standings: [string, Team][], records: Map<string, { wins: number; losses: number }>): string {
