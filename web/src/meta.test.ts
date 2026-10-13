@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { defaultSample, flexPicks, minutes, mirages, paceRows, presenceShifts, range, sampleOptions, sideVerdict } from './meta';
+import { adjustedWinrate, defaultSample, flexPicks, kOptions, minutes, mirages, paceRows, presenceShifts, range, sampleOptions, sideVerdict } from './meta';
 import type { ChampionEntry, Meta } from './types';
 
 const base: Meta = { updated_at: 'x', source_fetched_at: 'x', match_count: 1 };
@@ -83,5 +83,23 @@ describe('flexPicks', () => {
     const rows = [champ('Flex', { picks: 7, roles: { mid: 2, top: 5 } }), champ('OneOff', { picks: 6, roles: { mid: 5, bot: 1 } }),
       champ('Solo', { picks: 9, roles: { jng: 9 } })];
     expect(flexPicks(rows)).toEqual([{ champion: 'Flex', picks: 7, roles: [['top', 5], ['mid', 2]] }]);
+  });
+});
+
+describe('adjusted winrate selector', () => {
+  it('adds k imaginary games at 50%', () => {
+    expect(adjustedWinrate({ wins: 5, picks: 5 }, 0)).toBe(1);
+    expect(adjustedWinrate({ wins: 5, picks: 5 }, 50)).toBeCloseTo(30 / 55);
+    expect(adjustedWinrate({ wins: 180, picks: 300 }, 300)).toBeCloseTo(0.55);
+  });
+
+  it('has no winrate without picks', () => {
+    expect(adjustedWinrate({ wins: 0, picks: 0 }, 272)).toBeNull();
+  });
+
+  it('puts the estimated k among the fixed options, in order and without repeats', () => {
+    expect(kOptions(272)).toEqual([50, 100, 200, 272, 400]);
+    expect(kOptions(100)).toEqual([50, 100, 200, 400]);
+    expect(kOptions(undefined)).toEqual([50, 100, 200, 400]);
   });
 });

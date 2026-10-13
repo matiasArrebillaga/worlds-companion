@@ -3,7 +3,7 @@ import { PHASE_LABELS } from '../format';
 import { escapeHtml } from '../html';
 import { go, pick } from '../router';
 import { withTransition } from './layout';
-import { defaultSample, flexPicks, minutes, mirages, paceRows, PHASES, presenceShifts, range, sampleOptions, sideVerdict } from '../meta';
+import { adjustedWinrate, defaultSample, flexPicks, kOptions, minutes, mirages, paceRows, PHASES, presenceShifts, range, sampleOptions, sideVerdict } from '../meta';
 import { FEW_GAMES, fmt, pct, ROLE_LABELS, signed, sortBy } from '../stats';
 import type { ChampionEntry, MetaSample, SampleId, SideSplit, WinrateNoise } from '../types';
 import { champHex } from './player';
@@ -17,7 +17,9 @@ const NOISE_MIN_PICKS = 5; // igual que en pipeline/meta.py
 
 // Estado mientras la página esté abierta; la muestra se elige la primera vez según los datos
 const state = { sample: null as SampleId | null, view: 'principal' as View, sort: 'presence', dir: 'desc' as Dir,
-  query: '' };
+  query: '', k: null as number | null, kInfo: false };
+// k con el que se muestra el % ajustado de la tabla: el elegido o, si no, el estimado por el pipeline. Se fija en cada render
+let shownK: number | undefined;
 
 function empty(): string {
   return '<div class="state"><b>Todavía no hay partidas de Worlds 2026</b><span>El meta del torneo aparece después de las primeras partidas.</span></div>';
@@ -44,11 +46,30 @@ const COL = {
   dpm: { id: 'dpm', label: 'DPM', hint: 'daño/min', value: (c) => c.dpm ?? null, show: (c) => fmt(c.dpm ?? null), kind: 'count' },
   cs_min: { id: 'cs_min', label: 'CS/min', value: (c) => c.cs_min ?? null, show: (c) => fmt(c.cs_min ?? null, 1), kind: 'count' },
   kp: rate('kp', 'KP', 'part. kills'),
-  winrate_adj: { id: 'winrate_adj', label: '% Vict.', hint: 'ajustado', value: (c) => c.winrate_adj ?? null, show: (c) => pct(c.winrate_adj ?? null),
+  winrate_adj: { id: 'winrate_adj', label: '% Vict.', hint: 'ajustado', value: (c) => adjusted(c), show: (c) => pct(adjusted(c)),
     sub: (c) => `${pct(c.winrate)} crudo`, kind: 'diverge', ref: 0.5 },
   range: { id: 'range', label: 'Rango 95%', hint: 'del % real', value: (c) => c.winrate_low ?? null, show: (c) => range(c.winrate_low, c.winrate_high),
     bar: (c) => whisker(c.winrate_low, c.winrate_high, c.winrate, 0.1, 0.9), kind: 'share', wide: true },
 } satisfies Record<string, Column<ChampionEntry>>;
+
+// Sin k conocido (champions.json viejo) se usa el ajustado que ya viene calculado
+function adjusted(c: ChampionEntry): number | null {
+  return shownK === undefined ? c.winrate_adj ?? null : adjustedWinrate(c, shownK);
+}
+
+// Selector de k (solo en la vista Resultado) con su explicación plegable
+function kPicker(estimated: number | undefined): string {
+  if (shownK === undefined) return '';
+  const options = kOptions(estimated).map((v): [string, string] => [String(v), String(v)]);
+  const streak = (k: number) => pct(adjustedWinrate({ wins: 5, picks: 5 }, k));
+  const why = estimated
+    ? ` <b>Por qué ${estimated}:</b> es el que estima el modelo según cuánto se diferencian de verdad los campeones en las ligas de la temporada (unos ±3 puntos). Probado con partidas que el ajuste no había visto, fue el que mejor predijo; con 50 o 100 predice peor.`
+    : '';
+  return `<div class="kpick">${chips('k', options, String(shownK), 'k')}
+      <button type="button" class="kinfo" data-kinfo aria-expanded="${state.kInfo}" aria-controls="k-info" aria-label="Qué es k">!</button></div>
+    <p id="k-info" class="k-note"${state.kInfo ? '' : ' hidden'}><b>Qué es:</b> cuántas partidas imaginarias al 50% se le suman a cada campeón antes de calcular su % de victorias, para que una racha corta no lo ponga primero. Un 5-0 queda en ${streak(50)} con k = 50 y en ${streak(400)} con k = 400.
+      <b>Cómo usarlo:</b> con k chico manda el récord y suben los campeones con pocas partidas y buena racha; con k grande todo se pega al 50% y solo se despegan los que tienen muchas partidas. Si un campeón queda arriba con cualquier k, su % es sólido.${why}</p>`;
+}
 
 // Draft y Rendimiento juntos; Resultado aparte
 const VIEWS: Record<View, [string, [string, Column<ChampionEntry>[]][]]> = {
@@ -77,7 +98,8 @@ function champions(rows: ChampionEntry[], k: number | undefined): string {
   const views = chips('view', Object.entries(VIEWS).map(([id, [label]]) => [id, label]), state.view, 'Vista');
   const legend = columns.includes(COL.presence)
     ? '<div class="legend"><span><i class="lg-pick"></i>Pick</span><span><i class="lg-ban"></i>Ban</span><span>Presencia = las dos juntas</span></div>' : '';
-  const kk = k ?? 'k';
+  shownK = state.k ?? k;
+  const kk = shownK ?? 'k';
   return `
     ${leaders([
       { column: COL.presence, label: 'Más presente', rows },
@@ -85,7 +107,7 @@ function champions(rows: ChampionEntry[], k: number | undefined): string {
       { column: COL.winrate_adj, label: 'Mejor % ajustado', rows: played },
       { column: COL.dpm, label: 'Más daño', rows: played },
     ], champWho)}
-    <div class="tools">${searchBox(state.query, 'Buscar campeón')}${views}${sortBar(columns, sort.id, state.dir)}${legend}</div>
+    <div class="tools">${searchBox(state.query, 'Buscar campeón')}${views}${state.view === 'resultado' ? kPicker(k) : ''}${sortBar(columns, sort.id, state.dir)}${legend}</div>
     ${championTable(rows, groups, sort)}
     ${how(`Presencia = % pick + % ban: cuánto le importa el campeón al meta. Uno que se banea siempre tiene 0 picks y 100% de presencia. Prioridad = % de partidas en que se elige en la primera rotación (los 6 primeros picks) o se banea en la primera fase de bans: mide qué se considera imprescindible, no qué gana más. KDA, CS/min, DPM y KP son de los jugadores que lo usaron. El % de victorias es el ajustado: (victorias + ${kk}/2) / (picks + ${kk}), o sea ${kk} partidas "imaginarias" al 50%; abajo va el crudo. Rango = dónde está el % real con 95% de confianza: si cruza la línea dorada del 50%, no se distingue de una moneda.`)}`;
 }
@@ -238,7 +260,15 @@ export function renderMeta(el: HTMLElement, data: SiteData, tabParam: string | n
       });
       return;
     }
+    if (d.kinfo !== undefined) {
+      // Se abre y cierra sin redibujar: el foco queda en el botón
+      state.kInfo = !state.kInfo;
+      button.setAttribute('aria-expanded', String(state.kInfo));
+      el.querySelector<HTMLElement>('#k-info')?.toggleAttribute('hidden', !state.kInfo);
+      return;
+    }
     if (d.sample) state.sample = d.sample as SampleId;
+    else if (d.k) state.k = Number(d.k);
     else if (d.view) { state.view = d.view as View; state.dir = 'desc'; }
     else if (d.dir !== undefined) state.dir = state.dir === 'desc' ? 'asc' : 'desc';
     else if (d.sort) {

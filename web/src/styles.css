@@ -294,6 +294,13 @@ h1 a { text-decoration: none; }
 .lg-solid { background: var(--fg); }
 .lg-band { height: 10px !important; background: var(--cyan-soft); }
 
+.kpick { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.kinfo { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-ctl); background: transparent; color: var(--gold);
+  font: 700 15px/1 var(--f-data); cursor: pointer; }
+.kinfo:hover, .kinfo[aria-expanded="true"] { background: var(--raised); }
+.k-note { margin: 0; max-width: 68ch; font-size: 14.5px; color: var(--fg); }
+.k-note b { color: var(--gold); font-weight: 600; }
+
 details.how { border-top: 1px solid var(--line); padding-top: 10px; font-size: 14.5px; color: var(--fg2); }
 details.how summary { cursor: pointer; list-style: none; display: inline-flex; gap: 8px; align-items: center; min-height: 32px;
   font: 500 12px/1 var(--f-data); letter-spacing: .1em; text-transform: uppercase; color: var(--fg2); }

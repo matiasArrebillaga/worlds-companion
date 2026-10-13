@@ -15,6 +15,17 @@ export function defaultSample(meta: Meta): SampleId {
   return meta.guide_patch ? 'guide' : 'worlds';
 }
 
+// % de victorias ajustado con otro k (igual que pipeline/meta.py · adjust_winrates): k partidas imaginarias al 50%
+export function adjustedWinrate(c: { wins: number; picks: number }, k: number): number | null {
+  return c.picks ? (c.wins + k / 2) / (c.picks + k) : null;
+}
+
+// Opciones del selector de k: valores fijos para comparar más el estimado por el pipeline, en orden y sin repetir
+const K_FIXED = [50, 100, 200, 400];
+export function kOptions(estimated: number | undefined): number[] {
+  return [...new Set(estimated ? [...K_FIXED, estimated] : K_FIXED)].sort((a, b) => a - b);
+}
+
 // 31.5 → "31:30"; un dato faltante es "—", nunca 0
 export function minutes(value: number | null): string {
   if (value === null) return '—';
