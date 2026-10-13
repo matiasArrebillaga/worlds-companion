@@ -544,7 +544,7 @@ footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line
     <span class="frac"><span><var>p̂</var> + <span class="frac"><span><var>z</var>²</span><span>2<var>n</var></span></span> ± <var>z</var> √(<span class="frac"><span><var>p̂</var>(1−<var>p̂</var>)</span><span><var>n</var></span></span> + <span class="frac"><span><var>z</var>²</span><span>4<var>n</var>²</span></span>)</span><span>1 + <span class="frac"><span><var>z</var>²</span><span><var>n</var></span></span></span></span>
   </div>
   <p>Con 3 de 3 da [43,9%, 100%]: "puede ser muy bueno, pero también uno del montón". Con 1 de 10 da [1,8%, 40,4%].</p>
-  <p>Aparece en los % de victorias de equipos y campeones, en el % del lado azul y en el de cada región. Ejemplo real: Rumble ganó 46 de sus 77 partidas en las ligas en los parches 16.17–16.18 (59,7%), con rango [48,6%, 70,0%]. El rango todavía toca el 50%: con estas partidas no se puede descartar que sea un campeón promedio.</p>
+  <p>Aparece en los % de victorias de equipos y campeones, en el % del lado azul y en el de cada región. Ejemplo real: Rumble ganó 47 de sus 77 partidas en las ligas en los parches 16.17–16.18 (61,0%), con rango [49,9%, 71,2%]. El rango todavía toca el 50%: con estas partidas no se puede descartar que sea un campeón promedio.</p>
   <div class="why"><b>Cómo se usa para comparar</b>
     <p>Si los rangos de dos equipos se superponen mucho, con estos datos no se puede decir cuál es mejor. Es una regla práctica, no un test formal (dos intervalos pueden superponerse un poco y la diferencia ser real), pero evita el error más común: tomar 62% contra 58% como una diferencia cuando cada uno tiene ±15 puntos de incertidumbre.</p>
   </div>
@@ -554,7 +554,7 @@ footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line
   <p>Si se ordena la tabla de campeones por % de victorias crudo, arriba quedan los que jugaron 5 partidas y tuvieron suerte. El intervalo de Wilson avisa del problema, pero no da un número para ordenar. Para eso está el <b>% ajustado</b> (<code>pipeline/meta.py · adjust_winrates</code>):</p>
   <div class="eq"><span class="lbl">% de victorias ajustado</span>
     <span class="frac"><span>victorias + <var>k</var>/2</span><span>picks + <var>k</var></span></span>
-    &nbsp;&nbsp;&nbsp; con &nbsp;&nbsp;&nbsp; <var>k</var> = 269
+    &nbsp;&nbsp;&nbsp; con &nbsp;&nbsp;&nbsp; <var>k</var> = 272
   </div>
   <p>Es como sumarle a cada campeón <var>k</var> partidas imaginarias, la mitad ganadas. También se puede leer como un promedio ponderado entre el dato del campeón y el 50%: el dato pesa <span class="m">picks / (picks + k)</span>. Un campeón con <var>k</var> picks propios pesa lo mismo que el 50%.</p>
   <div class="tbl"><table>
@@ -562,18 +562,19 @@ footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line
     <tbody>
       <tr><td>Lux</td><td class="num">5-0</td><td class="num">100%</td><td class="num">2%</td><td class="num">50,9%</td></tr>
       <tr><td>Zaahen</td><td class="num">1-7</td><td class="num">12,5%</td><td class="num">3%</td><td class="num">48,9%</td></tr>
-      <tr><td>Rumble</td><td class="num">46-31</td><td class="num">59,7%</td><td class="num">22%</td><td class="num">52,2%</td></tr>
-      <tr><td>Ezreal</td><td class="num">43-29</td><td class="num">59,7%</td><td class="num">21%</td><td class="num">52,1%</td></tr>
+      <tr><td>Rumble</td><td class="num">47-30</td><td class="num">61,0%</td><td class="num">22%</td><td class="num">52,4%</td></tr>
+      <tr><td>Ezreal</td><td class="num">41-30</td><td class="num">57,7%</td><td class="num">21%</td><td class="num">51,6%</td></tr>
     </tbody>
   </table></div>
   <h3>Es la misma idea que el ajuste por región</h3>
   <p>En estadística esto se llama <b>encogimiento bayesiano</b>. Partimos de una creencia previa, "los campeones son bastante parejos, cerca de 50%", y los datos la van corrigiendo. Con pocos datos manda la creencia; con muchos, mandan los datos. Es lo mismo que hacen los ajustes regionales del Elo (sección 4) y la forma que arranca en 0 (sección 6). Técnicamente es la media de la distribución <em>a posteriori</em> con un prior Beta(<var>k</var>/2, <var>k</var>/2).</p>
-  <h3>De dónde sale k = 269</h3>
+  <h3>De dónde sale k = 272</h3>
   <p><var>k</var> no se elige a ojo: depende de cuánto difieren <em>de verdad</em> los campeones. Si fueran todos muy distintos, un 60% sería creíble enseguida y <var>k</var> sería chico. Si son casi iguales, hacen falta muchas partidas para creerle a un número lejos de 50%, y <var>k</var> es grande. La fórmula es</p>
   <div class="eq"><span class="lbl">Fuerza del prior (pipeline/meta.py · prior_picks)</span>
     <var>k</var> = <span class="frac"><span><var>p̄</var>(1 − <var>p̄</var>)</span><span><var>τ</var>²</span></span> ≈ <span class="frac"><span>0,25</span><span><var>τ</var>²</span></span>
   </div>
-  <p>donde <var>τ</var>² es la varianza de la fuerza real de los campeones, que se estima en la sección siguiente con toda la temporada de las ligas (campeones con 20 picks o más). Que <var>k</var> dé 269 significa <span class="m">τ ≈ 3</span> puntos: el campeón típico es apenas 3 puntos mejor o peor que el promedio. Las diferencias grandes que se ven en las tablas son casi todas azar.</p>
+  <p>donde <var>τ</var>² es la varianza de la fuerza real de los campeones, que se estima en la sección siguiente con toda la temporada de las ligas (campeones con 20 picks o más). Que <var>k</var> dé 272 significa <span class="m">τ ≈ 3</span> puntos: el campeón típico es apenas 3 puntos mejor o peor que el promedio. Las diferencias grandes que se ven en las tablas son casi todas azar.</p>
+  <p>Para comprobarlo, se calculó el ajustado con una parte de las partidas y se midió cuánto erraba contra partidas que no había visto (<b>validación predictiva</b>). El <var>k</var> estimado fue el que mejor predijo; con 25, 50 o 100 el error crece rápido, y entre 200 y 400 casi no cambia. En Meta → Campeones → Resultado se puede elegir otro <var>k</var> (de 25 a 400) para ver cómo cambia el orden: un campeón que queda arriba con cualquier <var>k</var> tiene un % sólido.</p>
   <div class="warn"><b>Espejismos</b>
     <p>En Meta → Panorama, "espejismos" son los campeones (desde 5 picks) cuyo porcentaje más cambia al ajustarlo. Un 0% o 100% con 1 pick es obviamente azar; lo engañoso es un 73% con 15 picks, que parece sólido y no lo es. El ajuste no castiga a los buenos: con suficientes partidas el dato domina.</p>
   </div>
@@ -599,14 +600,14 @@ footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line
   <div class="tbl"><table>
     <thead><tr><th>Ligas, parches 16.17–16.18 (campeones con 5+ picks)</th><th class="num">Valor</th></tr></thead>
     <tbody>
-      <tr><td>Campeones / picks</td><td class="num">93 / 3013</td></tr>
-      <tr><td>Varianza observada de los %</td><td class="num">0,00931</td></tr>
-      <tr><td>Varianza que daría el azar</td><td class="num">0,00763</td></tr>
-      <tr><td><b>Parte que es ruido</b></td><td class="num"><b>82%</b></td></tr>
-      <tr><td>Desvío real entre campeones (τ)</td><td class="num">≈ 4,1 puntos</td></tr>
+      <tr><td>Campeones / picks</td><td class="num">94 / 3007</td></tr>
+      <tr><td>Varianza observada de los %</td><td class="num">0,00843</td></tr>
+      <tr><td>Varianza que daría el azar</td><td class="num">0,00773</td></tr>
+      <tr><td><b>Parte que es ruido</b></td><td class="num"><b>92%</b></td></tr>
+      <tr><td>Desvío real entre campeones (τ)</td><td class="num">≈ 2,7 puntos</td></tr>
     </tbody>
   </table></div>
-  <p>De cada 10 unidades de dispersión en la tabla de campeones, 8 son azar. Por eso el sitio muestra rangos, ordena por el ajustado y publica este número en Meta → Panorama. En Worlds, con muchas menos partidas, la parte de ruido es todavía mayor.</p>
+  <p>De cada 10 unidades de dispersión en la tabla de campeones, 9 son azar. Por eso el sitio muestra rangos, ordena por el ajustado y publica este número en Meta → Panorama. En Worlds, con muchas menos partidas, la parte de ruido es todavía mayor.</p>
 
   <!-- 16 -->
   <h2 id="lados"><span class="n">16</span>Lados, ritmo y regiones</h2>

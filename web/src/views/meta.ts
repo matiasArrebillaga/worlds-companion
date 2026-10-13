@@ -57,17 +57,17 @@ function adjusted(c: ChampionEntry): number | null {
   return shownK === undefined ? c.winrate_adj ?? null : adjustedWinrate(c, shownK);
 }
 
-// Selector de k (solo en la vista Resultado) con su explicación plegable
+// Lista desplegable de k (solo en la vista Resultado, al lado de los chips de vista) con su explicación plegable
 function kPicker(estimated: number | undefined): string {
   if (shownK === undefined) return '';
-  const options = kOptions(estimated).map((v): [string, string] => [String(v), String(v)]);
+  const options = kOptions(estimated).map((v) => `<option value="${v}"${v === shownK ? ' selected' : ''}>${v}</option>`).join('');
   const streak = (k: number) => pct(adjustedWinrate({ wins: 5, picks: 5 }, k));
   const why = estimated
-    ? ` <b>Por qué ${estimated}:</b> es el que estima el modelo según cuánto se diferencian de verdad los campeones en las ligas de la temporada (unos ±3 puntos). Probado con partidas que el ajuste no había visto, fue el que mejor predijo; con 50 o 100 predice peor.`
+    ? ` <b>Por qué ${estimated}:</b> es el que estima el modelo según cuánto se diferencian de verdad los campeones en las ligas de la temporada (unos ±3 puntos). Probado con partidas que el ajuste no había visto, fue el que mejor predijo; con 25, 50 o 100 predice peor.`
     : '';
-  return `<div class="kpick">${chips('k', options, String(shownK), 'k')}
-      <button type="button" class="kinfo" data-kinfo aria-expanded="${state.kInfo}" aria-controls="k-info" aria-label="Qué es k">!</button></div>
-    <p id="k-info" class="k-note"${state.kInfo ? '' : ' hidden'}><b>Qué es:</b> cuántas partidas imaginarias al 50% se le suman a cada campeón antes de calcular su % de victorias, para que una racha corta no lo ponga primero. Un 5-0 queda en ${streak(50)} con k = 50 y en ${streak(400)} con k = 400.
+  return `<label class="label" for="k-select">k</label><select id="k-select" data-kselect>${options}</select>
+      <button type="button" class="kinfo" data-kinfo aria-expanded="${state.kInfo}" aria-controls="k-info" aria-label="Qué es k">!</button>
+    <p id="k-info" class="k-note"${state.kInfo ? '' : ' hidden'}><b>Qué es:</b> cuántas partidas imaginarias al 50% se le suman a cada campeón antes de calcular su % de victorias, para que una racha corta no lo ponga primero. Un 5-0 queda en ${streak(25)} con k = 25 y en ${streak(400)} con k = 400.
       <b>Cómo usarlo:</b> con k chico manda el récord y suben los campeones con pocas partidas y buena racha; con k grande todo se pega al 50% y solo se despegan los que tienen muchas partidas. Si un campeón queda arriba con cualquier k, su % es sólido.${why}</p>`;
 }
 
@@ -107,7 +107,7 @@ function champions(rows: ChampionEntry[], k: number | undefined): string {
       { column: COL.winrate_adj, label: 'Mejor % ajustado', rows: played },
       { column: COL.dpm, label: 'Más daño', rows: played },
     ], champWho)}
-    <div class="tools">${searchBox(state.query, 'Buscar campeón')}${views}${state.view === 'resultado' ? kPicker(k) : ''}${sortBar(columns, sort.id, state.dir)}${legend}</div>
+    <div class="tools">${searchBox(state.query, 'Buscar campeón')}<div class="kpick">${views}${state.view === 'resultado' ? kPicker(k) : ''}</div>${sortBar(columns, sort.id, state.dir)}${legend}</div>
     ${championTable(rows, groups, sort)}
     ${how(`Presencia = % pick + % ban: cuánto le importa el campeón al meta. Uno que se banea siempre tiene 0 picks y 100% de presencia. Prioridad = % de partidas en que se elige en la primera rotación (los 6 primeros picks) o se banea en la primera fase de bans: mide qué se considera imprescindible, no qué gana más. KDA, CS/min, DPM y KP son de los jugadores que lo usaron. El % de victorias es el ajustado: (victorias + ${kk}/2) / (picks + ${kk}), o sea ${kk} partidas "imaginarias" al 50%; abajo va el crudo. Rango = dónde está el % real con 95% de confianza: si cruza la línea dorada del 50%, no se distingue de una moneda.`)}`;
 }
@@ -268,7 +268,6 @@ export function renderMeta(el: HTMLElement, data: SiteData, tabParam: string | n
       return;
     }
     if (d.sample) state.sample = d.sample as SampleId;
-    else if (d.k) state.k = Number(d.k);
     else if (d.view) { state.view = d.view as View; state.dir = 'desc'; }
     else if (d.dir !== undefined) state.dir = state.dir === 'desc' ? 'asc' : 'desc';
     else if (d.sort) {
@@ -285,6 +284,12 @@ export function renderMeta(el: HTMLElement, data: SiteData, tabParam: string | n
   };
   el.onchange = (event) => {
     const select = event.target as HTMLSelectElement;
+    if (select.dataset.kselect !== undefined) {
+      state.k = Number(select.value);
+      renderMeta(el, data, tab);
+      el.querySelector<HTMLSelectElement>('#k-select')?.focus();
+      return;
+    }
     if (select.dataset.sortselect === undefined) return;
     state.sort = select.value;
     state.dir = 'desc';

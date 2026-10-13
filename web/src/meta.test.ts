@@ -98,8 +98,8 @@ describe('adjusted winrate selector', () => {
   });
 
   it('puts the estimated k among the fixed options, in order and without repeats', () => {
-    expect(kOptions(272)).toEqual([50, 100, 200, 272, 400]);
-    expect(kOptions(100)).toEqual([50, 100, 200, 400]);
-    expect(kOptions(undefined)).toEqual([50, 100, 200, 400]);
+    expect(kOptions(272)).toEqual([25, 50, 100, 200, 272, 400]);
+    expect(kOptions(100)).toEqual([25, 50, 100, 200, 400]);
+    expect(kOptions(undefined)).toEqual([25, 50, 100, 200, 400]);
   });
 });

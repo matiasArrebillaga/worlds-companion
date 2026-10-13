@@ -21,7 +21,7 @@ export function adjustedWinrate(c: { wins: number; picks: number }, k: number): 
 }
 
 // Opciones del selector de k: valores fijos para comparar más el estimado por el pipeline, en orden y sin repetir
-const K_FIXED = [50, 100, 200, 400];
+const K_FIXED = [25, 50, 100, 200, 400];
 export function kOptions(estimated: number | undefined): number[] {
   return [...new Set(estimated ? [...K_FIXED, estimated] : K_FIXED)].sort((a, b) => a - b);
 }

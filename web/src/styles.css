@@ -295,6 +295,8 @@ h1 a { text-decoration: none; }
 .lg-band { height: 10px !important; background: var(--cyan-soft); }
 
 .kpick { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.kpick select { min-height: 44px; padding: 0 12px; background: var(--sunken); border: 1px solid var(--line-ctl); color: var(--fg); font: 500 14px var(--f-data); }
+.k-note { flex-basis: 100%; }
 .kinfo { width: 32px; height: 32px; border-radius: 50%; border: 1px solid var(--line-ctl); background: transparent; color: var(--gold);
   font: 700 15px/1 var(--f-data); cursor: pointer; }
 .kinfo:hover, .kinfo[aria-expanded="true"] { background: var(--raised); }
