@@ -191,7 +191,9 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 .pred { display: grid; gap: 6px; font: 500 15px/1 var(--f-data); font-variant-numeric: tabular-nums; color: var(--fg2); }
 .pred .fav { color: var(--gold); font-weight: 700; }
 .pred .ends { display: flex; justify-content: space-between; gap: 8px; }
-.pred .track { display: flex; gap: 3px; height: 10px; }
+.pred .track { display: flex; gap: 3px; height: 10px; position: relative; }
+/* Marca fina en el 50% para ver cuán parejo es */
+.pred .track::after { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--fg2); }
 .pred .track i { flex-basis: 0; background: var(--line-ctl); opacity: .55; transform-origin: left; animation: grow .7s var(--ease); }
 .pred .track i + i { transform-origin: right; }
 .pred .track i.fav { background: var(--gold); opacity: 1; }
