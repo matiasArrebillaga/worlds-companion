@@ -460,6 +460,9 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
   .mod { padding: 16px 14px; }
   .lrow:not(.head), .formrow { min-height: 58px; padding: 8px 12px; border-bottom: 0; background: var(--sunken); }
   .lrow:not(.head) + .lrow, .formrow + .formrow { margin-top: 6px; }
+  /* Forma: el nombre usa todo el renglón y la barra baja a uno propio */
+  .formrow { grid-template-columns: 22px minmax(0, 1fr) auto; row-gap: 8px; }
+  .formrow .meter { grid-column: 2 / -1; grid-row: 2; }
   .lrow.head { padding: 0 12px 4px; }
 }
 
@@ -501,6 +504,19 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
   clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut)); }
 .panel h2 { margin-bottom: 6px; }
 .panel .row .m em { font-style: normal; color: var(--fg3); }
+
+/* Sin spoilers (Lista): tapa marcador, V/D, veredicto y sorpresa hasta tocar "Ver" (o apagar el interruptor) */
+.reveal, .safe { display: none; }
+.hide-res :is(.bezel, .row):not(.shown) .spoil { display: none; }
+.hide-res :is(.bezel, .row):not(.shown) .safe { display: inline; }
+.hide-res :is(.bezel, .row):not(.shown) .reveal { display: inline-block; }
+.hide-res .bezel:not(.shown) .team.lost { opacity: 1; }
+.mid { display: grid; justify-items: center; }
+.reveal { position: relative; z-index: 1; font: 600 11px/1 var(--f-data); letter-spacing: .08em; text-transform: uppercase; white-space: nowrap;
+  color: var(--cyan); background: transparent; border: 1px solid var(--line-ctl); padding: 7px 8px; cursor: pointer;
+  transition: background .25s var(--ease); }
+.reveal:hover { background: var(--raised); }
+.spoil-toggle { margin-bottom: 4px; }
 .timeline { gap: 28px; }
 .day-list { display: grid; gap: 12px; }
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { featuredMatch, groupByDay, recentResults } from './schedule';
+import { featuredMatch, groupByDay, recentResults, spoilersHidden } from './schedule';
 import type { Match } from './types';
 
 const BA = 'America/Argentina/Buenos_Aires';
@@ -56,5 +56,22 @@ describe('recentResults', () => {
       match({ id: 'up' }),
     ], 5);
     expect(results.map((m) => m.id)).toEqual(['new', 'old']);
+  });
+});
+
+describe('spoilersHidden', () => {
+  const store = (value: string | null) => ({ getItem: () => value });
+
+  it('oculta los resultados si no hay nada guardado', () => {
+    expect(spoilersHidden(store(null))).toBe(true);
+  });
+
+  it('los muestra solo si se eligió verlos', () => {
+    expect(spoilersHidden(store('show'))).toBe(false);
+    expect(spoilersHidden(store('hide'))).toBe(true);
+  });
+
+  it('sin acceso al almacenamiento, oculta', () => {
+    expect(spoilersHidden({ getItem: () => { throw new Error('bloqueado'); } })).toBe(true);
   });
 });

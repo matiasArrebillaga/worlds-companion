@@ -9,8 +9,8 @@ type Side = 'team1' | 'team2';
 function result(m: Match, side: Side): string {
   if (!m.winner) return '';
   return m.winner === side
-    ? '<span class="res w" title="Victoria">V</span>'
-    : '<span class="res l" title="Derrota">D</span>';
+    ? '<span class="res w spoil" title="Victoria">V</span>'
+    : '<span class="res l spoil" title="Derrota">D</span>';
 }
 
 // Sigla del equipo con su logo (subrayado con el color de la región) o, si no hay logo, el rombito
@@ -56,7 +56,17 @@ function teamSide(m: Match, side: Side): string {
 // "Sorpresa · tenía 28%": ganó el que el modelo daba con menos de 35%
 export function upsetTag(m: Match): string {
   const p = upsetChance(m);
-  return p === null ? '' : `<span class="upset">Sorpresa · tenía ${formatPercent(p)}</span>`;
+  return p === null ? '' : `<span class="upset spoil">Sorpresa · tenía ${formatPercent(p)}</span>`;
+}
+
+// Marcador que el modo sin spoilers de la Lista tapa con un botón para verlo (fuera de la Lista no se tapa)
+export function hiddenScore(score: string): string {
+  return `<span class="spoil">${score}</span><button type="button" class="reveal" aria-label="Ver resultado">Ver</button>`;
+}
+
+// Centro de la tarjeta: el marcador (tapable) o "VS" si todavía no hay
+export function middleOf(m: Match): string {
+  return m.score ? `<span class="mid">${hiddenScore(`<span class="score">${m.score[0]}–${m.score[1]}</span>`)}</span>` : '<span class="vs">VS</span>';
 }
 
 function head(m: Match, time: string): string {
@@ -96,7 +106,7 @@ function verdictHtml(m: Match): string {
   const text = v === 'hit'
     ? '<span class="verdict hit">✓ El modelo acertó</span>'
     : v === 'miss' ? '<span class="verdict miss">✗ El modelo falló</span>' : '';
-  return text ? `<div class="verdicts">${text}${upsetTag(m)}</div>` : '';
+  return text ? `<div class="verdicts spoil">${text}${upsetTag(m)}</div>` : '';
 }
 
 // Barra + chance por partida + veredicto, todo junto (próximo partido y Cara a cara)
@@ -108,7 +118,7 @@ export function predictionBlock(m: Match): string {
 
 export function matchCard(m: Match, tz: string): string {
   const time = formatTime(m.start_utc, tz);
-  const middle = m.score ? `<span class="score">${m.score[0]}–${m.score[1]}</span>` : '<span class="vs">VS</span>';
+  const middle = middleOf(m);
   // Pie: veredicto si ya se jugó; si no, la chance por partida (o el aviso de la serie en curso)
   const note = m.status === 'live' ? 'Se actualiza cada hora'
     : verdictHtml(m) || (m.team1 && m.team2 && m.prediction ? oddsText(m) : '');

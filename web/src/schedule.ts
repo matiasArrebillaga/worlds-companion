@@ -40,3 +40,13 @@ export function recentResults(matches: Match[], limit: number): Match[] {
 export function firstDay(matches: Match[]): string | null {
   return matches.map((m) => m.date).filter((d): d is string => !!d).sort()[0] ?? null;
 }
+
+// Modo sin spoilers de la Lista: viene activado; solo se apaga si la persona eligió ver los resultados
+export const SPOILERS_KEY = 'wc-spoilers';
+export function spoilersHidden(storage: Pick<Storage, 'getItem'>): boolean {
+  try {
+    return storage.getItem(SPOILERS_KEY) !== 'show';
+  } catch {
+    return true; // navegación privada o almacenamiento bloqueado
+  }
+}

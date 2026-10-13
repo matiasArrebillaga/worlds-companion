@@ -5,12 +5,12 @@ import { escapeHtml } from '../html';
 import { go, pick } from '../router';
 import { drawCalibrationChart } from '../charts/calibrationChart';
 import { withTransition } from './layout';
-import { dayKeyOf, featuredMatch, groupByDay, recentResults } from '../schedule';
+import { dayKeyOf, featuredMatch, groupByDay, recentResults, SPOILERS_KEY, spoilersHidden } from '../schedule';
 import { PENDING, swissRounds, swissStandings } from '../swiss';
 import { teamMark, teamRegionColor } from '../theme/regions';
 import type { Match, Team } from '../types';
 import { bracketGrid, recordTint, stageButtons } from './bracketGrid';
-import { matchCard, predictionBlock, stretchLink, teamWithFav, upsetTag } from './matchCard';
+import { hiddenScore, matchCard, middleOf, predictionBlock, stretchLink, teamWithFav, upsetTag } from './matchCard';
 import { BO1_NOTE, handlePredictionsClick, predictionsView } from './predictions';
 
 // Calendario: la página de inicio. Lista (línea de tiempo centrada en el próximo partido),
@@ -53,7 +53,7 @@ function featureCard(m: Match, tz: string): string {
   const pill = m.status === 'live'
     ? '<span class="pill cyan"><span class="dot" aria-hidden="true"></span>Serie en curso</span>'
     : `<span class="pill gold">Próximo · ${PHASE_LABELS[m.phase]} · ${escapeHtml(roundLabel(m.round))}</span>`;
-  const middle = m.score ? `<span class="score">${m.score[0]}–${m.score[1]}</span>` : '<span class="vs">VS</span>';
+  const middle = middleOf(m);
   return `
     <article class="bezel feature${m.status === 'live' ? ' live' : ''}" id="hoy" data-id="${escapeHtml(m.id)}">
       <div class="core">
@@ -84,14 +84,16 @@ function listView(matches: Match[], tz: string, featured: Match | null): string 
         <div class="day-list">${cards}</div>
       </section>`;
   }).join('');
+  // Interruptor del modo sin spoilers (el estado lo pone renderCalendar en .cal)
+  const toggle = `<div class="seg small spoil-toggle"><button type="button" data-spoilers aria-pressed="${spoilersHidden(localStorage)}">Ocultar resultados</button></div>`;
   return days
-    ? `${BO1_NOTE}${days}`
+    ? `${toggle}${BO1_NOTE}${days}`
     : emptyState('Todavía no hay partidos', 'Cuando Leaguepedia publique el calendario, aparecen acá.');
 }
 
 function todayRow(m: Match, tz: string): string {
   const label = m.status === 'finished' ? 'Final' : m.status === 'live' ? 'En curso' : formatTime(m.start_utc, tz);
-  const extra = m.score ? `${m.score[0]}–${m.score[1]}` : `Bo${m.best_of}`;
+  const extra = m.score ? hiddenScore(`${m.score[0]}–${m.score[1]}`) : `Bo${m.best_of}`;
   return `<div class="row"><span class="t">${escapeHtml(label)}</span><span class="m">${shortOf(m.team1)} <em>vs</em> ${shortOf(m.team2)}</span><span class="label">${extra}</span></div>`;
 }
 
@@ -100,7 +102,10 @@ function resultRow(m: Match, tz: string): string {
   const [winner, loser] = m.winner === 'team1' ? [m.team1, m.team2] : [m.team2, m.team1];
   const [hi, lo] = m.winner === 'team1' ? m.score : [m.score[1], m.score[0]];
   const day = dayKeyOf(m, tz);
-  return `<div class="row"><span class="t">${day ? escapeHtml(formatDayShort(day)) : ''}</span><span class="m">${escapeHtml(winner.short)} <em>a</em> ${escapeHtml(loser.short)}${upsetTag(m)}</span><span class="label">${hi}–${lo}</span></div>`;
+  // Con el modo sin spoilers se ve el cruce en el orden del calendario, sin ganador
+  const plain = `<span class="safe">${escapeHtml(m.team1.short)} <em>vs</em> ${escapeHtml(m.team2.short)}</span>`;
+  const told = `<span class="spoil">${escapeHtml(winner.short)} <em>a</em> ${escapeHtml(loser.short)}${upsetTag(m)}</span>`;
+  return `<div class="row"><span class="t">${day ? escapeHtml(formatDayShort(day)) : ''}</span><span class="m">${told}${plain}</span><span class="label">${hiddenScore(`${hi}–${lo}`)}</span></div>`;
 }
 
 // Paneles laterales (solo PC): los partidos de hoy a la izquierda y los últimos resultados a la derecha
@@ -265,7 +270,7 @@ export function renderCalendar(el: HTMLElement, data: SiteData, tz: string, rout
       <p class="muted">Horarios en tu zona horaria. Los partidos sin hora confirmada dicen "a confirmar".</p>
       ${seg(SUBS, sub, 'Vista del calendario')}
     </section>
-    ${sub === 'lista' ? `<div class="cal">${todayAside(matches, tz)}<div class="stack timeline">${body}</div>${resultsAside(matches, tz)}</div>` : body}`;
+    ${sub === 'lista' ? `<div class="cal${spoilersHidden(localStorage) ? ' hide-res' : ''}">${todayAside(matches, tz)}<div class="stack timeline">${body}</div>${resultsAside(matches, tz)}</div>` : body}`;
 
   stopTimer();
   stopTimer = sub === 'lista' ? startCountdown(el, featured) : () => {};
@@ -275,6 +280,17 @@ export function renderCalendar(el: HTMLElement, data: SiteData, tz: string, rout
   el.onclick = (event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button');
     if (!button) return;
+    // Sin spoilers: "Ver" destapa solo ese partido; el interruptor tapa o destapa todos y se recuerda
+    if (button.classList.contains('reveal')) {
+      button.closest('.bezel, .row')?.classList.add('shown');
+      return;
+    }
+    if (button.dataset.spoilers !== undefined) {
+      const hide = el.querySelector('.cal')!.classList.toggle('hide-res');
+      button.setAttribute('aria-pressed', String(hide));
+      try { localStorage.setItem(SPOILERS_KEY, hide ? 'hide' : 'show'); } catch { /* sin almacenamiento: vale hasta recargar */ }
+      return;
+    }
     if (button.dataset.team !== undefined) {
       // Resaltar (o soltar) el camino de un equipo sin redibujar la página
       picked = picked === button.dataset.team ? null : button.dataset.team;
