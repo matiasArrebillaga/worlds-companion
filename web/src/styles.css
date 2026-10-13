@@ -336,15 +336,17 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
 .pb .b { background: repeating-linear-gradient(135deg, var(--fg2) 0 2px, transparent 2px 4px); }
 
 /* Rango del 95% y mancuerna */
-.wh { display: block; position: relative; height: 16px; min-width: 70px; }
-.wh .ref, .db .ref { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--gold); opacity: .7; }
-.wh .ci { position: absolute; top: 7px; height: 2px; background: var(--fg2); }
-.wh .ci::before, .wh .ci::after { content: ""; position: absolute; top: -4px; width: 2px; height: 10px; background: inherit; }
-.wh .ci::before { left: 0; }
-.wh .ci::after { right: 0; }
+.wh { display: block; position: relative; height: 16px; min-width: 70px;
+  background: linear-gradient(var(--line), var(--line)) center / 100% 2px no-repeat; } /* pista tenue: toda la escala */
+.db .ref { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--gold); opacity: .7; }
+/* Rango: banda translúcida (gris si cruza el 50%, verde o roja si queda de un lado), 50% dorado encima y rombo = dato */
+.wh .ci { position: absolute; top: 4px; height: 8px; background: var(--fg2); opacity: .6; }
 .wh .ci.up { background: var(--win); }
 .wh .ci.down { background: var(--loss); }
-.wh .pt { position: absolute; top: 4px; width: 8px; height: 8px; margin-left: -4px; background: var(--fg); transform: rotate(45deg); }
+.wh .ref { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--gold); z-index: 1; }
+.wh .pt { position: absolute; top: 4px; width: 8px; height: 8px; margin-left: -4px; background: var(--fg); transform: rotate(45deg);
+  box-shadow: 0 0 0 2px var(--bg); z-index: 2; }
+.airy th .axis { margin-top: 6px; min-width: 140px; color: var(--fg3); letter-spacing: 0; }
 .db { display: block; position: relative; height: 18px; }
 .db .band { position: absolute; top: 3px; height: 12px; background: var(--cyan-soft); }
 .db .ln { position: absolute; top: 8px; height: 2px; background: var(--line-ctl); }
@@ -387,7 +389,7 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
 .airy td.ent::before { display: none; }
 .ent-in { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .airy .rk { width: 22px; flex: none; text-align: right; font: 12px var(--f-data); color: var(--fg2); }
-.airy td .wh { margin-top: 6px; min-width: 90px; }
+.airy td .wh { margin-top: 6px; min-width: 140px; }
 
 /* Tablero: módulos */
 .board { display: grid; gap: 12px; }
@@ -457,14 +459,17 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
   .airy td small { display: inline; margin: 0; font-size: 11.5px; }
   .airy td .pb { width: 30px; min-width: 0; flex: none; margin: 0; }
   .airy td.wide { grid-column: 1 / -1; }
-  .airy td.wide .wh { flex: 1; min-width: 60px; max-width: 150px; margin: 0; }
+  .airy td.wide .wh { flex: 1; min-width: 100px; margin: 0 0 0 4px; }
+  /* Sin encabezados en el celular: la línea del 50% lleva su número */
+  .airy td .wh .ref::after { content: "50"; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+    font: 600 9px/1 var(--f-data); color: var(--gold); padding-bottom: 1px; }
   /* Cabecera de la tarjeta: nombre a la izquierda, dato que ordena a la derecha */
   .airy td.ent { display: block; grid-column: 1 / span 3; grid-row: 1; max-width: none; padding: 0 0 8px; background: none; align-self: center; }
   .airy td.on { display: block; grid-column: 4; grid-row: 1; padding: 0 0 8px; background: none; text-align: right; white-space: normal; align-self: center; font: 700 20px/1.1 var(--f-data); }
   .airy td.on::before { display: block; margin: 0 0 4px; color: var(--gold); }
   .airy td.on small { display: block; margin-top: 3px; }
   .airy td.on .meter, .airy td.on .pb { width: auto; max-width: 70px; min-width: 0; margin: 6px 0 0 auto; }
-  .airy td.on .wh { min-width: 0; margin-top: 6px; }
+  .airy td.on .wh { min-width: 0; margin-top: 14px; }
   /* Filas de Panorama y Análisis: una baldosa por fila */
   .mod { padding: 16px 14px; }
   .lrow:not(.head), .formrow { min-height: 58px; padding: 8px 12px; border-bottom: 0; background: var(--sunken); }

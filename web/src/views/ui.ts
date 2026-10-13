@@ -19,6 +19,7 @@ export interface Column<T> {
   kind: BarKind;
   ref?: number; // centro de las barras 'diverge'
   wide?: boolean; // en el celular ocupa todo el ancho de la tarjeta
+  head?: string; // dibujo debajo del encabezado (el eje de las barras de rango)
 }
 
 const clamp = (v: number) => Math.min(100, Math.max(0, v));
@@ -170,7 +171,7 @@ export function airyTable<T>(o: TableOptions<T>): string {
     const on = c.id === o.sort;
     const aria = on ? (o.dir === 'desc' ? 'descending' : 'ascending') : 'none';
     const arrow = on ? (o.dir === 'desc' ? ' ▼' : ' ▲') : '';
-    return `<th class="${cls(c)}" aria-sort="${aria}"><button type="button" data-sort="${c.id}">${c.label}${arrow}${c.hint ? `<small>${c.hint}</small>` : ''}</button></th>`;
+    return `<th class="${cls(c)}" aria-sort="${aria}"><button type="button" data-sort="${c.id}">${c.label}${arrow}${c.hint ? `<small>${c.hint}</small>` : ''}</button>${c.head ?? ''}</th>`;
   }).join('');
   const scale = Object.fromEntries(columns.map((c) => [c.id, o.scale.map(c.value).filter((v): v is number => v !== null)]));
   const body = o.rows.map((row, i) => {

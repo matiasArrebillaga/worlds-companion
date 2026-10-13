@@ -49,7 +49,9 @@ const COL = {
   winrate_adj: { id: 'winrate_adj', label: '% Vict.', hint: 'ajustado', value: (c) => adjusted(c), show: (c) => pct(adjusted(c)),
     sub: (c) => `${pct(c.winrate)} crudo`, kind: 'diverge', ref: 0.5 },
   range: { id: 'range', label: 'Rango 95%', hint: 'del % real', value: (c) => c.winrate_low ?? null, show: (c) => range(c.winrate_low, c.winrate_high),
-    bar: (c) => whisker(c.winrate_low, c.winrate_high, c.winrate, 0.1, 0.9), kind: 'share', wide: true },
+    bar: (c) => whisker(c.winrate_low, c.winrate_high, c.winrate), kind: 'share', wide: true,
+    // Escala completa 0-100%: con el eje a la vista, cortar los rangos en 10-90% sería engañoso
+    head: axis([0, 0.5, 1], 0, 1, (v) => String(v * 100)) },
 } satisfies Record<string, Column<ChampionEntry>>;
 
 // Sin k conocido (champions.json viejo) se usa el ajustado que ya viene calculado
