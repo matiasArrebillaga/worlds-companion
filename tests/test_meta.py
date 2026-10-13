@@ -1,6 +1,6 @@
 import pytest
 
-from pipeline.meta import (GUIDE_LEAGUE, GUIDE_UNTIL_GAMES, MAX_PRIOR, adjust_winrates, build_meta,
+from pipeline.meta import (GUIDE_LABEL, GUIDE_PATCHES, GUIDE_UNTIL_GAMES, MAX_PRIOR, adjust_winrates, build_meta,
                            champion_stats, draft_slots, pace_stats, phase_of, prior_picks, region_stats, side_stats,
                            wilson, winrate_noise)
 
@@ -117,14 +117,15 @@ def test_regions_only_count_games_between_different_regions():
 
 
 def test_build_meta_keeps_the_guide_until_worlds_has_enough_games():
-    # La guía es la Demacia Cup (sin importar el parche); las ligas en el mismo parche quedan afuera
-    league = [game(page=GUIDE_LEAGUE, patch="16.18", date="2026-10-05 10:00:00"),
-              game(page=GUIDE_LEAGUE, patch="16.18", date="2026-10-06 10:00:00"),
-              game(page="LCK", region="KR", patch="16.18", date="2026-10-01 10:00:00")]
+    # La guía junta los últimos parches de las ligas principales (16.17 y 16.18); 16.16 queda afuera
+    league = [game(page="LCK", region="KR", patch=GUIDE_PATCHES[0], date="2026-10-05 10:00:00"),
+              game(page="VCS", region="VN", patch=GUIDE_PATCHES[1], date="2026-10-06 10:00:00"),
+              game(page="DCGI", patch=GUIDE_PATCHES[1], date="2026-10-07 10:00:00"),  # Demacia Cup
+              game(page="LCK", region="KR", patch="16.16", date="2026-10-01 10:00:00")]
     qualifier = [game(date="2026-09-10 10:00:00")]  # "WLDs" antes del torneo: clasificatorio regional
     before = build_meta(league + qualifier, SCHEDULE, "2026-10-15")
-    assert before["worlds_games"] == 0 and before["guide_patch"] == "16.18"
-    assert before["samples"]["guide"]["games"] == 2 and before["samples"]["worlds"]["games"] == 0
+    assert before["worlds_games"] == 0 and before["guide_patch"] == GUIDE_LABEL
+    assert before["samples"]["guide"]["games"] == 3 and before["samples"]["worlds"]["games"] == 0
     assert set(before["champions"]) == {"worlds", "guide"}
 
     worlds = [game(date=f"2026-10-{15 + i % 5} 10:00:00") for i in range(GUIDE_UNTIL_GAMES)]
@@ -209,7 +210,7 @@ def test_pace_quartiles():
 
 
 def test_build_meta_keeps_guide_presence_after_the_guide_is_hidden():
-    league = [game(page=GUIDE_LEAGUE, patch="16.18", date="2026-10-05 10:00:00")]
+    league = [game(page="LCK", region="KR", patch=GUIDE_PATCHES[0], date="2026-10-05 10:00:00")]
     worlds = [game(date="2026-10-16 10:00:00", blue_champs=("Ksante", "Vi", "Azir", "Jinx", "Rell"))
               for _ in range(GUIDE_UNTIL_GAMES)]
     meta = build_meta(league + worlds, SCHEDULE, "2026-10-15")

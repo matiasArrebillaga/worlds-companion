@@ -17,7 +17,7 @@ from models import tournament
 from pipeline import utc_now_iso
 from pipeline.assets import DDRAGON_FILE, champion_icons, logo_url
 from pipeline.history import CURRENT_YEAR, load_aliases, load_season_games
-from pipeline.meta import GUIDE_LEAGUE, build_meta
+from pipeline.meta import build_meta
 from pipeline.schedule import UNDECIDED_TEAMS, build_schedule, short_name
 from pipeline.stats import build_team_and_player_stats, elo_history, series_list
 from pipeline.validate import (validate_lineups, validate_meta, validate_predictions, validate_ratings,
@@ -89,9 +89,7 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
 
     # Forma de los jugadores con los datos de Oracle's Elixir de la temporada
     role_model = load_model()
-    oe_all, oe_fetched_at = read_extract(raw_dir / OE_EXTRACT)
-    # La Demacia Cup solo es la guía del meta: no entra en la forma del modelo ni en las stats
-    oe_games = [g for g in oe_all if g["page"] != GUIDE_LEAGUE]
+    oe_games, oe_fetched_at = read_extract(raw_dir / OE_EXTRACT)
     ups = lineups(oe_games)
     forms = player_forms(oe_games, norms_of(role_model))
 
@@ -120,8 +118,8 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
             })
         teams_payload.sort(key=lambda t: -t["rating"])
         errors += validate_stats(teams_payload, players_payload)
-        # Meta (campeones, lados, ritmo, regiones) con las partidas de Worlds y la guía (Demacia Cup)
-        meta_stats = build_meta(oe_all, schedule, worlds_start)
+        # Meta (campeones, lados, ritmo, regiones) con las partidas de Worlds y la guía del parche anterior
+        meta_stats = build_meta(oe_games, schedule, worlds_start)
         errors += validate_meta(meta_stats["champions"])
     current = [] if errors else make_predictions(schedule, run.ratings, now, aliases, adjust)
     errors += validate_predictions(attach_predictions(schedule, [], current))

@@ -6,8 +6,8 @@ const base: Meta = { updated_at: 'x', source_fetched_at: 'x', match_count: 1 };
 
 describe('sample selector', () => {
   it('offers the guide only while it exists and starts there', () => {
-    const before: Meta = { ...base, worlds_patch: '16.20', guide_patch: '16.18', worlds_games: 3 };
-    expect(sampleOptions(before)).toEqual([['worlds', 'Worlds (16.20)'], ['guide', 'Demacia Cup (16.18)']]);
+    const before: Meta = { ...base, worlds_patch: '16.20', guide_patch: '16.17–16.18', worlds_games: 3 };
+    expect(sampleOptions(before)).toEqual([['worlds', 'Worlds (16.20)'], ['guide', 'Guía 16.17–16.18']]);
     expect(defaultSample(before)).toBe('guide');
     const after: Meta = { ...base, worlds_patch: '16.20', guide_patch: null, worlds_games: 12 };
     expect(sampleOptions(after)).toEqual([['worlds', 'Worlds (16.20)']]);

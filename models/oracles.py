@@ -17,8 +17,8 @@ OE_LEAGUE_REGIONS: dict[str, str | None] = {
     "LCS": "NA", "LTA N": "NA", "CBLOL": "BR", "LTA S": "BR", "LLA": "LAT",
     "LCP": "APAC", "PCS": "APAC", "VCS": "VN", "LJL": "JP",
     "LTA": None, "FST": None, "MSI": None, "EWC": None, "WLDs": None,
-    # Demacia Cup Global Invitational (octubre, antes de Worlds): solo se usa como guía del meta,
-    # pipeline/build.py la saca de todo lo demás
+    # Demacia Cup Global Invitational (octubre, parche 16.18): ningún equipo es de Worlds, así que
+    # no mueve la forma de los jugadores de Worlds; suma partidas a la guía del meta
     "DCGI": None,
 }
 

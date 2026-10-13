@@ -195,7 +195,7 @@ export interface PlayersFile {
   players: PlayerEntry[];
 }
 
-// Meta (champions.json y samples de meta.json): "worlds" = Worlds 2026; "guide" = Demacia Cup (guía previa)
+// Meta (champions.json y samples de meta.json): "worlds" = Worlds 2026; "guide" = ligas en los últimos parches
 export type SampleId = 'worlds' | 'guide';
 
 export interface SideSplit {
