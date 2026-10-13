@@ -148,6 +148,8 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 .tag.tbd { font-size: 1rem; color: var(--fg2); }
 .vs { font: 600 12px/1 var(--f-data); color: var(--fg2); letter-spacing: .14em; }
 .score { font: 700 1.8rem/1 var(--f-display); font-variant-numeric: tabular-nums; }
+.pill.time { font-size: 13px; color: var(--fg); border-color: var(--line-ctl); }
+@media (min-width: 860px) { .match .tag:not(.tbd) { font-size: 1.9rem; } .match .score { font-size: 2.1rem; } }
 .foot { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font: 12px var(--f-data); color: var(--fg2); }
 
 /* Próximo partido (tarjeta destacada) */
@@ -183,8 +185,14 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 }
 
 /* Predicción: probabilidad de ganar la serie */
-.pred { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; font: 500 13px/1 var(--f-data); font-variant-numeric: tabular-nums; color: var(--fg2); }
+/* Tira dividida: cada equipo ocupa su parte desde su lado; el favorito en dorado (como el rombito) */
+.pred { display: grid; gap: 6px; font: 500 15px/1 var(--f-data); font-variant-numeric: tabular-nums; color: var(--fg2); }
 .pred .fav { color: var(--gold); font-weight: 700; }
+.pred .ends { display: flex; justify-content: space-between; gap: 8px; }
+.pred .track { display: flex; gap: 3px; height: 10px; }
+.pred .track i { flex-basis: 0; background: var(--line-ctl); opacity: .55; transform-origin: left; animation: grow .7s var(--ease); }
+.pred .track i + i { transform-origin: right; }
+.pred .track i.fav { background: var(--gold); opacity: 1; }
 .bar { display: block; height: 6px; background: var(--sunken); overflow: hidden; }
 .bar i { display: block; height: 100%; background: var(--cyan); transform-origin: left; animation: grow .7s var(--ease); }
 .bar.gold i { background: var(--gold); }
@@ -214,7 +222,7 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 .calib-line b { color: var(--fg); text-align: right; font-variant-numeric: tabular-nums; }
 
 @media (prefers-reduced-motion: reduce) {
-  .bar i { animation: none; }
+  .bar i, .pred .track i { animation: none; }
 }
 
 /* Equipos, jugadores y rankings */
@@ -460,9 +468,19 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
 #hoy.feature { scroll-margin-top: 128px; }
 .mu.tbd { color: var(--fg2); font-size: 13px; }
 .cal { display: grid; gap: 28px; align-items: start; }
-@media (min-width: 960px) { .cal { grid-template-columns: minmax(0, 1fr) 300px; } }
 @media (max-width: 959px) { .cal-aside { display: none; } }
-.cal-aside { position: sticky; top: 84px; display: grid; gap: 14px; }
+/* PC angosta: la lista y los dos paneles apilados a la derecha */
+@media (min-width: 960px) and (max-width: 1179px) {
+  .cal { grid-template-columns: minmax(0, 1fr) 280px; grid-template-rows: auto 1fr; }
+  .timeline { grid-column: 1; grid-row: 1 / span 2; }
+  .today-aside { grid-column: 2; grid-row: 1; }
+  .results-aside { grid-column: 2; grid-row: 2; }
+}
+/* PC ancha: la lista centrada, "Hoy" a la izquierda y "Últimos resultados" a la derecha, fijos al bajar */
+@media (min-width: 1180px) {
+  .cal { grid-template-columns: 240px minmax(0, 1fr) 240px; gap: 24px; }
+  .cal-aside { position: sticky; top: 84px; }
+}
 .panel { background: var(--raised); padding: 16px; display: grid; gap: 2px;
   clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut)); }
 .panel h2 { margin-bottom: 6px; }
@@ -711,9 +729,6 @@ html { -webkit-tap-highlight-color: transparent; }
 /* ================= Lectura de datos =================
    Marca del 50% y favorito, sorpresas, ventaja en Cara a cara, tooltip con el dato exacto y gráficos. */
 
-/* Barra de predicción: una marca fina en el 50% para ver cuán parejo es */
-.pred .bar { position: relative; overflow: visible; }
-.pred .bar::after { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--fg2); }
 /* Rombito dorado junto a la sigla del favorito del modelo */
 .fv { width: 6px; height: 6px; background: var(--gold); transform: rotate(45deg); flex: none; display: inline-block; }
 .team .fv { margin-inline: 2px; }

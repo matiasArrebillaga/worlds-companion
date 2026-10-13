@@ -103,15 +103,21 @@ function resultRow(m: Match, tz: string): string {
   return `<div class="row"><span class="t">${day ? escapeHtml(formatDayShort(day)) : ''}</span><span class="m">${escapeHtml(winner.short)} <em>a</em> ${escapeHtml(loser.short)}${upsetTag(m)}</span><span class="label">${hi}–${lo}</span></div>`;
 }
 
-// Columna lateral (solo PC): los partidos de hoy y los últimos resultados
-function aside(matches: Match[], tz: string): string {
+// Paneles laterales (solo PC): los partidos de hoy a la izquierda y los últimos resultados a la derecha
+function todayAside(matches: Match[], tz: string): string {
   const todayKey = localDayKey(new Date().toISOString(), tz);
   const today = matches.filter((m) => dayKeyOf(m, tz) === todayKey);
-  const recent = recentResults(matches, 5);
   return `
-    <aside class="cal-aside" aria-label="Resumen del día">
+    <aside class="cal-aside today-aside" aria-label="Partidos de hoy">
       <section class="panel"><h2 class="label">Hoy, en tu hora</h2>
         ${today.length ? today.map((m) => todayRow(m, tz)).join('') : '<p class="muted">No hay partidos hoy.</p>'}</section>
+    </aside>`;
+}
+
+function resultsAside(matches: Match[], tz: string): string {
+  const recent = recentResults(matches, 5);
+  return `
+    <aside class="cal-aside results-aside" aria-label="Últimos resultados">
       <section class="panel"><h2 class="label">Últimos resultados</h2>
         ${recent.length ? recent.map((m) => resultRow(m, tz)).join('') : '<p class="muted">Aparecen en cuanto termine el primer partido.</p>'}</section>
     </aside>`;
@@ -259,7 +265,7 @@ export function renderCalendar(el: HTMLElement, data: SiteData, tz: string, rout
       <p class="muted">Horarios en tu zona horaria. Los partidos sin hora confirmada dicen "a confirmar".</p>
       ${seg(SUBS, sub, 'Vista del calendario')}
     </section>
-    ${sub === 'lista' ? `<div class="cal"><div class="stack timeline">${body}</div>${aside(matches, tz)}</div>` : body}`;
+    ${sub === 'lista' ? `<div class="cal">${todayAside(matches, tz)}<div class="stack timeline">${body}</div>${resultsAside(matches, tz)}</div>` : body}`;
 
   stopTimer();
   stopTimer = sub === 'lista' ? startCountdown(el, featured) : () => {};

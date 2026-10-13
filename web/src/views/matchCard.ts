@@ -62,45 +62,64 @@ export function upsetTag(m: Match): string {
 function head(m: Match, time: string): string {
   if (m.status === 'live') return '<span class="pill cyan"><span class="dot" aria-hidden="true"></span>Serie en curso</span>';
   if (m.status === 'finished') return '<span class="pill">Finalizado</span>';
-  return `<span class="pill">${escapeHtml(time)}</span>`;
+  return `<span class="pill time">${escapeHtml(time)}</span>`;
 }
 
-// Probabilidad de ganar la serie + si el modelo acertó (con texto, no solo color)
-export function predictionBlock(m: Match): string {
+// Barra de probabilidad de ganar la serie, dividida: cada equipo ocupa su parte desde su lado
+// y el favorito va en dorado (como el rombito)
+export function predictionBar(m: Match): string {
   const p = m.prediction;
   if (!p || !m.team1 || !m.team2) return '';
   const fav = favorite(m);
   const p1 = formatPercent(p.p_team1_series);
   const p2 = formatPercent(1 - p.p_team1_series);
-  const v = verdict(m);
-  const verdictText = v === 'hit'
-    ? '<span class="verdict hit">✓ El modelo acertó</span>'
-    : v === 'miss' ? '<span class="verdict miss">✗ El modelo falló</span>' : '';
-  const verdictHtml = verdictText ? `<div class="verdicts">${verdictText}${upsetTag(m)}</div>` : '';
   const label = `Probabilidad de ganar la serie: ${escapeHtml(m.team1.short)} ${p1}, ${escapeHtml(m.team2.short)} ${p2}`;
-  const odds = gameOdds(m);
-  const oddsHtml = odds
-    ? `<p class="pred-game">Por partida: ${escapeHtml(odds.short)} ${formatPercent(odds.p)}</p>`
-    : '';
+  // flex-grow proporcional: las dos partes suman el ancho completo aunque haya un hueco entre ellas
+  const part = (share: number, side: Side) =>
+    `<i class="${fav === side ? 'fav' : ''}" style="flex-grow:${(share * 100).toFixed(1)}"></i>`;
   return `
     <div class="pred" role="img" aria-label="${label}">
-      <span class="pct${fav === 'team1' ? ' fav' : ''}">${p1}</span>
-      <span class="bar" aria-hidden="true"><i style="width:${(p.p_team1_series * 100).toFixed(1)}%"></i></span>
-      <span class="pct${fav === 'team2' ? ' fav' : ''}">${p2}</span>
-    </div>${oddsHtml}${verdictHtml}`;
+      <div class="ends"><span class="pct${fav === 'team1' ? ' fav' : ''}">${p1}</span><span class="pct${fav === 'team2' ? ' fav' : ''}">${p2}</span></div>
+      <div class="track" aria-hidden="true">${part(p.p_team1_series, 'team1')}${part(1 - p.p_team1_series, 'team2')}</div>
+    </div>`;
+}
+
+// "Por partida: KC 52%" (solo Bo3/Bo5)
+function oddsText(m: Match): string {
+  const odds = gameOdds(m);
+  return odds ? `Por partida: ${escapeHtml(odds.short)} ${formatPercent(odds.p)}` : '';
+}
+
+// Si el modelo acertó (con texto, no solo color) y la etiqueta de sorpresa
+function verdictHtml(m: Match): string {
+  const v = verdict(m);
+  const text = v === 'hit'
+    ? '<span class="verdict hit">✓ El modelo acertó</span>'
+    : v === 'miss' ? '<span class="verdict miss">✗ El modelo falló</span>' : '';
+  return text ? `<div class="verdicts">${text}${upsetTag(m)}</div>` : '';
+}
+
+// Barra + chance por partida + veredicto, todo junto (próximo partido y Cara a cara)
+export function predictionBlock(m: Match): string {
+  if (!m.prediction || !m.team1 || !m.team2) return '';
+  const odds = oddsText(m);
+  return `${predictionBar(m)}${odds ? `<p class="pred-game">${odds}</p>` : ''}${verdictHtml(m)}`;
 }
 
 export function matchCard(m: Match, tz: string): string {
   const time = formatTime(m.start_utc, tz);
   const middle = m.score ? `<span class="score">${m.score[0]}–${m.score[1]}</span>` : '<span class="vs">VS</span>';
-  const footRight = m.status === 'live' ? 'Se actualiza cada hora' : escapeHtml(time);
+  // Pie: veredicto si ya se jugó; si no, la chance por partida (o el aviso de la serie en curso)
+  const note = m.status === 'live' ? 'Se actualiza cada hora'
+    : verdictHtml(m) || (m.team1 && m.team2 && m.prediction ? oddsText(m) : '');
+  const link = stretchLink(m, 'Cara a cara');
   return `
     <article class="bezel${m.status === 'live' ? ' live' : m.status === 'finished' ? ' done' : ''}" data-id="${escapeHtml(m.id)}">
       <div class="core match">
-        <div class="match-head">${head(m, time)}<span class="label">${escapeHtml(roundLabel(m.round))} · Bo${m.best_of}</span></div>
+        <div class="match-head">${head(m, time)}<span class="label">${PHASE_LABELS[m.phase]} · ${escapeHtml(roundLabel(m.round))} · Bo${m.best_of}</span></div>
         <div class="teams">${teamSide(m, 'team1')}${middle}${teamSide(m, 'team2')}</div>
-        ${predictionBlock(m)}
-        <div class="foot"><span>${PHASE_LABELS[m.phase]}${m.team1 && m.team2 ? ` · ${stretchLink(m, 'Cara a cara')}` : ''}</span><span>${footRight}</span></div>
+        ${predictionBar(m)}
+        ${note || link ? `<div class="foot"><span>${note}</span>${link}</div>` : ''}
       </div>
     </article>`;
 }
