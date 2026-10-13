@@ -544,7 +544,7 @@ footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line
     <span class="frac"><span><var>p̂</var> + <span class="frac"><span><var>z</var>²</span><span>2<var>n</var></span></span> ± <var>z</var> √(<span class="frac"><span><var>p̂</var>(1−<var>p̂</var>)</span><span><var>n</var></span></span> + <span class="frac"><span><var>z</var>²</span><span>4<var>n</var>²</span></span>)</span><span>1 + <span class="frac"><span><var>z</var>²</span><span><var>n</var></span></span></span></span>
   </div>
   <p>Con 3 de 3 da [43,9%, 100%]: "puede ser muy bueno, pero también uno del montón". Con 1 de 10 da [1,8%, 40,4%].</p>
-  <p>Aparece en los % de victorias de equipos y campeones, en el % del lado azul y en el de cada región. Ejemplo real: Rumble ganó 46 de sus 77 partidas en la guía de parches (59,7%), con rango [48,6%, 70,0%]. El rango todavía toca el 50%: con estas partidas no se puede descartar que sea un campeón promedio.</p>
+  <p>Aparece en los % de victorias de equipos y campeones, en el % del lado azul y en el de cada región. Ejemplo real: Rumble ganó 46 de sus 77 partidas en las ligas en los parches 16.17–16.18 (59,7%), con rango [48,6%, 70,0%]. El rango todavía toca el 50%: con estas partidas no se puede descartar que sea un campeón promedio.</p>
   <div class="why"><b>Cómo se usa para comparar</b>
     <p>Si los rangos de dos equipos se superponen mucho, con estos datos no se puede decir cuál es mejor. Es una regla práctica, no un test formal (dos intervalos pueden superponerse un poco y la diferencia ser real), pero evita el error más común: tomar 62% contra 58% como una diferencia cuando cada uno tiene ±15 puntos de incertidumbre.</p>
   </div>
@@ -558,7 +558,7 @@ footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line
   </div>
   <p>Es como sumarle a cada campeón <var>k</var> partidas imaginarias, la mitad ganadas. También se puede leer como un promedio ponderado entre el dato del campeón y el 50%: el dato pesa <span class="m">picks / (picks + k)</span>. Un campeón con <var>k</var> picks propios pesa lo mismo que el 50%.</p>
   <div class="tbl"><table>
-    <thead><tr><th>Campeón (guía 16.17–16.18)</th><th class="num">Récord</th><th class="num">Crudo</th><th class="num">Peso del dato</th><th class="num">Ajustado</th></tr></thead>
+    <thead><tr><th>Campeón (ligas, parches 16.17–16.18)</th><th class="num">Récord</th><th class="num">Crudo</th><th class="num">Peso del dato</th><th class="num">Ajustado</th></tr></thead>
     <tbody>
       <tr><td>Lux</td><td class="num">5-0</td><td class="num">100%</td><td class="num">2%</td><td class="num">50,9%</td></tr>
       <tr><td>Zaahen</td><td class="num">1-7</td><td class="num">12,5%</td><td class="num">3%</td><td class="num">48,9%</td></tr>
@@ -597,7 +597,7 @@ footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line
   </ul>
   <p>Es el mismo método que usan los meta-análisis para saber si estudios distintos miden un efecto distinto o solo tienen ruido (método de DerSimonian-Laird). <var>p̄</var> es siempre cerca de 50%, porque en cada partida ganan 5 picks y pierden 5.</p>
   <div class="tbl"><table>
-    <thead><tr><th>Guía 16.17–16.18 (campeones con 5+ picks)</th><th class="num">Valor</th></tr></thead>
+    <thead><tr><th>Ligas, parches 16.17–16.18 (campeones con 5+ picks)</th><th class="num">Valor</th></tr></thead>
     <tbody>
       <tr><td>Campeones / picks</td><td class="num">93 / 3013</td></tr>
       <tr><td>Varianza observada de los %</td><td class="num">0,00931</td></tr>
@@ -614,7 +614,7 @@ footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line
   <p>¿El lado azul gana más? Parece fácil de medir: contar. Pero en un Bo3 o Bo5, el que perdió la partida anterior elige lado en la siguiente. El lado deja de ser al azar: depende de quién viene perdiendo, que suele ser el equipo más flojo. Eso es una <b>variable de confusión</b>: algo que influye a la vez en "qué lado le toca" y en "quién gana", y que puede crear una diferencia o esconderla.</p>
   <p>La partida 1 de cada serie es la medición más limpia, porque nadie viene de perder. Por eso el sitio la muestra aparte (<code>pipeline/meta.py · side_stats</code>):</p>
   <div class="tbl"><table>
-    <thead><tr><th>Guía 16.17–16.18</th><th class="num">Partidas</th><th class="num">Gana el azul</th><th class="num">Rango 95%</th></tr></thead>
+    <thead><tr><th>Ligas, parches 16.17–16.18</th><th class="num">Partidas</th><th class="num">Gana el azul</th><th class="num">Rango 95%</th></tr></thead>
     <tbody>
       <tr><td>Todas</td><td class="num">305</td><td class="num">53,8%</td><td class="num">48,2 – 59,3%</td></tr>
       <tr><td>Partida 1</td><td class="num">90</td><td class="num">47,8%</td><td class="num">37,8 – 58,0%</td></tr>
@@ -623,8 +623,8 @@ footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line
   </table></div>
   <p>Los tres rangos incluyen el 50%: con esta muestra no se puede afirmar que algún lado tenga ventaja. Y la diferencia entre la partida 1 y el resto muestra por qué no conviene mezclarlas.</p>
   <h3>Ritmo: mediana y cuartiles</h3>
-  <p>La duración típica se mide con la <b>mediana</b> (el valor del medio al ordenar las partidas), no con el promedio. Una partida eterna de 55 minutos mueve el promedio, pero no la mediana. Los <b>cuartiles</b> p25 y p75 marcan dónde está la mitad central: en la guía, la mediana es 31,6 minutos y la mitad de las partidas dura entre 28,3 y 35,4.</p>
-  <p>Las kills por minuto (0,88 en la guía) se calculan como <b>ratio de totales</b>: kills totales sobre minutos totales. El promedio de los ratios de cada partida haría pesar igual a una partida de 20 minutos que a una de 40. Lo mismo con el KDA de equipos y jugadores: (kills + asistencias totales) / muertes totales, con un mínimo de 1 muerte para que nadie tenga KDA infinito.</p>
+  <p>La duración típica se mide con la <b>mediana</b> (el valor del medio al ordenar las partidas), no con el promedio. Una partida eterna de 55 minutos mueve el promedio, pero no la mediana. Los <b>cuartiles</b> p25 y p75 marcan dónde está la mitad central: en las ligas en 16.17–16.18, la mediana es 31,6 minutos y la mitad de las partidas dura entre 28,3 y 35,4.</p>
+  <p>Las kills por minuto (0,88 en esas mismas partidas) se calculan como <b>ratio de totales</b>: kills totales sobre minutos totales. El promedio de los ratios de cada partida haría pesar igual a una partida de 20 minutos que a una de 40. Lo mismo con el KDA de equipos y jugadores: (kills + asistencias totales) / muertes totales, con un mínimo de 1 muerte para que nadie tenga KDA infinito.</p>
   <h3>Regiones: solo entre regiones</h3>
   <p>El % de una región se calcula solo con partidas contra otras regiones. En un LCK contra LCK la región gana siempre el 50%, así que meter esas partidas acercaría todo a 50% sin decir nada. Con el rango de Wilson al lado, porque en Worlds son pocas partidas por región.</p>
 
@@ -632,8 +632,8 @@ footer { margin-top: 3rem; padding-top: 1.2rem; border-top: 1px solid var(--line
   <h2 id="justas"><span class="n">17</span>Comparaciones justas y datos faltantes</h2>
   <h3>Temporada vs. "contra equipos de Worlds"</h3>
   <p>Un 70% de victorias contra equipos de la VCS no es lo mismo que un 70% contra la LCK. El % de la temporada mezcla rivales de niveles muy distintos según la liga. Por eso Equipos → Análisis agrega una columna que usa solo partidas entre dos equipos clasificados a Worlds: todos medidos con la misma vara. El precio es que son muchas menos partidas y los rangos son más anchos. Es el dilema clásico entre <b>sesgo</b> (la temporada compara cosas distintas) y <b>varianza</b> (la columna justa tiene pocas partidas).</p>
-  <h3>La guía de parches</h3>
-  <p>Worlds se juega en el parche 16.20 y al principio no hay ninguna partida. Mientras Worlds tenga menos de 10, Meta muestra como guía los parches 16.17–16.18 de las ligas, los últimos que jugaron antes del torneo. Es otra muestra (otro parche, otras ligas, otros rivales): sirve para orientarse, no es lo mismo. Cuando hay datos de Worlds, la sección "cambios del parche" compara la presencia de cada campeón en la guía con la de Worlds.</p>
+  <h3>La guía: Demacia Cup</h3>
+  <p>Worlds se juega en el parche 16.20 y al principio no hay ninguna partida. Mientras Worlds tenga menos de 10, Meta muestra como guía la Demacia Cup Global Invitational (3–8 de octubre, parche 16.18): el torneo más cercano a Worlds, con equipos de Worlds de varias regiones jugando entre sí. Por eso sirve más que las ligas para ver regiones. Pero son 39 partidas: los porcentajes de campeones y de lados tienen rangos muy anchos, y otro parche y otro torneo no son Worlds. Sirve para orientarse, no es lo mismo. Cuando hay datos de Worlds, la sección "cambios del parche" compara la presencia de cada campeón en la guía con la de Worlds.</p>
   <h3>Un dato faltante no es un cero</h3>
   <p>Oracle's Elixir a veces publica partidas sin bans o sin el orden de los picks, y a parte de la LPL le falta la diferencia de oro al minuto 15. Contar esos casos como 0 bajaría los promedios sin razón. Cada métrica usa como denominador solo las partidas donde el dato existe. Por ejemplo, la presencia de un campeón es % de picks (sobre todas las partidas) más % de bans (sobre las partidas que tienen bans).</p>
   <h3>Flex</h3>

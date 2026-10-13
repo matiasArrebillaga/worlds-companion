@@ -17,6 +17,9 @@ OE_LEAGUE_REGIONS: dict[str, str | None] = {
     "LCS": "NA", "LTA N": "NA", "CBLOL": "BR", "LTA S": "BR", "LLA": "LAT",
     "LCP": "APAC", "PCS": "APAC", "VCS": "VN", "LJL": "JP",
     "LTA": None, "FST": None, "MSI": None, "EWC": None, "WLDs": None,
+    # Demacia Cup Global Invitational (octubre, antes de Worlds): solo se usa como guía del meta,
+    # pipeline/build.py la saca de todo lo demás
+    "DCGI": None,
 }
 
 

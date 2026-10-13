@@ -212,7 +212,7 @@ export function renderMeta(el: HTMLElement, data: SiteData, tabParam: string | n
     ? `<div class="seg small" role="group" aria-label="Muestra">${options.map(([id, label]) => `<button type="button" data-sample="${id}" aria-pressed="${id === state.sample}">${escapeHtml(label)}</button>`).join('')}</div>`
     : '';
   const guide = state.sample === 'guide'
-    ? `<p class="muted small-note">Guía: partidas de las ligas en los parches ${escapeHtml(data.meta.guide_patch ?? '')}, no de Worlds. Sirve de orientación hasta que el torneo tenga 10 partidas; después se va.</p>`
+    ? `<p class="muted small-note">Guía: partidas de la Demacia Cup (parche ${escapeHtml(data.meta.guide_patch ?? '')}), no de Worlds. Sirve de orientación hasta que el torneo tenga 10 partidas; después se va.</p>`
     : '';
 
   el.innerHTML = `

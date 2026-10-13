@@ -77,8 +77,8 @@ cd web && npm run build         # build de producción
 - Logos de equipos: variante "square" de Leaguepedia (respaldo: campo Image de Teams), bajados una sola vez.
   El CDN de Fandom pide Referer de lol.fandom.com. Los logos negros se pasan a blanco (no se verían).
 - Íconos de campeones: Data Dragon de Riot (`data/raw/ddragon_champions.json`: nombre en inglés → id de imagen).
-- Oracle's Elixir: forma de los jugadores del modelo elo-2 y meta (parche de Worlds 16.20; guía 16.17–16.18 hasta
-  que Worlds tenga 10 partidas), con un extracto diario en `data/raw/oracles_2026.json`; CSV completos para los
+- Oracle's Elixir: forma de los jugadores del modelo elo-2 y meta (parche de Worlds 16.20; guía: Demacia Cup, liga `DCGI`,
+  hasta que Worlds tenga 10 partidas), con un extracto diario en `data/raw/oracles_2026.json`; CSV completos para los
   notebooks (`--history`, no se commitean). Atribuir en el footer.
 
 ## Secciones del sitio

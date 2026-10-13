@@ -1,7 +1,7 @@
 """Agregados del meta (campeones, draft, lados, ritmo, regiones) para champions.json y meta.json.
 
 Fuente: games de Oracle's Elixir (models.oracles.parse_rows). Dos muestras: las partidas de Worlds y,
-mientras Worlds tenga pocas, las de las ligas en los últimos parches como guía.
+mientras Worlds tenga pocas, las de la Demacia Cup como guía.
 """
 from collections import defaultdict
 from statistics import median, quantiles
@@ -11,10 +11,9 @@ from models.elo import team_regions
 from pipeline.stats import _is_worlds, player_stats, wilson
 
 WORLDS_PATCH = "16.20"
-# Guía: los últimos parches que jugaron las ligas principales antes de Worlds (no hay partidas en 16.19;
-# en 16.18 solo jugó la VCS, así que solo no alcanza)
-GUIDE_PATCHES = ("16.17", "16.18")
-GUIDE_LABEL = "16.17–16.18"
+# Guía: la Demacia Cup Global Invitational (3–8 de octubre), el torneo más cercano a Worlds en parche
+# (16.18) y con equipos de Worlds de varias regiones enfrentándose entre sí
+GUIDE_LEAGUE = "DCGI"
 GUIDE_UNTIL_GAMES = 10    # con esta cantidad de partidas de Worlds, la guía deja de publicarse
 FIRST_ROTATION = 6        # picks 1 a 6 (B1 R1 R2 B2 B3 R3): la primera rotación del draft
 # Posición global de cada pick del equipo en el draft (pick1 del azul es el primero de todos)
@@ -231,7 +230,7 @@ def build_meta(oe_games: list[dict], schedule: list[dict], worlds_start: str | N
     """Todo lo que publican champions.json y meta.json, por muestra ("worlds" y, si hace falta, "guide")."""
     regions = team_regions(oe_games)
     worlds = [g for g in oe_games if _is_worlds(g, worlds_start)]
-    guide = [g for g in oe_games if g["teams"]["blue"].get("patch") in GUIDE_PATCHES]
+    guide = [g for g in oe_games if g["page"] == GUIDE_LEAGUE]
     samples = {"worlds": worlds}
     if len(worlds) < GUIDE_UNTIL_GAMES:
         samples["guide"] = guide
@@ -245,7 +244,9 @@ def build_meta(oe_games: list[dict], schedule: list[dict], worlds_start: str | N
         r["guide_presence"] = guide_presence.get(r["champion"], 0.0) if guide else None
     return {
         "worlds_patch": WORLDS_PATCH,
-        "guide_patch": GUIDE_LABEL if "guide" in samples else None,
+        # Parches que se jugaron en la guía (ej. "16.18"); None si ya no se publica
+        "guide_patch": ("–".join(sorted({g["teams"]["blue"]["patch"] for g in guide})) or None)
+                       if "guide" in samples else None,
         "worlds_games": len(worlds),
         "prior_picks": k,
         "champions": champions,
@@ -253,7 +254,7 @@ def build_meta(oe_games: list[dict], schedule: list[dict], worlds_start: str | N
                      for name, rows in champions.items()},
         "samples": {name: {
             "games": len(gs),
-            # La guía son ligas: sus fases no son las de Worlds, así que solo el total
+            # La guía es otro torneo: sus fases no son las de Worlds, así que solo el total
             "sides": side_stats(gs, phase if name == "worlds" else None),
             "pace": pace_stats(gs, phase if name == "worlds" else None),
             "regions": region_stats(gs, regions),
