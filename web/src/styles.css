@@ -34,6 +34,8 @@
   --f-body: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
   --f-data: "JetBrains Mono", ui-monospace, Consolas, monospace;
   --cut: 12px;
+  /* Ancho máximo del contenido (barra, página y footer); crece en pantallas de PC anchas */
+  --page-w: 1180px;
   --ease: cubic-bezier(.32, .72, 0, 1);
 }
 
@@ -58,7 +60,7 @@ body::before {
 a { color: inherit; }
 a:focus-visible, button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 
-.app { max-width: 1180px; margin: 0 auto; padding: 24px 16px 48px; display: grid; gap: 40px; position: relative; }
+.app { max-width: var(--page-w); margin: 0 auto; padding: 24px 16px 48px; display: grid; gap: 40px; position: relative; }
 
 h1, h2, h3 { font-family: var(--f-display); font-weight: 600; text-transform: uppercase; letter-spacing: .02em; margin: 0; text-wrap: balance; }
 h1 { font-size: clamp(2rem, 6vw, 3rem); line-height: 1; }
@@ -98,7 +100,7 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 .topbar {
   position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
   display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
-  max-width: 1180px; margin: 12px auto 0; padding: 10px 18px;
+  max-width: var(--page-w); margin: 12px auto 0; padding: 10px 18px;
   background: rgba(17, 26, 46, .85); backdrop-filter: blur(12px);
   border: 1px solid var(--line);
   clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
@@ -177,7 +179,7 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 .state b { color: var(--fg); font-weight: 600; }
 .state.error { border-color: var(--loss); }
 
-.site-footer { max-width: 1180px; margin: 0 auto; padding: 24px 16px 32px; display: grid; gap: 10px; font-size: 12px; color: var(--fg2); }
+.site-footer { max-width: var(--page-w); margin: 0 auto; padding: 24px 16px 32px; display: grid; gap: 10px; font-size: 12px; color: var(--fg2); }
 .site-footer p { margin: 0; max-width: 90ch; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -480,6 +482,18 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
 @media (min-width: 1180px) {
   .cal { grid-template-columns: 240px minmax(0, 1fr) 240px; gap: 24px; }
   .cal-aside { position: sticky; top: 84px; }
+}
+
+/* PC ancha (16:9 desde 1500 px): más ancho y todo un poco más grande. El celular no cambia */
+@media (min-width: 1500px) {
+  :root { --page-w: 1420px; }
+  body { font-size: 16px; }
+  .cal { grid-template-columns: 290px minmax(0, 1fr) 290px; gap: 28px; }
+  .match .tag:not(.tbd) { font-size: 2.1rem; }
+  .match .score { font-size: 2.3rem; }
+  .pred { font-size: 16px; }
+  .pred .track { height: 12px; }
+  .row .m { font-size: 1.15rem; }
 }
 .panel { background: var(--raised); padding: 16px; display: grid; gap: 2px;
   clip-path: polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut)); }
