@@ -157,6 +157,8 @@ Riot Games (ni el de League of Legends ni el de Worlds). Fotos de jugadores: no.
 - Tarjetas por estado: jugada apagada, próxima en card-hi con borde dorado, en curso con borde cian.
 
 - Todo como variables CSS en `:root`; nunca colores sueltos en componentes.
+- Paletas alternativas (Hextech vivo, Arena, Brasa, Marea) en un desplegable junto al logo; la tabla de arriba es la
+  de por defecto. Valores en `styles.css` (`:root[data-palette]`), lista en `web/src/theme/palette.ts`, guardada en el navegador.
 - Contraste mínimo WCAG AA. No transmitir información solo con color: lado como chip AZUL/ROJO, resultado como V/D.
 - Colores por región: valores en `styles.css` (`--region-*`), elección por equipo en `web/src/theme/regions.ts`.
 - Tipografía (Google Fonts): Saira Condensed 600–700 para títulos (mayúsculas, leve espaciado),

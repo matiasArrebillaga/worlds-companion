@@ -6,6 +6,8 @@
     <meta name="color-scheme" content="dark" />
     <meta name="theme-color" content="#090D18" />
     <title>Worlds Companion</title>
+    <!-- Paleta guardada, aplicada antes de pintar para que no parpadee (misma clave que theme/palette.ts) -->
+    <script>try { var p = localStorage.getItem('wc-palette'); if (p && p !== 'hextech') document.documentElement.dataset.palette = p; } catch (e) {}</script>
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="icon" type="image/png" href="./icons/icon-192.png" />
     <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
@@ -15,7 +17,10 @@
   </head>
   <body>
     <header class="topbar">
-      <a class="wordmark" href="#/" aria-label="Worlds Companion, ir al Calendario"><span class="hexmark" aria-hidden="true"></span>Worlds Companion</a>
+      <div class="brand">
+        <a class="wordmark" href="#/" aria-label="Worlds Companion, ir al Calendario"><span class="hexmark" aria-hidden="true"></span>Worlds Companion</a>
+        <select class="palette" id="palette" aria-label="Paleta de colores"></select>
+      </div>
       <nav class="tabs" aria-label="Secciones">
         <a class="tab" href="#/" data-tab="#/"><i class="dot live-dot" aria-hidden="true"></i>Calendario</a>
         <a class="tab" href="#/equipos" data-tab="#/equipos">Equipos</a>

@@ -11,17 +11,24 @@
   --fg2: #A6B1C8;
   --fg3: #6F7B96;
   --gold: #D4AE52;
-  --gold-soft: rgba(212, 174, 82, .14);
+  --gold-soft: color-mix(in srgb, var(--gold) 14%, transparent);
   --cyan: #45CCD4;
-  --cyan-soft: rgba(69, 204, 212, .13);
+  --cyan-soft: color-mix(in srgb, var(--cyan) 13%, transparent);
   --win: #52C285;
   --loss: #F0606A;
   --blue: #4F95F0;
-  --blue-soft: rgba(79, 149, 240, .18);
+  --blue-soft: color-mix(in srgb, var(--blue) 18%, transparent);
   --red: #F07F55;
-  --red-soft: rgba(240, 127, 85, .17);
-  --bezel-a: rgba(212, 174, 82, .24);
-  --bezel-b: rgba(69, 204, 212, .14);
+  --red-soft: color-mix(in srgb, var(--red) 17%, transparent);
+  --bezel-a: color-mix(in srgb, var(--gold) 24%, transparent);
+  --bezel-b: color-mix(in srgb, var(--cyan) 14%, transparent);
+  /* Mezcla de colores de las paletas alternativas: acento extra, brillos del fondo y degradé de bordes.
+     En la paleta por defecto no cambian nada (acento = dorado, brillos transparentes, bordes = line) */
+  --accent: var(--gold);
+  --glow-a: transparent;
+  --glow-b: transparent;
+  --edge-a: var(--line);
+  --edge-b: var(--line);
   /* Regiones (las usa theme/regions.ts) */
   --region-kr: #F2F4F8;
   --region-cn: #E8424F;
@@ -39,8 +46,40 @@
   --ease: cubic-bezier(.32, .72, 0, 1);
 }
 
+/* Paletas alternativas (selector junto al logo, theme/palette.ts). Solo redefinen colores base;
+   los tonos suaves y biseles se derivan solos. Victoria, derrota, lados y regiones conservan su significado */
+:root[data-palette] { --bezel-b: color-mix(in srgb, var(--accent) 30%, transparent); }
+:root[data-palette="vivo"] {
+  --bg: #060E26; --sunken: #030817; --card: #0D1C44; --raised: #16295E; --card-hi: #1D3573;
+  --line: #243E7A; --line-ctl: #6F8AD0; --fg: #F5F8FF; --fg2: #B0C0E8; --fg3: #7489BC;
+  --gold: #FFC940; --cyan: #2EE6F0; --win: #4FD98E; --loss: #FF5F6D; --blue: #5AA4FF; --red: #FF8A5C;
+  --accent: #8C6BFF; --glow-a: rgba(46, 230, 240, .16); --glow-b: rgba(140, 107, 255, .2); --edge-a: #FFC940; --edge-b: #8C6BFF;
+}
+:root[data-palette="arena"] {
+  --bg: #120F1A; --sunken: #0A0810; --card: #1C1826; --raised: #272133; --card-hi: #30293F;
+  --line: #3A3249; --line-ctl: #887E9E; --fg: #F6F4FA; --fg2: #BCB5CA; --fg3: #847B96;
+  --gold: #F2B84B; --cyan: #F06BFF; --win: #55C98A; --loss: #FF5C6C; --blue: #5A9CF5; --red: #FF8A57;
+  --accent: #E8414F; --glow-a: rgba(240, 107, 255, .14); --glow-b: rgba(232, 65, 79, .17); --edge-a: #F06BFF; --edge-b: #E8414F;
+}
+:root[data-palette="brasa"] {
+  --bg: #140D0B; --sunken: #0B0706; --card: #22160F; --raised: #312017; --card-hi: #3D291D;
+  --line: #4A3326; --line-ctl: #A68370; --fg: #FFF7F0; --fg2: #D6C2B2; --fg3: #9A8372;
+  --gold: #FFB23F; --cyan: #3FD9C4; --win: #63CF7E; --loss: #FF5D5D; --blue: #5C9DFF; --red: #FF8250;
+  --accent: #E0457B; --glow-a: rgba(255, 178, 63, .14); --glow-b: rgba(63, 217, 196, .13); --edge-a: #FFB23F; --edge-b: #E0457B;
+}
+:root[data-palette="marea"] {
+  --bg: #061619; --sunken: #030D0F; --card: #0C252A; --raised: #13343B; --card-hi: #194048;
+  --line: #1F4A52; --line-ctl: #62A0A8; --fg: #F2FBFB; --fg2: #ABCDD0; --fg3: #71979C;
+  --gold: #FFD04A; --cyan: #3DF5C8; --win: #5BD98A; --loss: #FF6470; --blue: #5AA8FF; --red: #FF8A5E;
+  --accent: #A08CFF; --glow-a: rgba(61, 245, 200, .13); --glow-b: rgba(160, 140, 255, .18); --edge-a: #3DF5C8; --edge-b: #A08CFF;
+}
+
 * { box-sizing: border-box; }
 html, body { background: var(--bg); color: var(--fg); margin: 0; }
+/* Brillos de color en dos esquinas (solo en las paletas alternativas) */
+html { background: radial-gradient(circle at 0% 0%, var(--glow-a), transparent 45%) fixed,
+  radial-gradient(circle at 100% 100%, var(--glow-b), transparent 55%) fixed, var(--bg); }
+body { background: transparent; }
 body {
   font-family: var(--f-body);
   font-size: 15px;
@@ -88,7 +127,7 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 }
 .bezel.live { background: linear-gradient(135deg, var(--cyan), var(--line) 35%, var(--line) 65%, var(--cyan)); }
 .core {
-  background: var(--card);
+  background: linear-gradient(135deg, var(--glow-a), transparent 55%), var(--card);
   clip-path: polygon(var(--c) 0, 100% 0, 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, 0 100%, 0 var(--c));
   box-shadow: inset 0 1px 0 rgba(245, 247, 252, .07);
   padding: 18px;
@@ -101,18 +140,25 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
   position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
   display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
   max-width: var(--page-w); margin: 12px auto 0; padding: 10px 18px;
-  background: rgba(17, 26, 46, .85); backdrop-filter: blur(12px);
-  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--card) 85%, transparent); backdrop-filter: blur(12px);
+  border: 1px solid var(--line); border-image: linear-gradient(90deg, var(--edge-a), var(--edge-b)) 1;
   clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
 }
 .wordmark { font: 700 18px/1 var(--f-display); letter-spacing: .12em; text-transform: uppercase; text-decoration: none; display: flex; align-items: center; gap: 10px; }
-.hexmark { width: 20px; height: 22px; background: var(--gold); clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); display: grid; place-items: center; }
+.hexmark { width: 20px; height: 22px; background: linear-gradient(135deg, var(--gold), var(--accent)); clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); display: grid; place-items: center; }
 .hexmark::after { content: ""; width: 11px; height: 12px; background: var(--card); clip-path: inherit; }
 .tabs { display: flex; gap: 4px; }
 .tab { font: 600 14px/1 var(--f-display); letter-spacing: .1em; text-transform: uppercase; color: var(--fg2); text-decoration: none; padding: 10px 12px; position: relative; transition: color .3s var(--ease); }
-.tab::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 2px; height: 2px; background: var(--gold); transform: scaleX(0); transform-origin: left; transition: transform .45s var(--ease); }
+.tab::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 2px; height: 2px; background: linear-gradient(90deg, var(--gold), var(--accent)); transform: scaleX(0); transform-origin: left; transition: transform .45s var(--ease); }
 .tab:hover, .tab[aria-current="page"] { color: var(--fg); }
 .tab[aria-current="page"]::after { transform: scaleX(1); }
+.brand { display: flex; align-items: center; gap: 12px; }
+.palette {
+  font: 500 12px/1 var(--f-data); color: var(--fg2); background: var(--sunken);
+  border: 1px solid var(--line-ctl); padding: 6px 8px; min-height: 32px; cursor: pointer;
+}
+.palette:hover { color: var(--fg); }
+.palette:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 .updated { display: flex; gap: 8px; align-items: center; font: 12px var(--f-data); color: var(--fg2); }
 .updated.stale { color: var(--gold); }
 
@@ -137,7 +183,7 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 .res.w { color: var(--bg); background: var(--win); }
 .res.l { color: var(--bg); background: var(--loss); }
 .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); animation: pulse 2.4s var(--ease) infinite; }
-@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(69,204,212,.6); } 70% { box-shadow: 0 0 0 8px rgba(69,204,212,0); } 100% { box-shadow: 0 0 0 0 rgba(69,204,212,0); } }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--cyan) 60%, transparent); } 70% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
 
 /* Tarjeta de partido */
 .match { display: grid; gap: 14px; }
@@ -745,7 +791,7 @@ html { -webkit-tap-highlight-color: transparent; }
 
 /* La tarjeta del partido que acaba de terminar destella una vez */
 .bezel.flash { animation: flash 1.8s var(--ease); }
-@keyframes flash { 0% { filter: drop-shadow(0 0 14px rgba(69, 204, 212, .55)); } 100% { filter: none; } }
+@keyframes flash { 0% { filter: drop-shadow(0 0 14px color-mix(in srgb, var(--cyan) 55%, transparent)); } 100% { filter: none; } }
 
 /* Esqueleto de carga */
 .sk { display: grid; gap: 12px; padding: 18px; background: var(--card);

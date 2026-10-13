@@ -18,6 +18,7 @@ import { renderPlayer } from './views/player';
 import { renderStats } from './views/stats';
 import { renderTeam } from './views/team';
 import { setTeamPages } from './theme/regions';
+import { PALETTES, applyPalette, storedPalette } from './theme/palette';
 
 type View = (el: HTMLElement, data: SiteData, tz: string, route: Route) => () => void;
 
@@ -144,6 +145,14 @@ async function start(): Promise<void> {
     const restore = !linkClicked;
     withTransition(() => route(data, restore));
     linkClicked = false;
+  });
+  // Selector de paleta junto al logo: al cambiar se redibuja la vista para que los gráficos tomen los colores nuevos
+  const palette = document.getElementById('palette') as HTMLSelectElement;
+  palette.innerHTML = PALETTES.map((p) => `<option value="${p.id}">${p.name}</option>`).join('');
+  palette.value = storedPalette(localStorage);
+  palette.addEventListener('change', () => {
+    applyPalette(palette.value, localStorage);
+    render(data);
   });
   route(data);
 }
