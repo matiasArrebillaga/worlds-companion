@@ -1,10 +1,9 @@
 // Paletas de colores: los valores viven en styles.css (:root[data-palette="…"]); acá solo la lista y la elección
 export const PALETTES = [
   { id: 'hextech', name: 'Hextech' }, // la de siempre, por defecto
-  { id: 'vivo', name: 'Hextech vivo' },
   { id: 'arena', name: 'Arena' },
-  { id: 'brasa', name: 'Brasa' },
-  { id: 'marea', name: 'Marea' },
+  { id: 'grafito', name: 'Grafito' }, // minimalista oscura
+  { id: 'papel', name: 'Papel' }, // minimalista clara
 ] as const;
 
 export const PALETTE_KEY = 'wc-palette';

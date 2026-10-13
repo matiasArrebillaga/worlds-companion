@@ -29,6 +29,9 @@
   --glow-b: transparent;
   --edge-a: var(--line);
   --edge-b: var(--line);
+  --hex-opacity: .12;
+  --shadow: rgba(0, 0, 0, .5);
+  --logo-edge: none; /* contorno de los logos blancos en la paleta clara */
   /* Regiones (las usa theme/regions.ts) */
   --region-kr: #F2F4F8;
   --region-cn: #E8424F;
@@ -49,29 +52,32 @@
 /* Paletas alternativas (selector junto al logo, theme/palette.ts). Solo redefinen colores base;
    los tonos suaves y biseles se derivan solos. Victoria, derrota, lados y regiones conservan su significado */
 :root[data-palette] { --bezel-b: color-mix(in srgb, var(--accent) 30%, transparent); }
-:root[data-palette="vivo"] {
-  --bg: #060E26; --sunken: #030817; --card: #0D1C44; --raised: #16295E; --card-hi: #1D3573;
-  --line: #243E7A; --line-ctl: #6F8AD0; --fg: #F5F8FF; --fg2: #B0C0E8; --fg3: #7489BC;
-  --gold: #FFC940; --cyan: #2EE6F0; --win: #4FD98E; --loss: #FF5F6D; --blue: #5AA4FF; --red: #FF8A5C;
-  --accent: #8C6BFF; --glow-a: rgba(46, 230, 240, .16); --glow-b: rgba(140, 107, 255, .2); --edge-a: #FFC940; --edge-b: #8C6BFF;
-}
+/* Arena: violeta oscuro con rojos y magenta */
 :root[data-palette="arena"] {
   --bg: #0A0810; --sunken: #050409; --card: #1C1826; --raised: #272133; --card-hi: #30293F;
-  --line: #3A3249; --line-ctl: #887E9E; --fg: #F6F4FA; --fg2: #BCB5CA; --fg3: #847B96;
-  --gold: #FF6B5E; --cyan: #F06BFF; --win: #55C98A; --loss: #FF4F7B; --blue: #5A9CF5; --red: #FF8A57;
-  --accent: #D7263D; --glow-a: rgba(240, 107, 255, .12); --glow-b: rgba(215, 38, 61, .18); --edge-a: #FF6B5E; --edge-b: #9E1B32;
+  --line: #3A3249; --line-ctl: #887E9E; --fg: #F6F4FA; --fg2: #BCB5CA; --fg3: #958CA8;
+  --gold: #EE5E4D; --cyan: #D062E6; --win: #55C98A; --loss: #F2557D; --blue: #5A9CF5; --red: #FF8A57;
+  --accent: #A51C30; --glow-a: rgba(208, 98, 230, .10); --glow-b: rgba(165, 28, 48, .16); --edge-a: #EE5E4D; --edge-b: #6E1222;
 }
-:root[data-palette="brasa"] {
-  --bg: #140D0B; --sunken: #0B0706; --card: #22160F; --raised: #312017; --card-hi: #3D291D;
-  --line: #4A3326; --line-ctl: #A68370; --fg: #FFF7F0; --fg2: #D6C2B2; --fg3: #9A8372;
-  --gold: #FFB23F; --cyan: #3FD9C4; --win: #63CF7E; --loss: #FF5D5D; --blue: #5C9DFF; --red: #FF8250;
-  --accent: #E0457B; --glow-a: rgba(255, 178, 63, .14); --glow-b: rgba(63, 217, 196, .13); --edge-a: #FFB23F; --edge-b: #E0457B;
+/* Minimalistas (Grafito oscura, Papel clara): monocromo cálido, sin panal, sin brillos y bordes lisos */
+:root[data-palette="grafito"], :root[data-palette="papel"] {
+  --accent: var(--gold); --glow-a: transparent; --glow-b: transparent; --edge-a: var(--line); --edge-b: var(--line);
+  --bezel-a: var(--line); --bezel-b: var(--line); --hex-opacity: 0;
 }
-:root[data-palette="marea"] {
-  --bg: #061619; --sunken: #030D0F; --card: #0C252A; --raised: #13343B; --card-hi: #194048;
-  --line: #1F4A52; --line-ctl: #62A0A8; --fg: #F2FBFB; --fg2: #ABCDD0; --fg3: #71979C;
-  --gold: #FFD04A; --cyan: #3DF5C8; --win: #5BD98A; --loss: #FF6470; --blue: #5AA8FF; --red: #FF8A5E;
-  --accent: #A08CFF; --glow-a: rgba(61, 245, 200, .13); --glow-b: rgba(160, 140, 255, .18); --edge-a: #3DF5C8; --edge-b: #A08CFF;
+:root[data-palette="grafito"] {
+  --bg: #111110; --sunken: #0A0A09; --card: #1A1A18; --raised: #242422; --card-hi: #2C2B28;
+  --line: #33322F; --line-ctl: #77756F; --fg: #F2F1EE; --fg2: #A8A6A0; --fg3: #8F8D87;
+  --gold: #CDB27A; --cyan: #8FB8C9; --win: #7DBF8E; --loss: #E07B76; --blue: #7FA6E0; --red: #E0956B;
+}
+/* Papel: fondo hueso y tarjetas blancas; acentos oscuros para llegar a AA sobre blanco */
+:root[data-palette="papel"] {
+  color-scheme: light;
+  --bg: #F7F6F3; --sunken: #EFEEEA; --card: #FFFFFF; --raised: #F1F0EC; --card-hi: #FFFFFF;
+  --line: #E4E3DE; --line-ctl: #8D8B85; --fg: #2F3437; --fg2: #5F5E5A; --fg3: #6F6E69;
+  --gold: #8A5A00; --cyan: #1F6C9F; --win: #346538; --loss: #9F2F2D; --blue: #2B5CB8; --red: #A8481A;
+  --region-kr: #3F4248; --region-cn: #B5232F; --region-eu: #127A86; --region-na: #2F55D4; --region-br: #1C7D45;
+  --region-apac: #6B45C9; --region-other: #77756F;
+  --shadow: rgba(0, 0, 0, .08); --logo-edge: drop-shadow(0 0 .6px rgba(0, 0, 0, .7)) drop-shadow(0 0 .6px rgba(0, 0, 0, .7));
 }
 
 * { box-sizing: border-box; }
@@ -91,7 +97,7 @@ body::before {
   content: "";
   position: fixed; inset: 0;
   pointer-events: none;
-  opacity: .12;
+  opacity: var(--hex-opacity);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cpath fill='%2324304A' d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/svg%3E");
   -webkit-mask-image: radial-gradient(ellipse 70% 50% at 50% 0%, #000 0%, transparent 75%);
           mask-image: radial-gradient(ellipse 70% 50% at 50% 0%, #000 0%, transparent 75%);
@@ -662,7 +668,7 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
 /* ================= Logos de equipos e íconos de campeones =================
    Logo: tamaño relativo a la sigla, subrayado con el color de la región. Sin logo queda el rombito.
    Campeón: ícono de Data Dragon recortado en el hexágono, encima del monograma (que se ve si no carga). */
-.logo { object-fit: contain; flex: none; }
+.logo { object-fit: contain; flex: none; filter: var(--logo-edge); }
 .tag .logo, .tm .logo { width: 1.15em; height: 1.15em; padding-bottom: 3px; border-bottom: 2px solid var(--rc); }
 .who .logo { width: 30px; height: 30px; }
 .team-title { display: flex; align-items: center; gap: 14px; }
@@ -781,7 +787,7 @@ html { -webkit-tap-highlight-color: transparent; }
 /* Aviso de resultados nuevos: abajo a la derecha en PC, encima de la barra inferior en el celular */
 .toast { position: fixed; z-index: 20; right: 16px; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); left: 16px;
   display: grid; gap: 6px; padding: 12px 14px; background: var(--card-hi); border-left: 3px solid var(--cyan);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, .5); font-size: 14px;
+  box-shadow: 0 12px 32px var(--shadow); font-size: 14px;
   transform: translateY(16px); opacity: 0; pointer-events: none; transition: transform .45s var(--ease), opacity .45s var(--ease); }
 .toast.show { transform: none; opacity: 1; }
 .toast-line { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
@@ -902,7 +908,7 @@ html { -webkit-tap-highlight-color: transparent; }
 
 /* Tooltip compartido (tooltip.ts) */
 .tip { position: fixed; z-index: 30; pointer-events: none; max-width: 260px; padding: 8px 10px; background: var(--card-hi);
-  border: 1px solid var(--line-ctl); box-shadow: 0 10px 24px rgba(0, 0, 0, .5); font: 500 12px/1.4 var(--f-data); color: var(--fg);
+  border: 1px solid var(--line-ctl); box-shadow: 0 10px 24px var(--shadow); font: 500 12px/1.4 var(--f-data); color: var(--fg);
   opacity: 0; transition: opacity .15s var(--ease); }
 .tip.on { opacity: 1; }
 [data-tip] { cursor: help; }

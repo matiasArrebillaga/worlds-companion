@@ -150,6 +150,8 @@ async function start(): Promise<void> {
   const palette = document.getElementById('palette') as HTMLSelectElement;
   palette.innerHTML = PALETTES.map((p) => `<option value="${p.id}">${p.name}</option>`).join('');
   palette.value = storedPalette(localStorage);
+  // Reaplica al arrancar: si había guardada una paleta que ya no existe, vuelve a la de por defecto
+  applyPalette(palette.value, localStorage);
   palette.addEventListener('change', () => {
     applyPalette(palette.value, localStorage);
     render(data);
