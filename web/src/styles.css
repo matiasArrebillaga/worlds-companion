@@ -56,10 +56,10 @@
   --accent: #8C6BFF; --glow-a: rgba(46, 230, 240, .16); --glow-b: rgba(140, 107, 255, .2); --edge-a: #FFC940; --edge-b: #8C6BFF;
 }
 :root[data-palette="arena"] {
-  --bg: #120F1A; --sunken: #0A0810; --card: #1C1826; --raised: #272133; --card-hi: #30293F;
+  --bg: #0A0810; --sunken: #050409; --card: #1C1826; --raised: #272133; --card-hi: #30293F;
   --line: #3A3249; --line-ctl: #887E9E; --fg: #F6F4FA; --fg2: #BCB5CA; --fg3: #847B96;
-  --gold: #F2B84B; --cyan: #F06BFF; --win: #55C98A; --loss: #FF5C6C; --blue: #5A9CF5; --red: #FF8A57;
-  --accent: #E8414F; --glow-a: rgba(240, 107, 255, .14); --glow-b: rgba(232, 65, 79, .17); --edge-a: #F06BFF; --edge-b: #E8414F;
+  --gold: #FF6B5E; --cyan: #F06BFF; --win: #55C98A; --loss: #FF4F7B; --blue: #5A9CF5; --red: #FF8A57;
+  --accent: #D7263D; --glow-a: rgba(240, 107, 255, .12); --glow-b: rgba(215, 38, 61, .18); --edge-a: #FF6B5E; --edge-b: #9E1B32;
 }
 :root[data-palette="brasa"] {
   --bg: #140D0B; --sunken: #0B0706; --card: #22160F; --raised: #312017; --card-hi: #3D291D;
