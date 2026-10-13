@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-10T23:42:05Z",
+ "fetched_at": "2026-10-13T04:07:51Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -8,8 +8,8 @@
    "Round": "",
    "Phase": "",
    "BestOf": "5",
-   "Team1": "FURIA",
-   "Team2": "MVK Esports",
+   "Team1": "Cloud9",
+   "Team2": "Karmine Corp",
    "Team1Score": "",
    "Team2Score": "",
    "Winner": "",
@@ -25,8 +25,8 @@
    "Round": "",
    "Phase": "",
    "BestOf": "5",
-   "Team1": "Cloud9",
-   "Team2": "Karmine Corp",
+   "Team1": "FURIA",
+   "Team2": "MVK Esports",
    "Team1Score": "",
    "Team2Score": "",
    "Winner": "",
