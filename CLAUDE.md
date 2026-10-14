@@ -135,35 +135,37 @@ Riot Games (ni el de League of Legends ni el de Worlds). Fotos de jugadores: no.
 
 | Token | Color | Uso |
 |---|---|---|
-| bg | `#090D18` | Fondo principal |
-| sunken | `#05070E` | Pistas de barras, inputs |
-| card | `#111A2E` | Tarjetas |
-| raised | `#1C2842` | Hover, sub-pestaña activa, paneles laterales |
-| card-hi | `#24324F` | Tarjeta del próximo partido |
-| line | `#2A3858` | Divisores (solo decorativo) |
-| line-ctl | `#6A7AA3` | Bordes de controles |
+| bg | `#06080F` | Fondo principal |
+| sunken | `#04060B` | Pistas de barras, inputs |
+| card | `#172139` | Tarjetas |
+| raised | `#25324F` | Hover, sub-pestaña activa, paneles laterales |
+| card-hi | `#2C3B5C` | Tarjeta del próximo partido |
+| line | `#3E4F77` | Divisores (solo decorativo) |
+| line-ctl | `#7888B2` | Bordes de controles |
 | fg | `#F5F7FC` | Texto principal |
-| fg2 | `#A6B1C8` | Texto secundario |
-| fg3 | `#6F7B96` | Texto terciario (conectores, vacíos) |
-| gold | `#D4AE52` | Importancia: favorito, pestaña activa, final |
-| cyan | `#45CCD4` | Estado e interacción: en curso, foco |
+| fg2 | `#B6C0D5` | Texto secundario |
+| fg3 | `#9AA5C0` | Texto terciario (conectores, vacíos) |
+| gold | `#D4AE52` | Solo el modelo: favorito, pick, sorpresa, próximo partido |
+| cyan | `#45CCD4` | Solo en vivo y foco |
+| data | `#6FA9B4` | Barras y bandas de datos (cian apagado) |
 | win | `#52C285` | Victoria |
 | loss | `#F0606A` | Derrota |
 | blue | `#4F95F0` | Lado azul |
 | red | `#F07F55` | Lado rojo (coral, distinto de derrota) |
 
-- Regiones (`--region-*`, rombito junto a la sigla): KR blanco `#F2F4F8`, CN rojo `#E8424F`, EU cian `#4DD9E8`,
-  NA azul `#4F7BFF`, BR verde `#3DDC84`, APAC violeta `#A57CFF`.
+- Regiones (`--region-*`, rombito junto a la sigla): KR blanco `#F2F4F8`, CN rojo `#DE5560`, EU cian `#5CC8D4`,
+  NA azul `#5E86EC`, BR verde `#52C687`, APAC violeta `#A086E8`.
 - Tarjetas por estado: jugada apagada, próxima en card-hi con borde dorado, en curso con borde cian.
 
 - Todo como variables CSS en `:root`; nunca colores sueltos en componentes.
-- Paletas alternativas (Arena; Grafito y Papel, minimalistas oscura y clara, sin panal, brillos ni borde degradé) en un
+- Un color, una tarea: navegación activa y hovers en blanco (`fg`), sin degradés ni brillos; bordes lisos de 1 px.
+- Paletas alternativas (Arena; Grafito y Papel, minimalistas oscura y clara, sin panal) en un
   desplegable junto al logo; la tabla de arriba es la de por defecto. En Papel los logos llevan un contorno fino. Valores en `styles.css` (`:root[data-palette]`), lista en `web/src/theme/palette.ts`, guardada en el navegador.
 - Contraste mínimo WCAG AA. No transmitir información solo con color: lado como chip AZUL/ROJO, resultado como V/D.
 - Colores por región: valores en `styles.css` (`--region-*`), elección por equipo en `web/src/theme/regions.ts`.
 - Tipografía (Google Fonts): Saira Condensed 600–700 para títulos (mayúsculas, leve espaciado),
   Plus Jakarta Sans para texto, JetBrains Mono con `tabular-nums` para números.
-- Tarjetas con esquinas cortadas (clip-path) y borde degradé dorado→cian sutil; panal de hexágonos muy tenue.
+- Tarjetas con esquinas cortadas (clip-path) y borde liso; panal de hexágonos muy tenue.
 - Campeones: ícono de Data Dragon recortado en hexágono; si no carga, monograma.
 - Equipos: logo junto a la sigla, subrayado con el color de la región; sin logo, rombito de la región.
 - Mobile first: se usa mucho desde el celular mientras se mira el partido.

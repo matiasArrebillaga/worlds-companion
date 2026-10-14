@@ -40,7 +40,7 @@ function history(p: PlayerEntry): string {
       <td class="num d">${escapeHtml(g.date.slice(5))}</td>
       <td class="r"><span class="res ${g.won ? 'w' : 'l'}">${g.won ? 'V' : 'D'}</span></td>
       <td class="c">${escapeHtml(g.champion)}</td>
-      <td class="o">vs ${escapeHtml(g.opponent)}${g.worlds ? ' <span class="pill gold">Worlds</span>' : ''}</td>
+      <td class="o">vs ${escapeHtml(g.opponent)}${g.worlds ? ' <span class="pill">Worlds</span>' : ''}</td>
       <td class="num" data-label="KDA">${g.kills}/${g.deaths}/${g.assists}</td>
       <td class="num" data-label="CS/min">${fmt(g.cs_min, 1)}</td>
       <td class="num" data-label="DPM">${fmt(g.dpm)}</td>

@@ -44,7 +44,7 @@ export async function drawEloChart(canvas: HTMLCanvasElement, lines: EloLine[], 
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const { dates, values } = alignLines(lines.map((l) => dailyElo(l.history)));
   // Primer equipo cian y continuo; el segundo dorado y punteado (no se distinguen solo por el color)
-  const styles = [{ color: cssVar('--cyan'), dash: [] as number[] }, { color: cssVar('--gold'), dash: [6, 4] }];
+  const styles = [{ color: cssVar('--data'), dash: [] as number[] }, { color: cssVar('--gold'), dash: [6, 4] }];
 
   // Línea vertical "Worlds" en el primer día del torneo que aparezca en el gráfico
   const worldsLine = {

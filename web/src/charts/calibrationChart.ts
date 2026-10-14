@@ -30,7 +30,7 @@ export async function drawCalibrationChart(canvas: HTMLCanvasElement, buckets: C
       datasets: [
         {
           data: used.map((b) => ({ x: b.predicted! * 100, y: b.observed! * 100, r: bubbleRadius(b.n) })),
-          backgroundColor: cssVar('--cyan-soft'), borderColor: cssVar('--cyan'), borderWidth: 2,
+          backgroundColor: cssVar('--data-soft'), borderColor: cssVar('--data'), borderWidth: 2,
           clip: false, // un punto en 100% no se corta contra el borde
         },
         {
