@@ -79,6 +79,7 @@ cd web && npm run build         # build de producción
 - lolesports (API no oficial, `pipeline/lolesports.py`): stats de cada partida de Worlds en vivo (último cuadro del feed
   livestats) para la pestaña Partidas mientras Leaguepedia no cargue el scoreboard (lo hace a mano, horas después).
   Sin bans ni daño absoluto; el ganador sale de MatchScheduleGame de Leaguepedia. Si falla, se usa la caché.
+  El meta también suma las partidas de Worlds que Oracle's Elixir todavía no tiene (de Leaguepedia o lolesports).
 - Íconos de campeones: Data Dragon de Riot (`data/raw/ddragon_champions.json`: nombre en inglés → id de imagen).
 - Oracle's Elixir: forma de los jugadores del modelo elo-2 y meta (parche de Worlds 16.20; guía 16.17–16.18 con las ligas y la
   Demacia Cup `DCGI` hasta que Worlds tenga 10 partidas), con un extracto diario en `data/raw/oracles_2026.json`; CSV completos para los

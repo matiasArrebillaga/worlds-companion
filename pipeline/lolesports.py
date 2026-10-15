@@ -110,6 +110,7 @@ def to_leaguepedia_rows(games: list[dict], matches: list[dict], schedule_games: 
         game_id = f"{match['MatchId']}_{g['number']}"
         frame, meta = g["last_frame"], g["metadata"]
         row = {"GameId": game_id, "MatchId": match["MatchId"], "GameInMatch": str(g["number"]),
+               "DateTimeUTC": g["first_frame_time"][:19].replace("T", " "),
                "Winner": winners.get(game_id, "") if frame["gameState"] == "finished" else "",
                "Gamelength": _length(g["first_frame_time"], frame["rfc460Timestamp"]),
                "Patch": ".".join((g.get("patch") or "").split(".")[:2])}
@@ -134,3 +135,46 @@ def to_leaguepedia_rows(games: list[dict], matches: list[dict], schedule_games: 
                                     "Gold": str(s.get("totalGold", "")), "DamageToChampions": ""})
         game_rows.append(row)
     return game_rows, player_rows
+
+
+OE_ROLES = {"1": "top", "2": "jng", "3": "mid", "4": "bot", "5": "sup"}
+
+
+def to_oe_games(game_rows: list[dict], player_rows: list[dict], oe_name) -> list[dict]:
+    """Filas con forma de Leaguepedia (las de lolesports o el scoreboard de Leaguepedia) → games con el formato de
+    models.oracles.parse_rows, para que el meta cuente las partidas de Worlds antes de que lleguen a Oracle's Elixir.
+    Solo partidas terminadas. Lo que no hay queda vacío (dato faltante): orden de picks y, con lolesports, bans y daño.
+    oe_name: nombre de Leaguepedia → nombre en Oracle's Elixir (para que coincidan las regiones de los equipos)."""
+    players: dict[tuple[str, str], list[dict]] = {}
+    for r in player_rows:
+        players.setdefault((r["GameId"], r.get("Side") or ""), []).append(r)
+    games = []
+    for g in game_rows:
+        winner = {"1": "blue", "2": "red"}.get(g.get("Winner") or "")
+        minutes, _, seconds = (g.get("Gamelength") or "").partition(":")
+        if not winner or not seconds:
+            continue
+        length = str(int(minutes) * 60 + int(seconds))
+        teams, sides = {}, {}
+        for n, side in (("1", "blue"), ("2", "red")):
+            bans = [b.strip() for b in (g.get(f"Team{n}Bans") or "").split(",")]
+            teams[side] = {"teamname": oe_name(g[f"Team{n}"]), "side": side.title(), "position": "team",
+                           "result": "1" if winner == side else "0", "gamelength": length,
+                           "kills": g.get(f"Team{n}Kills") or "", "patch": g.get("Patch") or "",
+                           **{f"ban{i}": b for i, b in enumerate(bans[:5], start=1)}}
+            sides[side] = {OE_ROLES[r["RoleNumber"]]: {
+                "champion": r.get("Champion") or "", "kills": r.get("Kills") or "", "deaths": r.get("Deaths") or "",
+                "assists": r.get("Assists") or "", "teamkills": teams[side]["kills"], "total cs": r.get("CS") or "",
+                "damagetochampions": r.get("DamageToChampions") or "", "playername": r.get("Link") or ""}
+                for r in players.get((g["GameId"], n), []) if r.get("RoleNumber") in OE_ROLES}
+        games.append({"date": g.get("DateTimeUTC") or "", "match_id": g["MatchId"], "game": int(g["GameInMatch"]),
+                      "page": "WLDs", "region": None, "blue": teams["blue"]["teamname"], "red": teams["red"]["teamname"],
+                      "winner": winner, "teams": teams, "players": sides})
+    return games
+
+
+def missing_from(oe_games: list[dict], extra: list[dict]) -> list[dict]:
+    """Las de `extra` que Oracle's Elixir todavía no tiene (mismo día, mismos equipos, mismo número de partida)."""
+    key = lambda g: (g["date"][:10], frozenset((g["blue"], g["red"])), g["game"])  # noqa: E731
+    known = {key(g) for g in oe_games}
+    return [g for g in extra if key(g) not in known]

@@ -98,6 +98,21 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
     def adjust(team1: str, team2: str) -> float:
         return adjustment(resolve_team(team1, ups), resolve_team(team2, ups), ups, forms, role_model)
 
+    # Detalle de cada partida jugada (draft, objetivos y jugadores) para la pestaña Partidas
+    # Leaguepedia manda; lolesports completa las partidas que Leaguepedia todavía no cargó
+    lp_games = _rows_if_exists(raw_dir / "worlds_2026_games.json")
+    lp_players = _rows_if_exists(raw_dir / "worlds_2026_game_players.json")
+    champion_names = {v: k for k, v in _read(raw_dir / "ddragon_champions.json")["ids"].items()}         if (raw_dir / "ddragon_champions.json").exists() else {}
+    live_games, live_players = lolesports.to_leaguepedia_rows(
+        _rows_if_exists(raw_dir / "lolesports_2026_games.json"), matches_raw["rows"],
+        _rows_if_exists(raw_dir / "worlds_2026_schedule_games.json"),
+        _rows_if_exists(raw_dir / "worlds_2026_teams.json"), champion_names)
+    known = {g["GameId"] for g in lp_games}
+    live_games = [g for g in live_games if g["GameId"] not in known]
+    live_ids = {g["GameId"] for g in live_games}
+    live_players = [p for p in live_players if p["GameId"] in live_ids]
+    games_detail = build_games(lp_games + live_games, lp_players + live_players)
+
     # Todo se valida antes de escribir nada (ni JSON ni predicciones congeladas)
     errors = (validate_schedule(schedule) + validate_ratings(teams, run.games_played, aliases)
               + validate_lineups(teams, ups))
@@ -121,7 +136,11 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
         teams_payload.sort(key=lambda t: -t["rating"])
         errors += validate_stats(teams_payload, players_payload)
         # Meta (campeones, lados, ritmo, regiones) con las partidas de Worlds y la guía del parche anterior
-        meta_stats = build_meta(oe_games, schedule, worlds_start)
+        # Las partidas de Worlds que Oracle's Elixir (se baja una vez por día) todavía no tiene salen de
+        # Leaguepedia o lolesports, así el meta se actualiza con cada build
+        fresh = lolesports.to_oe_games(lp_games + live_games, lp_players + live_players,
+                                       lambda name: oe_names.get(name) or name)
+        meta_stats = build_meta(oe_games + lolesports.missing_from(oe_games, fresh), schedule, worlds_start)
         errors += validate_meta(meta_stats["champions"])
     current = [] if errors else make_predictions(schedule, run.ratings, now, aliases, adjust)
     errors += validate_predictions(attach_predictions(schedule, [], current))
@@ -131,19 +150,6 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
         series = tournament.series_model(lambda a, b: game_probability(a, b, run.ratings, aliases, adjust))
         bracket_sim = tournament.payload(schedule, main_event_teams(rosters), series, lambda n: short_name(n, shorts))
         errors += validate_tournament(bracket_sim)
-    # Detalle de cada partida jugada (draft, objetivos y jugadores) para la pestaña Partidas
-    # Leaguepedia manda; lolesports completa las partidas que Leaguepedia todavía no cargó
-    lp_games = _rows_if_exists(raw_dir / "worlds_2026_games.json")
-    lp_players = _rows_if_exists(raw_dir / "worlds_2026_game_players.json")
-    champion_names = {v: k for k, v in _read(raw_dir / "ddragon_champions.json")["ids"].items()}         if (raw_dir / "ddragon_champions.json").exists() else {}
-    live_games, live_players = lolesports.to_leaguepedia_rows(
-        _rows_if_exists(raw_dir / "lolesports_2026_games.json"), matches_raw["rows"],
-        _rows_if_exists(raw_dir / "worlds_2026_schedule_games.json"),
-        _rows_if_exists(raw_dir / "worlds_2026_teams.json"), champion_names)
-    known = {g["GameId"] for g in lp_games}
-    live_games = [g for g in live_games if g["GameId"] not in known]
-    live_ids = {g["GameId"] for g in live_games}
-    games_detail = build_games(lp_games + live_games, lp_players + [p for p in live_players if p["GameId"] in live_ids])
     errors += validate_games(games_detail, {m["id"] for m in schedule})
     if errors:
         raise ValueError("validation failed:\n- " + "\n- ".join(errors))

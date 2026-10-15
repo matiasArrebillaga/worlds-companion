@@ -51,3 +51,16 @@ def test_window_time_is_past_and_multiple_of_ten_seconds():
     assert lolesports._window_time(now, "2026-10-15T18:16:00.000Z") == "2026-10-15T18:59:30.000Z"
     # Una partida vieja se pide como mucho 3 horas después del primer cuadro
     assert lolesports._window_time(now, "2026-10-10T18:16:04.000Z") == "2026-10-10T21:16:00.000Z"
+
+
+def test_finished_games_become_oracles_games_that_meta_can_count():
+    games, players = lolesports.to_leaguepedia_rows([live_game(), live_game("in_game")], MATCHES, WINNERS, TEAMS,
+                                                    {"LeeSin": "Lee Sin"})
+    oe = lolesports.to_oe_games(games, players, lambda name: name)
+    assert len(oe) == 1  # la que sigue en juego no cuenta
+    g = oe[0]
+    assert (g["page"], g["winner"], g["blue"], g["date"][:10]) == ("WLDs", "red", "Karmine Corp", "2026-10-15")
+    assert g["teams"]["blue"]["gamelength"] == "2106" and g["teams"]["blue"]["ban1"] == ""
+    assert g["players"]["red"]["jng"]["champion"] == "Lee Sin" and g["players"]["red"]["jng"]["teamkills"] == "20"
+    # Si Oracle's Elixir ya tiene esa partida, no se cuenta dos veces
+    assert lolesports.missing_from([g], oe) == [] and lolesports.missing_from([], oe) == oe
