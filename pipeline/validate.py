@@ -126,3 +126,19 @@ def validate_tournament(sim: dict) -> list[str]:
         if abs(sum(r[key] for r in rows) - total) > TOTAL_TOLERANCE:
             errors.append(f"tournament {stage}: {key} adds up to {sum(r[key] for r in rows):.3f}, expected {total}")
     return errors
+
+
+def validate_games(games: dict[str, list[dict]], match_ids: set[str]) -> list[str]:
+    """Partidas de cada serie: que la serie exista, sin números de partida repetidos y como mucho 5 por lado."""
+    errors: list[str] = []
+    for mid, rows in games.items():
+        if mid not in match_ids:
+            errors.append(f"games: unknown match {mid}")
+        numbers = [g["n"] for g in rows]
+        if len(numbers) != len(set(numbers)):
+            errors.append(f"games: {mid} has repeated game numbers {numbers}")
+        for g in rows:
+            for side in ("blue", "red"):
+                if len(g[side]["players"]) > 5:
+                    errors.append(f"games: {mid} game {g['n']} {side} has {len(g[side]['players'])} players")
+    return errors

@@ -16,11 +16,12 @@ from models.predictions import (attach_predictions, evaluate, freeze, game_proba
 from models import tournament
 from pipeline import utc_now_iso
 from pipeline.assets import DDRAGON_FILE, champion_icons, logo_url
+from pipeline.games import build_games
 from pipeline.history import CURRENT_YEAR, load_aliases, load_season_games
 from pipeline.meta import build_meta
 from pipeline.schedule import UNDECIDED_TEAMS, build_schedule, short_name
 from pipeline.stats import build_team_and_player_stats, elo_history, series_list
-from pipeline.validate import (validate_lineups, validate_meta, validate_predictions, validate_ratings,
+from pipeline.validate import (validate_games, validate_lineups, validate_meta, validate_predictions, validate_ratings,
                                validate_schedule, validate_stats, validate_tournament)
 
 RAW_DIR = Path("data/raw")
@@ -129,6 +130,10 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
         series = tournament.series_model(lambda a, b: game_probability(a, b, run.ratings, aliases, adjust))
         bracket_sim = tournament.payload(schedule, main_event_teams(rosters), series, lambda n: short_name(n, shorts))
         errors += validate_tournament(bracket_sim)
+    # Detalle de cada partida jugada (draft, objetivos y jugadores) para la pestaña Partidas
+    games_detail = build_games(_rows_if_exists(raw_dir / "worlds_2026_games.json"),
+                               _rows_if_exists(raw_dir / "worlds_2026_game_players.json"))
+    errors += validate_games(games_detail, {m["id"] for m in schedule})
     if errors:
         raise ValueError("validation failed:\n- " + "\n- ".join(errors))
 
@@ -158,6 +163,7 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
     _write(out_dir / "teams.json", {"updated_at": now, "stats_fetched_at": oe_fetched_at, "teams": teams_payload})
     _write(out_dir / "players.json", {"players": players_payload})
     _write(out_dir / "tournament.json", {"updated_at": now, "model_version": MODEL_VERSION, **bracket_sim})
+    _write(out_dir / "games.json", {"updated_at": now, "matches": games_detail})
 
 
 def main() -> None:
@@ -165,7 +171,7 @@ def main() -> None:
         build(RAW_DIR, OUT_DIR, utc_now_iso(), freeze_predictions="--freeze" in sys.argv)
     except ValueError as error:
         sys.exit(str(error))
-    print(f"wrote {OUT_DIR}/schedule.json, meta.json, elo.json, teams.json, players.json, champions.json and tournament.json")
+    print(f"wrote {OUT_DIR}/schedule.json, meta.json, elo.json, teams.json, players.json, champions.json, tournament.json and games.json")
 
 
 if __name__ == "__main__":

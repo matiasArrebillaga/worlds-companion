@@ -328,3 +328,46 @@ export interface SwissProbRound {
   round: number;
   groups: { record: string; best_of: number; expected: number; teams: TeamChance[] }[];
 }
+
+// ---- games.json: detalle de cada partida de Worlds (Leaguepedia) ----
+
+export interface GamePlayer {
+  name: string;
+  role: number | null; // 1 top, 2 jungla, 3 mid, 4 bot, 5 support
+  champion: string;
+  kills: number | null;
+  deaths: number | null;
+  assists: number | null;
+  cs: number | null;
+  gold: number | null;
+  damage: number | null;
+}
+
+export interface GameSide {
+  team: string; // nombre de Leaguepedia (el mismo que en el calendario)
+  picks: string[];
+  bans: string[];
+  kills: number | null;
+  gold: number | null;
+  towers: number | null;
+  dragons: number | null;
+  barons: number | null;
+  heralds: number | null;
+  grubs: number | null;
+  atakhans: number | null;
+  players: GamePlayer[]; // vacío hasta que Leaguepedia carga el scoreboard
+}
+
+export interface GameDetail {
+  n: number | null; // número de partida en la serie
+  length: string | null; // "30:12"
+  patch: string | null;
+  winner: 'blue' | 'red' | null;
+  blue: GameSide;
+  red: GameSide;
+}
+
+export interface GamesFile {
+  updated_at: string;
+  matches: Record<string, GameDetail[]>; // id del partido → sus partidas en orden
+}

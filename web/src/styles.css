@@ -871,7 +871,7 @@ html { -webkit-tap-highlight-color: transparent; }
 .duel-names > span { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .duel-names .r { justify-content: flex-end; }
 .duel-names .l { flex-direction: row-reverse; justify-content: flex-end; }
-.duel-names a { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 1.25rem/1.1 var(--f-display); text-transform: uppercase; text-decoration: none; }
+.duel-names a, .duel-names b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 700 1.25rem/1.1 var(--f-display); text-transform: uppercase; text-decoration: none; }
 .duel-names a:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
 .duel-names .logo { width: 22px; height: 22px; flex: none; }
 .duel-names .label { display: inline-flex; align-items: center; gap: 6px; color: var(--fg); }
@@ -882,6 +882,23 @@ html { -webkit-tap-highlight-color: transparent; }
 .duel-more .mirror:first-child { border-top: 1px dashed var(--line); }
 .duel[open] .duel-more { animation: duel-open .35s var(--ease); }
 @keyframes duel-open { from { opacity: 0; transform: translateY(-6px); } }
+
+/* Partido › Partidas: una tarjeta por partida (objetivos, draft y duelos por rol) */
+.game-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.game-head h3 { margin: 0; font: 700 1.2rem/1 var(--f-display); letter-spacing: .04em; text-transform: uppercase; }
+.game-sides { display: flex; justify-content: space-between; padding: 12px 0 4px; }
+.game-sides > span { display: inline-flex; align-items: center; gap: 8px; }
+.side { padding: 4px 6px; border: 1px solid currentColor; font: 700 11px/1 var(--f-data); letter-spacing: .08em; }
+.side.blue { color: var(--blue); }
+.side.red { color: var(--red); }
+.draft { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.draft-side { display: grid; gap: 6px; align-content: start; }
+.draft-side .picks, .draft-side .bans { display: flex; flex-wrap: wrap; gap: 4px; }
+.draft-side.r .picks, .draft-side.r .bans { justify-content: flex-end; }
+.draft .bans .champ { width: 22px; height: 25px; font-size: 9px; opacity: .55; filter: grayscale(1); }
+.game .duels { border-top: 1px solid var(--line); }
+.game .duel-names .champ { width: 28px; height: 32px; }
+@media (max-width: 480px) { .draft-side .picks { gap: 2px; } .draft .picks .champ { width: 26px; height: 30px; } }
 
 /* Tablas, filas de Análisis y tarjetas de líderes: la fila o tarjeta entera lleva a la página del equipo o jugador
    (el link de la sigla o el nombre la cubre); los gráficos con tooltip quedan por encima */

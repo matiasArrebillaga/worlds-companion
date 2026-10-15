@@ -111,7 +111,10 @@ cd web && npm run build         # build de producción
 - Favorito del modelo: rombito dorado junto a la sigla (sin texto extra); "Sorpresa" si ganó el que tenía < 35%.
 - Buscador en las tablas de Equipos, Jugadores y Campeones: ignora tildes, mayúsculas y signos, encuentra ligas
   ("lck") y conserva el puesto real de cada fila. Al escribir solo se reemplazan los resultados, no el campo.
-- **Partido**: head-to-head.
+- **Partido** (`#/partido/<id>/<pestaña>`): Previa (head-to-head) | Partidas (aparece cuando la serie empieza).
+  Partidas: una tarjeta por partida jugada con objetivos, draft y duelos por rol (KDA; al tocar, CS, oro y daño).
+  Sale de `games.json` (ScoreboardGames + ScoreboardPlayers de Leaguepedia, `pipeline/games.py`); llega un rato
+  después de cada partida y se actualiza con el cron horario: no hay datos minuto a minuto.
 
 ## Reglas de fechas y horarios
 

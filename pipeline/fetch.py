@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 
 from pipeline import assets, leaguepedia, utc_now_iso
+from pipeline.games import DETAIL_FIELDS, PLAYER_FIELDS
 from pipeline.history import GAME_FIELDS
 from pipeline.schedule import UNDECIDED_TEAMS
 
@@ -14,6 +15,7 @@ RAW_DIR = Path("data/raw")
 MATCHES_FILE = RAW_DIR / "worlds_2026_matches.json"
 TEAMS_FILE = RAW_DIR / "worlds_2026_teams.json"
 GAMES_FILE = RAW_DIR / "worlds_2026_games.json"
+GAME_PLAYERS_FILE = RAW_DIR / "worlds_2026_game_players.json"
 ROSTERS_FILE = RAW_DIR / "worlds_2026_rosters.json"
 TOURNAMENT_PREFIX = "2026 Season World Championship"
 
@@ -73,12 +75,20 @@ def main() -> None:
     changed = write_if_changed(MATCHES_FILE, matches, now)
     print(f"matches: {len(matches)} ({'updated' if changed else 'unchanged'})")
 
+    # Además de lo que usa el Elo, el detalle de cada partida (draft y objetivos) para la pestaña Partidas
     games = leaguepedia.cargo_query(
-        session, tables="ScoreboardGames", fields=GAME_FIELDS,
+        session, tables="ScoreboardGames", fields=f"{GAME_FIELDS},{DETAIL_FIELDS}",
         where=f'OverviewPage LIKE "{TOURNAMENT_PREFIX}%"', order_by="DateTime_UTC,GameId",
     )
     changed = write_if_changed(GAMES_FILE, games, now)
     print(f"games: {len(games)} ({'updated' if changed else 'unchanged'})")
+
+    game_players = leaguepedia.cargo_query(
+        session, tables="ScoreboardPlayers", fields=PLAYER_FIELDS,
+        where=f'OverviewPage LIKE "{TOURNAMENT_PREFIX}%"', order_by="GameId,Side,Role_Number",
+    )
+    changed = write_if_changed(GAME_PLAYERS_FILE, game_players, now)
+    print(f"game players: {len(game_players)} ({'updated' if changed else 'unchanged'})")
 
     rosters = leaguepedia.cargo_query(
         session, tables="TournamentRosters", fields="Team,OverviewPage",

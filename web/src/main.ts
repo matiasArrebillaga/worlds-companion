@@ -22,7 +22,8 @@ import { PALETTES, applyPalette, storedPalette } from './theme/palette';
 
 type View = (el: HTMLElement, data: SiteData, tz: string, route: Route) => () => void;
 
-// La pestaña de cada sección va en la URL: '#/bracket/suiza', '#/equipos/jugadores', '#/meta/panorama'
+// La pestaña de cada sección va en la URL: '#/bracket/suiza', '#/equipos/jugadores', '#/meta/panorama',
+// '#/partido/<id>/partidas'
 const ROUTES: Record<string, View> = {
   '#/': (el, data, tz) => renderCalendar(el, data, tz, { sub: 'lista' }),
   '#/bracket': (el, data, tz, r) => renderCalendar(el, data, tz, { sub: 'bracket', stage: r.param }),
@@ -30,7 +31,7 @@ const ROUTES: Record<string, View> = {
   '#/equipos': (el, data, _tz, r) => renderStats(el, data, r.param),
   '#/equipo': (el, data, tz, r) => renderTeam(el, data, tz, r.param),
   '#/jugador': (el, data, tz, r) => renderPlayer(el, data, tz, r.param),
-  '#/partido': (el, data, tz, r) => renderMatch(el, data, tz, r.param),
+  '#/partido': (el, data, tz, r) => renderMatch(el, data, tz, r.param, r.sub),
   '#/meta': (el, data, _tz, r) => renderMeta(el, data, r.param),
 };
 
