@@ -98,7 +98,15 @@ def play_bracket(matches: dict[str, dict], bracket: dict, decide: Callable[[str,
                 outcome, feeder = source
                 result = played.get(feeder) or {}
                 return result.get("winner" if outcome == "W" else "loser")
-            real1, real2 = real1 or pick(sources[0]), real2 or pick(sources[1])
+            # Leaguepedia ubica al equipo ya clasificado en cualquiera de los dos lados (ej. el ganador de la
+            # Semi 1 puede aparecer como team2), así que el lado vacío se llena con el candidato que no está
+            candidates = [pick(s) for s in sources]
+            if real1 and not real2:
+                real2 = next((c for c in candidates if c != real1), None)
+            elif real2 and not real1:
+                real1 = next((c for c in candidates if c != real2), None)
+            elif not real1 and not real2:
+                real1, real2 = candidates
         winner = _real_winner(m)
         if not winner and real1 and real2:
             winner = decide(real1, real2, m.get("best_of", 5))

@@ -85,3 +85,16 @@ def test_swiss_structure_boxes_hold_the_right_number_of_teams():
     assert sim["rounds"][2]["groups"][0]["best_of"] == 3  # 2-0 clasifica: Bo3
     finals = {f["record"]: sum(x["p"] for x in f["teams"]) for f in sim["final"]}
     assert abs(finals["3-0"] - 2) < 0.02 and abs(finals["0-3"] - 2) < 0.02
+
+
+def test_play_bracket_fills_the_empty_side_when_leaguepedia_puts_the_known_team_as_team2():
+    # Leaguepedia ya puso al ganador (B) y al perdedor (A) de la Semi 1 como team2 de sus próximos partidos
+    matches = {
+        "Round 1_1": match("Round 1_1", "A", "B", winner="team2"),
+        "Round 1_2": match("Round 1_2", "C", "D"),
+        "Round 2_1": match("Round 2_1", None, "B"),
+        "Round 1_3": match("Round 1_3", None, "A"),
+    }
+    played = t.play_bracket(matches, t.PLAYIN_BRACKET, lambda a, b, bo: a)
+    assert {played["Round 2_1"]["team1"], played["Round 2_1"]["team2"]} == {"B", "C"}
+    assert {played["Round 1_3"]["team1"], played["Round 1_3"]["team2"]} == {"A", "D"}
