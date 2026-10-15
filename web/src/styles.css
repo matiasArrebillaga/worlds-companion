@@ -14,13 +14,16 @@
   --gold-soft: color-mix(in srgb, var(--gold) 14%, transparent);
   --cyan: #45CCD4;
   --cyan-soft: color-mix(in srgb, var(--cyan) 13%, transparent);
+  /* En vivo: el mismo rojo en todas las paletas (no se redefine en :root[data-palette]) */
+  --live: #E5383F;
+  --live-soft: color-mix(in srgb, var(--live) 14%, transparent);
   --win: #52C285;
   --loss: #F0606A;
   --blue: #4F95F0;
   --blue-soft: color-mix(in srgb, var(--blue) 18%, transparent);
   --red: #F07F55;
   --red-soft: color-mix(in srgb, var(--red) 17%, transparent);
-  /* Un color, una tarea: dorado = el modelo (favorito, pick, sorpresa), cian = en vivo y foco,
+  /* Un color, una tarea: dorado = el modelo (favorito, pick, sorpresa), cian = foco, rojo (--live) = en vivo,
      --data = barras y bandas de datos (cian apagado). La navegación activa va en blanco */
   --data: #6FA9B4;
   --data-soft: color-mix(in srgb, var(--data) 22%, transparent);
@@ -120,7 +123,7 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
   background: var(--line);
   clip-path: polygon(var(--c) 0, 100% 0, 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, 0 100%, 0 var(--c));
 }
-.bezel.live { background: var(--cyan); }
+.bezel.live { background: var(--live); }
 .core {
   background: var(--card);
   clip-path: polygon(var(--c) 0, 100% 0, 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, 0 100%, 0 var(--c));
@@ -175,12 +178,12 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 /* Chips y estados */
 .pill { font: 600 11px/1 var(--f-data); letter-spacing: .1em; text-transform: uppercase; padding: 6px 9px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); color: var(--fg2); }
 .pill.gold { color: var(--gold); background: var(--gold-soft); border-color: transparent; }
-.pill.cyan { color: var(--cyan); background: var(--cyan-soft); border-color: transparent; }
+.pill.live { color: var(--live); background: var(--live-soft); border-color: transparent; }
 .res { font: 700 12px/1 var(--f-data); width: 24px; height: 24px; display: inline-grid; place-items: center; flex: none; }
 .res.w { color: var(--bg); background: var(--win); }
 .res.l { color: var(--bg); background: var(--loss); }
-.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); animation: pulse 2.4s var(--ease) infinite; }
-@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--cyan) 60%, transparent); } 70% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--live); animation: pulse 2.4s var(--ease) infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--live) 60%, transparent); } 70% { box-shadow: 0 0 0 8px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
 
 /* Tarjeta de partido */
 .match { display: grid; gap: 14px; }
@@ -587,7 +590,7 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
 .bezel.done .tag, .bezel.done .score { color: var(--fg2); }
 .feature { --c: 14px; background: var(--gold); }
 .feature .core { background: var(--card-hi); }
-.feature.live { background: var(--cyan); }
+.feature.live { background: var(--live); }
 @media (max-width: 859px) {
   /* En celular el próximo partido se destaca igual, pero ocupa menos pantalla */
   .feature .core { padding: 16px; gap: 14px; }
@@ -796,13 +799,13 @@ html { -webkit-tap-highlight-color: transparent; }
 .sk i.big { height: 26px; }
 @keyframes shimmer { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
-/* En vivo: punto cian en la pestaña Calendario (y "En vivo" en la barra inferior) */
+/* En vivo: punto rojo en la pestaña Calendario (y "En vivo" en la barra inferior) */
 .live-dot { display: none; }
 .is-live .live-dot { display: inline-block; }
 .tab .live-dot { margin-right: 8px; vertical-align: 2px; }
 .bottombar a { position: relative; }
 .bottombar .live-dot { position: absolute; top: 0; left: calc(50% + 8px); }
-.bottombar a.is-live:not([aria-current="page"]) { color: var(--cyan); }
+.bottombar a.is-live:not([aria-current="page"]) { color: var(--live); }
 
 /* Hover en lo que se puede tocar (solo con mouse: en el celular quedaría "pegado") */
 .bezel:has(.stretch) { transition: transform .35s var(--ease), filter .35s var(--ease); }

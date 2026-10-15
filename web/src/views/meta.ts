@@ -46,8 +46,8 @@ const COL = {
   dpm: { id: 'dpm', label: 'DPM', hint: 'daño/min', value: (c) => c.dpm ?? null, show: (c) => fmt(c.dpm ?? null), kind: 'count' },
   cs_min: { id: 'cs_min', label: 'CS/min', value: (c) => c.cs_min ?? null, show: (c) => fmt(c.cs_min ?? null, 1), kind: 'count' },
   kp: rate('kp', 'KP', 'part. kills'),
-  winrate_adj: { id: 'winrate_adj', label: '% Vict.', hint: 'ajustado', value: (c) => adjusted(c), show: (c) => pct(adjusted(c)),
-    sub: (c) => `${pct(c.winrate)} crudo`, kind: 'diverge', ref: 0.5 },
+  winrate: { id: 'winrate', label: '% Vict.', hint: 'crudo', value: (c) => c.winrate ?? null, show: (c) => pct(c.winrate ?? null), kind: 'diverge', ref: 0.5 },
+  winrate_adj: { id: 'winrate_adj', label: '% Vict.', hint: 'ajustado', value: (c) => adjusted(c), show: (c) => pct(adjusted(c)), kind: 'diverge', ref: 0.5 },
   range: { id: 'range', label: 'Rango 95%', hint: 'del % real', value: (c) => c.winrate_low ?? null, show: (c) => range(c.winrate_low, c.winrate_high),
     bar: (c) => whisker(c.winrate_low, c.winrate_high, c.winrate), kind: 'share', wide: true,
     // Escala completa 0-100%: con el eje a la vista, cortar los rangos en 10-90% sería engañoso
@@ -75,8 +75,8 @@ function kPicker(estimated: number | undefined): string {
 
 // Draft y Rendimiento juntos; Resultado aparte
 const VIEWS: Record<View, [string, [string, Column<ChampionEntry>[]][]]> = {
-  principal: ['Draft y rendimiento', [['Draft', [COL.presence, COL.first_rotation, COL.pick_rate, COL.ban_rate]], ['Rendimiento', [COL.kda, COL.dpm, COL.cs_min, COL.kp]]]],
-  resultado: ['Resultado', [['Resultado', [COL.winrate_adj, COL.range, COL.pick_rate, COL.ban_rate]]]],
+  principal: ['Draft y rendimiento', [['Draft', [COL.presence, COL.first_rotation, COL.pick_rate, COL.ban_rate]], ['Rendimiento', [COL.kda, COL.dpm, COL.cs_min, COL.kp, COL.winrate]]]],
+  resultado: ['Resultado', [['Resultado', [COL.winrate_adj, COL.winrate, COL.range, COL.pick_rate, COL.ban_rate]]]],
 };
 
 const champWho = (c: ChampionEntry) => who(champHex(c.champion), escapeHtml(c.champion), `${c.picks} picks · ${c.bans} bans`);
@@ -111,7 +111,7 @@ function champions(rows: ChampionEntry[], k: number | undefined): string {
     ], champWho)}
     <div class="tools">${searchBox(state.query, 'Buscar campeón')}<div class="kpick">${views}${state.view === 'resultado' ? kPicker(k) : ''}</div>${sortBar(columns, sort.id, state.dir)}${legend}</div>
     ${championTable(rows, groups, sort)}
-    ${how(`Presencia = % pick + % ban: cuánto le importa el campeón al meta. Uno que se banea siempre tiene 0 picks y 100% de presencia. Prioridad = % de partidas en que se elige en la primera rotación (los 6 primeros picks) o se banea en la primera fase de bans: mide qué se considera imprescindible, no qué gana más. KDA, CS/min, DPM y KP son de los jugadores que lo usaron. El % de victorias es el ajustado: (victorias + ${kk}/2) / (picks + ${kk}), o sea ${kk} partidas "imaginarias" al 50%; abajo va el crudo. Rango = dónde está el % real con 95% de confianza: si cruza la línea dorada del 50%, no se distingue de una moneda.`)}`;
+    ${how(`Presencia = % pick + % ban: cuánto le importa el campeón al meta. Uno que se banea siempre tiene 0 picks y 100% de presencia. Prioridad = % de partidas en que se elige en la primera rotación (los 6 primeros picks) o se banea en la primera fase de bans: mide qué se considera imprescindible, no qué gana más. KDA, CS/min, DPM y KP son de los jugadores que lo usaron. El % de victorias es el ajustado: (victorias + ${kk}/2) / (picks + ${kk}), o sea ${kk} partidas "imaginarias" al 50%; el crudo es victorias / picks, sin ajustar. Rango = dónde está el % real con 95% de confianza: si cruza la línea dorada del 50%, no se distingue de una moneda.`)}`;
 }
 
 // ---- Panorama: tablero ----

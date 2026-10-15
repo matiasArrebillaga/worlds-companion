@@ -51,7 +51,7 @@ function emptyState(title: string, detail: string): string {
 function featureCard(m: Match, tz: string): string {
   const when = m.start_utc ? escapeHtml(formatDateTimeLong(m.start_utc, tz)) : 'Fecha a confirmar';
   const pill = m.status === 'live'
-    ? '<span class="pill cyan"><span class="dot" aria-hidden="true"></span>En vivo</span>'
+    ? '<span class="pill live"><span class="dot" aria-hidden="true"></span>En vivo</span>'
     : `<span class="pill gold">Próximo · ${PHASE_LABELS[m.phase]} · ${escapeHtml(roundLabel(m.round))}</span>`;
   const middle = middleOf(m);
   return `
@@ -244,7 +244,7 @@ function startCountdown(el: HTMLElement, featured: Match | null): () => void {
     const left = start - Date.now();
     if (left <= 0) {
       // Llegó la hora: el resultado recién aparece con la próxima actualización de datos
-      box.innerHTML = '<span class="pill cyan"><span class="dot" aria-hidden="true"></span>Por empezar</span>';
+      box.innerHTML = '<span class="pill live"><span class="dot" aria-hidden="true"></span>Por empezar</span>';
       window.clearInterval(timer);
       return;
     }

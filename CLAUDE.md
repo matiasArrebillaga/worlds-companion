@@ -146,7 +146,8 @@ Riot Games (ni el de League of Legends ni el de Worlds). Fotos de jugadores: no.
 | fg2 | `#B6C0D5` | Texto secundario |
 | fg3 | `#9AA5C0` | Texto terciario (conectores, vacíos) |
 | gold | `#D4AE52` | Solo el modelo: favorito, pick, sorpresa, próximo partido |
-| cyan | `#45CCD4` | Solo en vivo y foco |
+| cyan | `#45CCD4` | Solo foco |
+| live | `#E5383F` | Solo en vivo (igual en todas las paletas) |
 | data | `#6FA9B4` | Barras y bandas de datos (cian apagado) |
 | win | `#52C285` | Victoria |
 | loss | `#F0606A` | Derrota |
@@ -155,7 +156,7 @@ Riot Games (ni el de League of Legends ni el de Worlds). Fotos de jugadores: no.
 
 - Regiones (`--region-*`, rombito junto a la sigla): KR blanco `#F2F4F8`, CN rojo `#DE5560`, EU cian `#5CC8D4`,
   NA azul `#5E86EC`, BR verde `#52C687`, APAC violeta `#A086E8`.
-- Tarjetas por estado: jugada apagada, próxima en card-hi con borde dorado, en curso con borde cian.
+- Tarjetas por estado: jugada apagada, próxima en card-hi con borde dorado, en curso con borde rojo.
 
 - Todo como variables CSS en `:root`; nunca colores sueltos en componentes.
 - Un color, una tarea: navegación activa y hovers en blanco (`fg`), sin degradés ni brillos; bordes lisos de 1 px.

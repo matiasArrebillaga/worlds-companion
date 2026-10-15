@@ -27,7 +27,7 @@ export function withTransition(update: () => void): void {
   transition.finished.catch(() => {});
 }
 
-// Con una serie en curso, punto cian en la pestaña Calendario (arriba) y "En vivo" en la barra de abajo
+// Con una serie en curso, punto rojo en la pestaña Calendario (arriba) y "En vivo" en la barra de abajo
 export function renderLive(live: boolean): void {
   document.querySelectorAll<HTMLAnchorElement>('a[data-tab="#/"]').forEach((link) => {
     link.classList.toggle('is-live', live);
