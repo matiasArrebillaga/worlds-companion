@@ -65,7 +65,7 @@ function featureCard(m: Match, tz: string): string {
         </div>
         ${predictionBlock(m)}
         ${m.status === 'upcoming' ? '<div class="countdown" data-countdown aria-label="Cuenta regresiva"></div>' : ''}
-        ${m.team1 && m.team2 ? `<div class="foot"><span>${m.status === 'live' ? 'El resultado se actualiza cada hora' : ''}</span>${stretchLink(m, 'Cara a cara')}</div>` : ''}
+        ${m.team1 && m.team2 ? `<div class="foot"><span>${m.status === 'live' ? 'El resultado se actualiza cada 30 minutos' : ''}</span>${stretchLink(m, 'Cara a cara')}</div>` : ''}
       </div>
     </article>`;
 }

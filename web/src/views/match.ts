@@ -154,7 +154,7 @@ function gamesTab(m: Match, games: GameDetail[], b: TeamEntry, players: PlayerEn
   const pending = m.status === 'live'
     ? `<div class="state"><b>Partida ${games.length + 1}</b><span>Todavía sin datos.</span></div>` : '';
   return `${games.map((g) => gameCard(g, b, players)).join('')}${pending}
-    ${how('Datos de Leaguepedia: cada partida aparece un rato después de terminar y el sitio se actualiza cada hora. La barra va hacia el equipo que saca ventaja en ese dato. Tocá un rol para ver CS, oro y daño a campeones de cada jugador.')}`;
+    ${how('Datos de Leaguepedia: cada partida aparece un rato después de terminar y el sitio se actualiza cada 30 minutos. La barra va hacia el equipo que saca ventaja en ese dato. Tocá un rol para ver CS, oro y daño a campeones de cada jugador.')}`;
 }
 
 export function renderMatch(el: HTMLElement, data: SiteData, tz: string, param: string | null, tabParam: string | null = null): () => void {

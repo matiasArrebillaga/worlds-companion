@@ -22,7 +22,7 @@ export function groupByDay(matches: Match[], tz: string): DayGroup[] {
     .sort((a, b) => (a.day ?? '9999').localeCompare(b.day ?? '9999'));
 }
 
-// El pipeline marca "en vivo" recién cuando termina la primera partida (y corre cada hora), así que una serie
+// El pipeline marca "en vivo" recién cuando termina la primera partida (y corre cada 30 minutos), así que una serie
 // que ya arrancó figura como "upcoming". Se toma como en curso desde su hora hasta ~1 h por partida + 30 min.
 const HOUR_MS = 3_600_000;
 export function markStarted(matches: Match[], now: Date): void {

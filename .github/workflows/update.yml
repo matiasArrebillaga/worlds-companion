@@ -2,9 +2,9 @@ name: Update data and deploy
 
 on:
   schedule:
-    # Cada hora durante Worlds 2026 (15/10 al 14/11; se extiende al 15/11 por husos horarios)
-    - cron: "0 * 15-31 10 *"
-    - cron: "0 * 1-15 11 *"
+    # Cada 30 minutos (en :17 y :47; el minuto 0 está saturado y GitHub saltea corridas) durante Worlds 2026 (15/10 al 14/11; se extiende al 15/11 por husos horarios)
+    - cron: "17,47 * 15-31 10 *"
+    - cron: "17,47 * 1-15 11 *"
   workflow_dispatch:
   push:
     branches: [master]

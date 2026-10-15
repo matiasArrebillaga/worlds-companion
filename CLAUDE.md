@@ -29,7 +29,7 @@ No me dejes tareas para hacer a mí: implementá vos.
 - Datos y modelos: Python 3.12, pandas, numpy (scikit-learn más adelante); matplotlib para exploración.
 - Exploración: notebooks Jupyter en `notebooks/` (no se usan en producción).
 - Frontend: sitio estático Vite + TypeScript sin framework, gráficos con Chart.js (D3 solo si Chart.js no alcanza).
-- Deploy: GitHub Pages, actualizado por GitHub Actions (cron horario durante Worlds).
+- Deploy: GitHub Pages, actualizado por GitHub Actions (cron cada 30 minutos durante Worlds).
 - Flujo: scripts de Python generan JSON en `web/public/data/`; el frontend solo lee esos JSON.
   El frontend nunca llama directamente a APIs externas (la única excepción son las imágenes de campeones,
   que se cargan del CDN de Data Dragon de Riot).
@@ -114,7 +114,7 @@ cd web && npm run build         # build de producción
 - **Partido** (`#/partido/<id>/<pestaña>`): Previa (head-to-head) | Partidas (aparece cuando la serie empieza).
   Partidas: una tarjeta por partida jugada con objetivos, draft y duelos por rol (KDA; al tocar, CS, oro y daño).
   Sale de `games.json` (ScoreboardGames + ScoreboardPlayers de Leaguepedia, `pipeline/games.py`); llega un rato
-  después de cada partida y se actualiza con el cron horario: no hay datos minuto a minuto.
+  después de cada partida y se actualiza con el cron (cada 30 minutos): no hay datos minuto a minuto.
 
 ## Reglas de fechas y horarios
 

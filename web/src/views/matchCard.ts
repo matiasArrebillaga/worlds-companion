@@ -121,7 +121,7 @@ export function matchCard(m: Match, tz: string, next = false): string {
   const time = formatTime(m.start_utc, tz);
   const middle = middleOf(m);
   // Pie: veredicto si ya se jugó; si no, la chance por partida (o el aviso de la serie en curso)
-  const note = m.status === 'live' ? 'Se actualiza cada hora'
+  const note = m.status === 'live' ? 'Se actualiza cada 30 minutos'
     : verdictHtml(m) || (m.team1 && m.team2 && m.prediction ? oddsText(m) : '');
   const link = stretchLink(m, 'Cara a cara');
   return `
