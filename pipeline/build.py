@@ -16,6 +16,7 @@ from models.predictions import (attach_predictions, evaluate, freeze, game_proba
 from models import tournament
 from pipeline import utc_now_iso
 from pipeline.assets import DDRAGON_FILE, champion_icons, logo_url
+from pipeline import lolesports
 from pipeline.games import build_games
 from pipeline.history import CURRENT_YEAR, load_aliases, load_season_games
 from pipeline.meta import build_meta
@@ -131,8 +132,18 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
         bracket_sim = tournament.payload(schedule, main_event_teams(rosters), series, lambda n: short_name(n, shorts))
         errors += validate_tournament(bracket_sim)
     # Detalle de cada partida jugada (draft, objetivos y jugadores) para la pestaña Partidas
-    games_detail = build_games(_rows_if_exists(raw_dir / "worlds_2026_games.json"),
-                               _rows_if_exists(raw_dir / "worlds_2026_game_players.json"))
+    # Leaguepedia manda; lolesports completa las partidas que Leaguepedia todavía no cargó
+    lp_games = _rows_if_exists(raw_dir / "worlds_2026_games.json")
+    lp_players = _rows_if_exists(raw_dir / "worlds_2026_game_players.json")
+    champion_names = {v: k for k, v in _read(raw_dir / "ddragon_champions.json")["ids"].items()}         if (raw_dir / "ddragon_champions.json").exists() else {}
+    live_games, live_players = lolesports.to_leaguepedia_rows(
+        _rows_if_exists(raw_dir / "lolesports_2026_games.json"), matches_raw["rows"],
+        _rows_if_exists(raw_dir / "worlds_2026_schedule_games.json"),
+        _rows_if_exists(raw_dir / "worlds_2026_teams.json"), champion_names)
+    known = {g["GameId"] for g in lp_games}
+    live_games = [g for g in live_games if g["GameId"] not in known]
+    live_ids = {g["GameId"] for g in live_games}
+    games_detail = build_games(lp_games + live_games, lp_players + [p for p in live_players if p["GameId"] in live_ids])
     errors += validate_games(games_detail, {m["id"] for m in schedule})
     if errors:
         raise ValueError("validation failed:\n- " + "\n- ".join(errors))

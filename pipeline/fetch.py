@@ -6,7 +6,9 @@ Solo reescribe un archivo si los datos cambiaron, para no ensuciar el historial 
 import json
 from pathlib import Path
 
-from pipeline import assets, leaguepedia, utc_now_iso
+import requests
+
+from pipeline import assets, leaguepedia, lolesports, utc_now_iso
 from pipeline.games import DETAIL_FIELDS, PLAYER_FIELDS
 from pipeline.history import GAME_FIELDS
 from pipeline.schedule import UNDECIDED_TEAMS
@@ -17,6 +19,9 @@ TEAMS_FILE = RAW_DIR / "worlds_2026_teams.json"
 GAMES_FILE = RAW_DIR / "worlds_2026_games.json"
 GAME_PLAYERS_FILE = RAW_DIR / "worlds_2026_game_players.json"
 ROSTERS_FILE = RAW_DIR / "worlds_2026_rosters.json"
+SCHEDULE_GAMES_FILE = RAW_DIR / "worlds_2026_schedule_games.json"
+LOLESPORTS_FILE = RAW_DIR / "lolesports_2026_games.json"
+WORLDS_START = "2026-10-14"
 TOURNAMENT_PREFIX = "2026 Season World Championship"
 
 # DateTime_UTC se renombra para que la clave no venga con espacios ("DateTime UTC")
@@ -89,6 +94,21 @@ def main() -> None:
     )
     changed = write_if_changed(GAME_PLAYERS_FILE, game_players, now)
     print(f"game players: {len(game_players)} ({'updated' if changed else 'unchanged'})")
+
+    # Lado y ganador de cada partida: Leaguepedia los carga enseguida, mucho antes que el scoreboard
+    schedule_games = leaguepedia.cargo_query(
+        session, tables="MatchScheduleGame", fields="GameId,MatchId,Blue,Red,Winner",
+        where=f'MatchId LIKE "{TOURNAMENT_PREFIX}%"', order_by="GameId",
+    )
+    write_if_changed(SCHEDULE_GAMES_FILE, schedule_games, now)
+
+    # Stats en vivo de lolesports mientras Leaguepedia no cargue el scoreboard. Si falla, queda la caché
+    try:
+        live = lolesports.fetch_games(requests.Session(), WORLDS_START, read_rows(LOLESPORTS_FILE))
+        changed = write_if_changed(LOLESPORTS_FILE, live, now)
+        print(f"lolesports games: {len(live)} ({'updated' if changed else 'unchanged'})")
+    except Exception as error:  # noqa: BLE001 — API sin documentar: nunca debe frenar la actualización
+        print(f"lolesports: skipped ({error})")
 
     rosters = leaguepedia.cargo_query(
         session, tables="TournamentRosters", fields="Team,OverviewPage",

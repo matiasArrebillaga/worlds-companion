@@ -76,6 +76,9 @@ cd web && npm run build         # build de producción
 - Atribuir a Leaguepedia (CC-BY-SA).
 - Logos de equipos: variante "square" de Leaguepedia (respaldo: campo Image de Teams), bajados una sola vez.
   El CDN de Fandom pide Referer de lol.fandom.com. Los logos negros se pasan a blanco (no se verían).
+- lolesports (API no oficial, `pipeline/lolesports.py`): stats de cada partida de Worlds en vivo (último cuadro del feed
+  livestats) para la pestaña Partidas mientras Leaguepedia no cargue el scoreboard (lo hace a mano, horas después).
+  Sin bans ni daño absoluto; el ganador sale de MatchScheduleGame de Leaguepedia. Si falla, se usa la caché.
 - Íconos de campeones: Data Dragon de Riot (`data/raw/ddragon_champions.json`: nombre en inglés → id de imagen).
 - Oracle's Elixir: forma de los jugadores del modelo elo-2 y meta (parche de Worlds 16.20; guía 16.17–16.18 con las ligas y la
   Demacia Cup `DCGI` hasta que Worlds tenga 10 partidas), con un extracto diario en `data/raw/oracles_2026.json`; CSV completos para los
