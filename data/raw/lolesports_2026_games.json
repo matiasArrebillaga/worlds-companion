@@ -1,0 +1,946 @@
+{
+ "fetched_at": "2026-10-15T22:04:12Z",
+ "rows": [
+  {
+   "game_id": "115660588583171787",
+   "number": 1,
+   "start_time": "2026-10-15T18:00:00Z",
+   "teams": {
+    "blue": "KC",
+    "red": "C9"
+   },
+   "patch": "16.20.826.3891",
+   "metadata": {
+    "patchVersion": "16.20.826.3891",
+    "blueTeamMetadata": {
+     "esportsTeamId": "111692118851466302",
+     "participantMetadata": [
+      {
+       "participantId": 1,
+       "esportsPlayerId": "103495716771322725",
+       "summonerName": "KC Canna",
+       "championId": "Rumble",
+       "role": "top"
+      },
+      {
+       "participantId": 2,
+       "esportsPlayerId": "105537190986692036",
+       "summonerName": "KC Yike",
+       "championId": "LeeSin",
+       "role": "jungle"
+      },
+      {
+       "participantId": 3,
+       "esportsPlayerId": "108205130709313212",
+       "summonerName": "KC kyeahoo",
+       "championId": "Syndra",
+       "role": "mid"
+      },
+      {
+       "participantId": 4,
+       "esportsPlayerId": "109461265532592848",
+       "summonerName": "KC Caliste",
+       "championId": "MissFortune",
+       "role": "bottom"
+      },
+      {
+       "participantId": 5,
+       "esportsPlayerId": "106625308523122120",
+       "summonerName": "KC Busio",
+       "championId": "Nautilus",
+       "role": "support"
+      }
+     ]
+    },
+    "redTeamMetadata": {
+     "esportsTeamId": "98767991877340524",
+     "participantMetadata": [
+      {
+       "participantId": 6,
+       "esportsPlayerId": "105501816646382923",
+       "summonerName": "C9 Thanatos",
+       "championId": "Gnar",
+       "role": "top"
+      },
+      {
+       "participantId": 7,
+       "esportsPlayerId": "99101098218071815",
+       "summonerName": "C9 Blaber",
+       "championId": "XinZhao",
+       "role": "jungle"
+      },
+      {
+       "participantId": 8,
+       "esportsPlayerId": "108567314915334762",
+       "summonerName": "C9 Loki ",
+       "championId": "Locke",
+       "role": "mid"
+      },
+      {
+       "participantId": 9,
+       "esportsPlayerId": "101383793877071109",
+       "summonerName": "C9 Tactical",
+       "championId": "Ezreal",
+       "role": "bottom"
+      },
+      {
+       "participantId": 10,
+       "esportsPlayerId": "99101098208825497",
+       "summonerName": "C9 Vulcan",
+       "championId": "Karma",
+       "role": "support"
+      }
+     ]
+    }
+   },
+   "first_frame_time": "2026-10-15T18:16:34.661Z",
+   "last_frame": {
+    "rfc460Timestamp": "2026-10-15T18:51:40.957Z",
+    "gameState": "finished",
+    "blueTeam": {
+     "totalGold": 57395,
+     "inhibitors": 0,
+     "towers": 3,
+     "barons": 0,
+     "totalKills": 1,
+     "dragons": [
+      "cloud"
+     ],
+     "participants": [
+      {
+       "participantId": 1,
+       "totalGold": 11514,
+       "level": 18,
+       "kills": 0,
+       "deaths": 4,
+       "assists": 0,
+       "creepScore": 304,
+       "currentHealth": 8,
+       "maxHealth": 2880
+      },
+      {
+       "participantId": 2,
+       "totalGold": 11657,
+       "level": 16,
+       "kills": 0,
+       "deaths": 1,
+       "assists": 1,
+       "creepScore": 263,
+       "currentHealth": 1509,
+       "maxHealth": 2673
+      },
+      {
+       "participantId": 3,
+       "totalGold": 12693,
+       "level": 17,
+       "kills": 1,
+       "deaths": 3,
+       "assists": 0,
+       "creepScore": 338,
+       "currentHealth": 0,
+       "maxHealth": 2520
+      },
+      {
+       "participantId": 4,
+       "totalGold": 14141,
+       "level": 16,
+       "kills": 0,
+       "deaths": 6,
+       "assists": 1,
+       "creepScore": 367,
+       "currentHealth": 0,
+       "maxHealth": 2137
+      },
+      {
+       "participantId": 5,
+       "totalGold": 7390,
+       "level": 12,
+       "kills": 0,
+       "deaths": 6,
+       "assists": 1,
+       "creepScore": 40,
+       "currentHealth": 19,
+       "maxHealth": 2695
+      }
+     ]
+    },
+    "redTeam": {
+     "totalGold": 75994,
+     "inhibitors": 2,
+     "towers": 11,
+     "barons": 2,
+     "totalKills": 20,
+     "dragons": [
+      "chemtech",
+      "infernal",
+      "infernal",
+      "infernal"
+     ],
+     "participants": [
+      {
+       "participantId": 6,
+       "totalGold": 14830,
+       "level": 20,
+       "kills": 1,
+       "deaths": 0,
+       "assists": 5,
+       "creepScore": 347,
+       "currentHealth": 2670,
+       "maxHealth": 3837
+      },
+      {
+       "participantId": 7,
+       "totalGold": 15621,
+       "level": 18,
+       "kills": 4,
+       "deaths": 0,
+       "assists": 10,
+       "creepScore": 286,
+       "currentHealth": 2160,
+       "maxHealth": 3602
+      },
+      {
+       "participantId": 8,
+       "totalGold": 15985,
+       "level": 18,
+       "kills": 11,
+       "deaths": 0,
+       "assists": 3,
+       "creepScore": 321,
+       "currentHealth": 2316,
+       "maxHealth": 2538
+      },
+      {
+       "participantId": 9,
+       "totalGold": 19305,
+       "level": 18,
+       "kills": 3,
+       "deaths": 0,
+       "assists": 9,
+       "creepScore": 394,
+       "currentHealth": 189,
+       "maxHealth": 3182
+      },
+      {
+       "participantId": 10,
+       "totalGold": 10253,
+       "level": 14,
+       "kills": 1,
+       "deaths": 1,
+       "assists": 16,
+       "creepScore": 38,
+       "currentHealth": 2312,
+       "maxHealth": 2612
+      }
+     ]
+    }
+   }
+  },
+  {
+   "game_id": "115660588583171788",
+   "number": 2,
+   "start_time": "2026-10-15T18:00:00Z",
+   "teams": {
+    "blue": "C9",
+    "red": "KC"
+   },
+   "patch": "16.20.826.3891",
+   "metadata": {
+    "patchVersion": "16.20.826.3891",
+    "blueTeamMetadata": {
+     "esportsTeamId": "98767991877340524",
+     "participantMetadata": [
+      {
+       "participantId": 1,
+       "esportsPlayerId": "105501816646382923",
+       "summonerName": "C9 Thanatos",
+       "championId": "Camille",
+       "role": "top"
+      },
+      {
+       "participantId": 2,
+       "esportsPlayerId": "99101098218071815",
+       "summonerName": "C9 Blaber",
+       "championId": "MonkeyKing",
+       "role": "jungle"
+      },
+      {
+       "participantId": 3,
+       "esportsPlayerId": "108567314915334762",
+       "summonerName": "C9 Loki ",
+       "championId": "Akali",
+       "role": "mid"
+      },
+      {
+       "participantId": 4,
+       "esportsPlayerId": "101383793877071109",
+       "summonerName": "C9 Tactical",
+       "championId": "Kalista",
+       "role": "bottom"
+      },
+      {
+       "participantId": 5,
+       "esportsPlayerId": "99101098208825497",
+       "summonerName": "C9 Vulcan",
+       "championId": "Renata",
+       "role": "support"
+      }
+     ]
+    },
+    "redTeamMetadata": {
+     "esportsTeamId": "111692118851466302",
+     "participantMetadata": [
+      {
+       "participantId": 6,
+       "esportsPlayerId": "103495716771322725",
+       "summonerName": "KC Canna",
+       "championId": "Jayce",
+       "role": "top"
+      },
+      {
+       "participantId": 7,
+       "esportsPlayerId": "105537190986692036",
+       "summonerName": "KC Yike",
+       "championId": "Vi",
+       "role": "jungle"
+      },
+      {
+       "participantId": 8,
+       "esportsPlayerId": "108205130709313212",
+       "summonerName": "KC kyeahoo",
+       "championId": "Cassiopeia",
+       "role": "mid"
+      },
+      {
+       "participantId": 9,
+       "esportsPlayerId": "109461265532592848",
+       "summonerName": "KC Caliste",
+       "championId": "Varus",
+       "role": "bottom"
+      },
+      {
+       "participantId": 10,
+       "esportsPlayerId": "106625308523122120",
+       "summonerName": "KC Busio",
+       "championId": "Velkoz",
+       "role": "support"
+      }
+     ]
+    }
+   },
+   "first_frame_time": "2026-10-15T19:14:55.707Z",
+   "last_frame": {
+    "rfc460Timestamp": "2026-10-15T19:51:44.978Z",
+    "gameState": "finished",
+    "blueTeam": {
+     "totalGold": 66335,
+     "inhibitors": 0,
+     "towers": 5,
+     "barons": 1,
+     "totalKills": 16,
+     "dragons": [
+      "hextech",
+      "infernal",
+      "infernal"
+     ],
+     "participants": [
+      {
+       "participantId": 1,
+       "totalGold": 12041,
+       "level": 17,
+       "kills": 4,
+       "deaths": 5,
+       "assists": 6,
+       "creepScore": 213,
+       "currentHealth": 0,
+       "maxHealth": 2754
+      },
+      {
+       "participantId": 2,
+       "totalGold": 13110,
+       "level": 17,
+       "kills": 1,
+       "deaths": 4,
+       "assists": 9,
+       "creepScore": 263,
+       "currentHealth": 0,
+       "maxHealth": 3069
+      },
+      {
+       "participantId": 3,
+       "totalGold": 12594,
+       "level": 16,
+       "kills": 5,
+       "deaths": 2,
+       "assists": 1,
+       "creepScore": 259,
+       "currentHealth": 2595,
+       "maxHealth": 2595
+      },
+      {
+       "participantId": 4,
+       "totalGold": 18777,
+       "level": 17,
+       "kills": 6,
+       "deaths": 1,
+       "assists": 5,
+       "creepScore": 386,
+       "currentHealth": 2767,
+       "maxHealth": 2767
+      },
+      {
+       "participantId": 5,
+       "totalGold": 9813,
+       "level": 14,
+       "kills": 0,
+       "deaths": 2,
+       "assists": 13,
+       "creepScore": 43,
+       "currentHealth": 0,
+       "maxHealth": 2746
+      }
+     ]
+    },
+    "redTeam": {
+     "totalGold": 68955,
+     "inhibitors": 1,
+     "towers": 7,
+     "barons": 0,
+     "totalKills": 14,
+     "dragons": [
+      "ocean",
+      "infernal",
+      "infernal"
+     ],
+     "participants": [
+      {
+       "participantId": 6,
+       "totalGold": 14622,
+       "level": 18,
+       "kills": 5,
+       "deaths": 4,
+       "assists": 4,
+       "creepScore": 289,
+       "currentHealth": 994,
+       "maxHealth": 2816
+      },
+      {
+       "participantId": 7,
+       "totalGold": 12673,
+       "level": 16,
+       "kills": 1,
+       "deaths": 4,
+       "assists": 11,
+       "creepScore": 210,
+       "currentHealth": 1517,
+       "maxHealth": 2972
+      },
+      {
+       "participantId": 8,
+       "totalGold": 13293,
+       "level": 18,
+       "kills": 2,
+       "deaths": 4,
+       "assists": 5,
+       "creepScore": 323,
+       "currentHealth": 2991,
+       "maxHealth": 2991
+      },
+      {
+       "participantId": 9,
+       "totalGold": 18972,
+       "level": 17,
+       "kills": 4,
+       "deaths": 2,
+       "assists": 6,
+       "creepScore": 371,
+       "currentHealth": 1487,
+       "maxHealth": 2765
+      },
+      {
+       "participantId": 10,
+       "totalGold": 9395,
+       "level": 14,
+       "kills": 2,
+       "deaths": 2,
+       "assists": 6,
+       "creepScore": 32,
+       "currentHealth": 0,
+       "maxHealth": 2088
+      }
+     ]
+    }
+   }
+  },
+  {
+   "game_id": "115660588583171789",
+   "number": 3,
+   "start_time": "2026-10-15T18:00:00Z",
+   "teams": {
+    "blue": "KC",
+    "red": "C9"
+   },
+   "patch": "16.20.826.3891",
+   "metadata": {
+    "patchVersion": "16.20.826.3891",
+    "blueTeamMetadata": {
+     "esportsTeamId": "111692118851466302",
+     "participantMetadata": [
+      {
+       "participantId": 1,
+       "esportsPlayerId": "103495716771322725",
+       "summonerName": "KC Canna",
+       "championId": "Kled",
+       "role": "top"
+      },
+      {
+       "participantId": 2,
+       "esportsPlayerId": "105537190986692036",
+       "summonerName": "KC Yike",
+       "championId": "Naafiri",
+       "role": "jungle"
+      },
+      {
+       "participantId": 3,
+       "esportsPlayerId": "108205130709313212",
+       "summonerName": "KC kyeahoo",
+       "championId": "Anivia",
+       "role": "mid"
+      },
+      {
+       "participantId": 4,
+       "esportsPlayerId": "109461265532592848",
+       "summonerName": "KC Caliste",
+       "championId": "Lucian",
+       "role": "bottom"
+      },
+      {
+       "participantId": 5,
+       "esportsPlayerId": "106625308523122120",
+       "summonerName": "KC Busio",
+       "championId": "Nami",
+       "role": "support"
+      }
+     ]
+    },
+    "redTeamMetadata": {
+     "esportsTeamId": "98767991877340524",
+     "participantMetadata": [
+      {
+       "participantId": 6,
+       "esportsPlayerId": "105501816646382923",
+       "summonerName": "C9 Thanatos",
+       "championId": "Olaf",
+       "role": "top"
+      },
+      {
+       "participantId": 7,
+       "esportsPlayerId": "99101098218071815",
+       "summonerName": "C9 Blaber",
+       "championId": "JarvanIV",
+       "role": "jungle"
+      },
+      {
+       "participantId": 8,
+       "esportsPlayerId": "108567314915334762",
+       "summonerName": "C9 Loki ",
+       "championId": "Annie",
+       "role": "mid"
+      },
+      {
+       "participantId": 9,
+       "esportsPlayerId": "101383793877071109",
+       "summonerName": "C9 Tactical",
+       "championId": "Jhin",
+       "role": "bottom"
+      },
+      {
+       "participantId": 10,
+       "esportsPlayerId": "99101098208825497",
+       "summonerName": "C9 Vulcan",
+       "championId": "Alistar",
+       "role": "support"
+      }
+     ]
+    }
+   },
+   "first_frame_time": "2026-10-15T20:17:24.667Z",
+   "last_frame": {
+    "rfc460Timestamp": "2026-10-15T20:55:10.537Z",
+    "gameState": "finished",
+    "blueTeam": {
+     "totalGold": 64680,
+     "inhibitors": 0,
+     "towers": 4,
+     "barons": 0,
+     "totalKills": 5,
+     "dragons": [],
+     "participants": [
+      {
+       "participantId": 1,
+       "totalGold": 13123,
+       "level": 18,
+       "kills": 0,
+       "deaths": 4,
+       "assists": 1,
+       "creepScore": 316,
+       "currentHealth": 0,
+       "maxHealth": 4783
+      },
+      {
+       "participantId": 2,
+       "totalGold": 13376,
+       "level": 17,
+       "kills": 1,
+       "deaths": 5,
+       "assists": 2,
+       "creepScore": 269,
+       "currentHealth": 1293,
+       "maxHealth": 2725
+      },
+      {
+       "participantId": 3,
+       "totalGold": 13170,
+       "level": 17,
+       "kills": 2,
+       "deaths": 8,
+       "assists": 1,
+       "creepScore": 286,
+       "currentHealth": 0,
+       "maxHealth": 2511
+      },
+      {
+       "participantId": 4,
+       "totalGold": 16336,
+       "level": 17,
+       "kills": 2,
+       "deaths": 2,
+       "assists": 3,
+       "creepScore": 400,
+       "currentHealth": 0,
+       "maxHealth": 2278
+      },
+      {
+       "participantId": 5,
+       "totalGold": 8675,
+       "level": 13,
+       "kills": 0,
+       "deaths": 3,
+       "assists": 5,
+       "creepScore": 27,
+       "currentHealth": 0,
+       "maxHealth": 2438
+      }
+     ]
+    },
+    "redTeam": {
+     "totalGold": 78726,
+     "inhibitors": 2,
+     "towers": 10,
+     "barons": 2,
+     "totalKills": 22,
+     "dragons": [
+      "infernal",
+      "mountain",
+      "chemtech",
+      "chemtech",
+      "elder"
+     ],
+     "participants": [
+      {
+       "participantId": 6,
+       "totalGold": 15520,
+       "level": 20,
+       "kills": 5,
+       "deaths": 1,
+       "assists": 3,
+       "creepScore": 323,
+       "currentHealth": 2769,
+       "maxHealth": 4470
+      },
+      {
+       "participantId": 7,
+       "totalGold": 18494,
+       "level": 18,
+       "kills": 7,
+       "deaths": 0,
+       "assists": 14,
+       "creepScore": 313,
+       "currentHealth": 2399,
+       "maxHealth": 3388
+      },
+      {
+       "participantId": 8,
+       "totalGold": 15625,
+       "level": 18,
+       "kills": 1,
+       "deaths": 2,
+       "assists": 14,
+       "creepScore": 298,
+       "currentHealth": 2258,
+       "maxHealth": 2707
+      },
+      {
+       "participantId": 9,
+       "totalGold": 18557,
+       "level": 18,
+       "kills": 7,
+       "deaths": 1,
+       "assists": 7,
+       "creepScore": 359,
+       "currentHealth": 2495,
+       "maxHealth": 2774
+      },
+      {
+       "participantId": 10,
+       "totalGold": 10530,
+       "level": 15,
+       "kills": 2,
+       "deaths": 1,
+       "assists": 12,
+       "creepScore": 39,
+       "currentHealth": 2082,
+       "maxHealth": 3331
+      }
+     ]
+    }
+   }
+  },
+  {
+   "game_id": "116299649500204436",
+   "number": 4,
+   "start_time": "2026-10-15T18:00:00Z",
+   "teams": {
+    "blue": "C9",
+    "red": "KC"
+   },
+   "patch": "16.20.826.3891",
+   "metadata": {
+    "patchVersion": "16.20.826.3891",
+    "blueTeamMetadata": {
+     "esportsTeamId": "98767991877340524",
+     "participantMetadata": [
+      {
+       "participantId": 1,
+       "esportsPlayerId": "105501816646382923",
+       "summonerName": "C9 Thanatos",
+       "championId": "Zaahen",
+       "role": "top"
+      },
+      {
+       "participantId": 2,
+       "esportsPlayerId": "99101098218071815",
+       "summonerName": "C9 Blaber",
+       "championId": "Sejuani",
+       "role": "jungle"
+      },
+      {
+       "participantId": 3,
+       "esportsPlayerId": "108567314915334762",
+       "summonerName": "C9 Loki ",
+       "championId": "Sylas",
+       "role": "mid"
+      },
+      {
+       "participantId": 4,
+       "esportsPlayerId": "101383793877071109",
+       "summonerName": "C9 Tactical",
+       "championId": "Yunara",
+       "role": "bottom"
+      },
+      {
+       "participantId": 5,
+       "esportsPlayerId": "99101098208825497",
+       "summonerName": "C9 Vulcan",
+       "championId": "Lulu",
+       "role": "support"
+      }
+     ]
+    },
+    "redTeamMetadata": {
+     "esportsTeamId": "111692118851466302",
+     "participantMetadata": [
+      {
+       "participantId": 6,
+       "esportsPlayerId": "103495716771322725",
+       "summonerName": "KC Canna",
+       "championId": "Renekton",
+       "role": "top"
+      },
+      {
+       "participantId": 7,
+       "esportsPlayerId": "105537190986692036",
+       "summonerName": "KC Yike",
+       "championId": "Qiyana",
+       "role": "jungle"
+      },
+      {
+       "participantId": 8,
+       "esportsPlayerId": "108205130709313212",
+       "summonerName": "KC kyeahoo",
+       "championId": "Orianna",
+       "role": "mid"
+      },
+      {
+       "participantId": 9,
+       "esportsPlayerId": "109461265532592848",
+       "summonerName": "KC Caliste",
+       "championId": "Xayah",
+       "role": "bottom"
+      },
+      {
+       "participantId": 10,
+       "esportsPlayerId": "106625308523122120",
+       "summonerName": "KC Busio",
+       "championId": "Rakan",
+       "role": "support"
+      }
+     ]
+    }
+   },
+   "first_frame_time": "2026-10-15T21:14:06.692Z",
+   "last_frame": {
+    "rfc460Timestamp": "2026-10-15T21:55:42.337Z",
+    "gameState": "finished",
+    "blueTeam": {
+     "totalGold": 67444,
+     "inhibitors": 0,
+     "towers": 4,
+     "barons": 0,
+     "totalKills": 6,
+     "dragons": [
+      "cloud"
+     ],
+     "participants": [
+      {
+       "participantId": 1,
+       "totalGold": 15809,
+       "level": 19,
+       "kills": 2,
+       "deaths": 1,
+       "assists": 1,
+       "creepScore": 358,
+       "currentHealth": 0,
+       "maxHealth": 3965
+      },
+      {
+       "participantId": 2,
+       "totalGold": 11759,
+       "level": 16,
+       "kills": 0,
+       "deaths": 2,
+       "assists": 6,
+       "creepScore": 223,
+       "currentHealth": 3726,
+       "maxHealth": 4155
+      },
+      {
+       "participantId": 3,
+       "totalGold": 11697,
+       "level": 17,
+       "kills": 0,
+       "deaths": 5,
+       "assists": 4,
+       "creepScore": 277,
+       "currentHealth": 0,
+       "maxHealth": 3552
+      },
+      {
+       "participantId": 4,
+       "totalGold": 18889,
+       "level": 16,
+       "kills": 3,
+       "deaths": 4,
+       "assists": 2,
+       "creepScore": 403,
+       "currentHealth": 0,
+       "maxHealth": 2332
+      },
+      {
+       "participantId": 5,
+       "totalGold": 9290,
+       "level": 14,
+       "kills": 1,
+       "deaths": 3,
+       "assists": 4,
+       "creepScore": 30,
+       "currentHealth": 0,
+       "maxHealth": 2192
+      }
+     ]
+    },
+    "redTeam": {
+     "totalGold": 81318,
+     "inhibitors": 1,
+     "towers": 9,
+     "barons": 1,
+     "totalKills": 15,
+     "dragons": [
+      "hextech",
+      "chemtech",
+      "cloud",
+      "cloud",
+      "elder"
+     ],
+     "participants": [
+      {
+       "participantId": 6,
+       "totalGold": 15986,
+       "level": 20,
+       "kills": 1,
+       "deaths": 0,
+       "assists": 8,
+       "creepScore": 368,
+       "currentHealth": 1920,
+       "maxHealth": 5259
+      },
+      {
+       "participantId": 7,
+       "totalGold": 16714,
+       "level": 18,
+       "kills": 1,
+       "deaths": 2,
+       "assists": 6,
+       "creepScore": 309,
+       "currentHealth": 999,
+       "maxHealth": 2610
+      },
+      {
+       "participantId": 8,
+       "totalGold": 14691,
+       "level": 18,
+       "kills": 2,
+       "deaths": 2,
+       "assists": 5,
+       "creepScore": 337,
+       "currentHealth": 1414,
+       "maxHealth": 2500
+      },
+      {
+       "participantId": 9,
+       "totalGold": 24113,
+       "level": 18,
+       "kills": 11,
+       "deaths": 1,
+       "assists": 3,
+       "creepScore": 436,
+       "currentHealth": 1100,
+       "maxHealth": 2514
+      },
+      {
+       "participantId": 10,
+       "totalGold": 9814,
+       "level": 14,
+       "kills": 0,
+       "deaths": 1,
+       "assists": 9,
+       "creepScore": 33,
+       "currentHealth": 1820,
+       "maxHealth": 2911
+      }
+     ]
+    }
+   }
+  }
+ ]
+}
