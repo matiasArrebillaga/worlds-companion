@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { featuredMatch, groupByDay, recentResults, spoilersHidden } from './schedule';
+import { featuredMatch, groupByDay, markStarted, recentResults, spoilersHidden } from './schedule';
 import type { Match } from './types';
 
 const BA = 'America/Argentina/Buenos_Aires';
@@ -28,6 +28,19 @@ describe('groupByDay', () => {
       ['2026-10-25', ['tbc']],
       [null, ['nodate']],
     ]);
+  });
+});
+
+describe('markStarted', () => {
+  it('treats a started series as live until its time window ends', () => {
+    const ms = [
+      match({ id: 'bo5', best_of: 5, start_utc: '2026-10-24T14:00:00Z' }), // 2 h de 5,5: en curso
+      match({ id: 'bo1', best_of: 1, start_utc: '2026-10-24T14:00:00Z' }), // 2 h de 1,5: ya pasó
+      match({ id: 'later', start_utc: '2026-10-24T17:00:00Z' }),
+      match({ id: 'done', status: 'finished', start_utc: '2026-10-24T15:00:00Z' }),
+    ];
+    markStarted(ms, new Date('2026-10-24T16:00:00Z'));
+    expect(ms.map((m) => m.status)).toEqual(['live', 'upcoming', 'upcoming', 'finished']);
   });
 });
 

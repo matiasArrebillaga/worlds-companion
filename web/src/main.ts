@@ -3,7 +3,7 @@ import { isNewer, loadData, loadMeta, type SiteData } from './data';
 import { setChampionIcons } from './theme/champions';
 import { setTeams } from './theme/regions';
 import { localDayKey, resolveTimeZone } from './format';
-import { dayKeyOf } from './schedule';
+import { dayKeyOf, markStarted } from './schedule';
 import { renderCalendar } from './views/calendar';
 import { canGoBack, markNewStep, parseHash, rememberScroll, savedScroll, syncDepth, tabFor, type Route } from './router';
 import { renderLive, renderUpdated, setActiveTab, showToast, withTransition } from './views/layout';
@@ -49,6 +49,7 @@ function render(data: SiteData): void {
   setTeams(data.elo.teams);
   setTeamPages(data.teams.teams);
   setChampionIcons(data.champions.icons);
+  markStarted(data.schedule.matches, new Date());
   cleanup();
   const r = currentRoute();
   cleanup = ROUTES[r.path](view, data, tz, r);

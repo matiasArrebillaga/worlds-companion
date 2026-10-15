@@ -69,7 +69,8 @@ export function middleOf(m: Match): string {
   return m.score ? `<span class="mid">${hiddenScore(`<span class="score">${m.score[0]}–${m.score[1]}</span>`)}</span>` : '<span class="vs">VS</span>';
 }
 
-function head(m: Match, time: string): string {
+function head(m: Match, time: string, next: boolean): string {
+  if (next) return `<span class="pill gold">Próximo · ${escapeHtml(time)}</span>`;
   if (m.status === 'live') return '<span class="pill cyan"><span class="dot" aria-hidden="true"></span>Serie en curso</span>';
   if (m.status === 'finished') return '<span class="pill">Finalizado</span>';
   return `<span class="pill time">${escapeHtml(time)}</span>`;
@@ -116,7 +117,7 @@ export function predictionBlock(m: Match): string {
   return `${predictionBar(m)}${odds ? `<p class="pred-game">${odds}</p>` : ''}${verdictHtml(m)}`;
 }
 
-export function matchCard(m: Match, tz: string): string {
+export function matchCard(m: Match, tz: string, next = false): string {
   const time = formatTime(m.start_utc, tz);
   const middle = middleOf(m);
   // Pie: veredicto si ya se jugó; si no, la chance por partida (o el aviso de la serie en curso)
@@ -126,7 +127,7 @@ export function matchCard(m: Match, tz: string): string {
   return `
     <article class="bezel${m.status === 'live' ? ' live' : m.status === 'finished' ? ' done' : ''}" data-id="${escapeHtml(m.id)}">
       <div class="core match">
-        <div class="match-head">${head(m, time)}<span class="label">${PHASE_LABELS[m.phase]} · ${escapeHtml(roundLabel(m.round))} · Bo${m.best_of}</span></div>
+        <div class="match-head">${head(m, time, next)}<span class="label">${PHASE_LABELS[m.phase]} · ${escapeHtml(roundLabel(m.round))} · Bo${m.best_of}</span></div>
         <div class="teams">${teamSide(m, 'team1')}${middle}${teamSide(m, 'team2')}</div>
         ${predictionBar(m)}
         ${note || link ? `<div class="foot"><span>${note}</span>${link}</div>` : ''}

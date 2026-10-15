@@ -5,7 +5,7 @@ import { escapeHtml } from '../html';
 import { go, pick } from '../router';
 import { drawCalibrationChart } from '../charts/calibrationChart';
 import { withTransition } from './layout';
-import { dayKeyOf, featuredMatch, groupByDay, recentResults, SPOILERS_KEY, spoilersHidden } from '../schedule';
+import { dayKeyOf, featuredMatch, groupByDay, nextMatch, recentResults, SPOILERS_KEY, spoilersHidden } from '../schedule';
 import { PENDING, swissRounds, swissStandings } from '../swiss';
 import { teamMark, teamRegionColor } from '../theme/regions';
 import type { Match, Team } from '../types';
@@ -51,7 +51,7 @@ function emptyState(title: string, detail: string): string {
 function featureCard(m: Match, tz: string): string {
   const when = m.start_utc ? escapeHtml(formatDateTimeLong(m.start_utc, tz)) : 'Fecha a confirmar';
   const pill = m.status === 'live'
-    ? '<span class="pill cyan"><span class="dot" aria-hidden="true"></span>Serie en curso</span>'
+    ? '<span class="pill cyan"><span class="dot" aria-hidden="true"></span>En vivo</span>'
     : `<span class="pill gold">Próximo · ${PHASE_LABELS[m.phase]} · ${escapeHtml(roundLabel(m.round))}</span>`;
   const middle = middleOf(m);
   return `
@@ -65,19 +65,21 @@ function featureCard(m: Match, tz: string): string {
         </div>
         ${predictionBlock(m)}
         ${m.status === 'upcoming' ? '<div class="countdown" data-countdown aria-label="Cuenta regresiva"></div>' : ''}
-        ${m.team1 && m.team2 ? `<div class="foot">${stretchLink(m, 'Cara a cara')}</div>` : ''}
+        ${m.team1 && m.team2 ? `<div class="foot"><span>${m.status === 'live' ? 'El resultado se actualiza cada hora' : ''}</span>${stretchLink(m, 'Cara a cara')}</div>` : ''}
       </div>
     </article>`;
 }
 
-// Días pasados arriba, el próximo partido en el medio y lo que viene abajo (main.ts hace scroll a #hoy)
+// Días pasados arriba, el próximo partido en el medio y lo que viene abajo (main.ts hace scroll a #hoy).
+// Con una serie en curso, esa va en grande y el próximo partido queda en chico con su etiqueta
 function listView(matches: Match[], tz: string, featured: Match | null): string {
+  const next = featured?.status === 'live' ? nextMatch(matches, new Date()) : null;
   const todayKey = localDayKey(new Date().toISOString(), tz);
   const days = groupByDay(matches, tz).map((g) => {
     const today = g.day === todayKey;
     // Sin próximo partido (torneo terminado o sin horarios), el ancla es el día de hoy
     const anchor = today && !featured ? ' id="hoy"' : '';
-    const cards = g.matches.map((m) => (m.id === featured?.id ? featureCard(m, tz) : matchCard(m, tz))).join('');
+    const cards = g.matches.map((m) => (m.id === featured?.id ? featureCard(m, tz) : matchCard(m, tz, m.id === next?.id))).join('');
     return `
       <section class="day${today ? ' today' : ''}"${anchor}>
         <h2 class="day-title">${g.day ? formatDayHeading(g.day) : 'Fecha a confirmar'}${today ? ' · hoy' : ''}</h2>

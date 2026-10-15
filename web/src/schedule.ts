@@ -22,11 +22,25 @@ export function groupByDay(matches: Match[], tz: string): DayGroup[] {
     .sort((a, b) => (a.day ?? '9999').localeCompare(b.day ?? '9999'));
 }
 
-// Una serie en curso tiene prioridad; si no, el próximo partido con hora confirmada
-export function featuredMatch(matches: Match[], now: Date): Match | null {
-  const live = matches.find((m) => m.status === 'live');
-  if (live) return live;
+// El pipeline marca "en vivo" recién cuando termina la primera partida (y corre cada hora), así que una serie
+// que ya arrancó figura como "upcoming". Se toma como en curso desde su hora hasta ~1 h por partida + 30 min.
+const HOUR_MS = 3_600_000;
+export function markStarted(matches: Match[], now: Date): void {
+  for (const m of matches) {
+    if (m.status !== 'upcoming' || !m.start_utc) continue;
+    const elapsed = now.getTime() - new Date(m.start_utc).getTime();
+    if (elapsed >= 0 && elapsed < (m.best_of + 0.5) * HOUR_MS) m.status = 'live';
+  }
+}
+
+// El próximo partido con hora confirmada que todavía no empezó
+export function nextMatch(matches: Match[], now: Date): Match | null {
   return matches.find((m) => m.status === 'upcoming' && m.start_utc !== null && new Date(m.start_utc) >= now) ?? null;
+}
+
+// Una serie en curso tiene prioridad; si no, el próximo partido
+export function featuredMatch(matches: Match[], now: Date): Match | null {
+  return matches.find((m) => m.status === 'live') ?? nextMatch(matches, now);
 }
 
 export function recentResults(matches: Match[], limit: number): Match[] {
