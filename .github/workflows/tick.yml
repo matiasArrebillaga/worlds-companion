@@ -1,0 +1,40 @@
+name: Tick (update every 30 minutes)
+
+# El cron de GitHub es "best effort" y en la práctica corre cada ~5 horas.
+# Este workflow se encadena a sí mismo: espera 30 minutos, dispara la actualización y se vuelve a disparar.
+# (workflow_dispatch es el único evento que GITHUB_TOKEN puede disparar.) El cron de update.yml queda de respaldo
+# y además reengancha la cadena si se corta.
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["Update data and deploy"]
+    types: [completed]
+
+permissions:
+  actions: write
+
+# Una sola cadena: si llega otro disparo mientras una espera, queda como máximo uno pendiente.
+concurrency:
+  group: tick
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    # Solo durante Worlds 2026 (hasta el 15/11 inclusive, por husos horarios).
+    # Desde workflow_run solo se reengancha tras corridas del cron, para no abrir cadenas nuevas con cada push.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.event == 'schedule'
+    timeout-minutes: 40
+    steps:
+      - name: Wait 30 minutes, trigger the update and re-trigger this tick
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          if [ "$(date -u +%Y%m%d)" -gt 20261115 ]; then echo "Worlds terminó: fin de la cadena"; exit 0; fi
+          sleep 1800
+          gh workflow run update.yml
+          gh workflow run tick.yml
