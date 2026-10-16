@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-16T22:34:39Z",
+ "fetched_at": "2026-10-16T23:04:50Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -732,8 +732,8 @@
   {
    "GameId": "2026 Season World Championship/Play-In_Round 1_3_3",
    "MatchId": "2026 Season World Championship/Play-In_Round 1_3",
-   "Blue": "",
-   "Red": "",
+   "Blue": "FURIA",
+   "Red": "Cloud9",
    "Winner": ""
   },
   {
