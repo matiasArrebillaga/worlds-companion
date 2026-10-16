@@ -47,7 +47,7 @@
   --ease: cubic-bezier(.32, .72, 0, 1);
 }
 
-/* Paletas alternativas (selector en el pie de página, theme/palette.ts). Solo redefinen colores base;
+/* Paletas alternativas (selector junto al logo, theme/palette.ts). Solo redefinen colores base;
    los tonos suaves se derivan solos. Victoria, derrota, lados y regiones conservan su significado */
 /* Arena: violeta oscuro; el ámbar hace de dorado (modelo, lejos de los rojos de derrota y en vivo) y el magenta de cian (foco) */
 :root[data-palette="arena"] {
@@ -150,11 +150,12 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 .tab::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: 2px; height: 2px; background: var(--fg); transform: scaleX(0); transform-origin: left; transition: transform .45s var(--ease); }
 .tab:hover, .tab[aria-current="page"] { color: var(--fg); }
 .tab[aria-current="page"]::after { transform: scaleX(1); }
-.palette-pick { justify-self: start; display: inline-flex; align-items: center; gap: 10px; font: 500 12px/1 var(--f-data); letter-spacing: .12em; text-transform: uppercase; }
+.brand { display: flex; align-items: center; gap: 12px; }
 .palette {
-  font: 500 14px/1 var(--f-data); color: var(--fg); background: var(--sunken);
-  border: 1px solid var(--line-ctl); padding: 0 10px; min-height: 44px; cursor: pointer;
+  font: 500 12px/1 var(--f-data); color: var(--fg2); background: var(--sunken);
+  border: 1px solid var(--line-ctl); padding: 6px 8px; min-height: 32px; cursor: pointer;
 }
+@media (max-width: 859px) { .palette { min-height: 40px; } }
 .palette:hover { color: var(--fg); }
 .palette:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
 .updated { display: flex; gap: 8px; align-items: center; font: 12px var(--f-data); color: var(--fg2); }
