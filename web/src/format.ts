@@ -32,13 +32,6 @@ export function formatTime(startUtc: string | null, tz: string): string {
     .format(new Date(startUtc));
 }
 
-export function formatDateTimeLong(startUtc: string, tz: string): string {
-  return new Intl.DateTimeFormat(LOCALE, {
-    weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
-    hourCycle: 'h23', timeZoneName: 'short', timeZone: tz,
-  }).format(new Date(startUtc));
-}
-
 // "YYYY-MM-DD" del día local (en-CA formatea justo así)
 export function localDayKey(iso: string, tz: string): string {
   return new Intl.DateTimeFormat('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', timeZone: tz })

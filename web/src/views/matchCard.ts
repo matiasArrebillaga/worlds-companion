@@ -70,7 +70,7 @@ export function middleOf(m: Match): string {
 }
 
 function head(m: Match, time: string, next: boolean): string {
-  if (next) return `<span class="pill gold">Próximo · ${escapeHtml(time)}</span>`;
+  if (next) return `<span class="pills"><span class="pill gold">Próximo</span><span class="pill time">${escapeHtml(time)}</span></span>`;
   if (m.status === 'live') return '<span class="pill live"><span class="dot" aria-hidden="true"></span>Serie en curso</span>';
   if (m.status === 'finished') return '<span class="pill">Finalizado</span>';
   return `<span class="pill time">${escapeHtml(time)}</span>`;

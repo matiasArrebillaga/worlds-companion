@@ -1,6 +1,6 @@
 import { currentStage, KNOCKOUT_LAYOUT, PLAYIN_LAYOUT, slotMatches, STAGES, type Stage } from '../bracket';
 import type { SiteData } from '../data';
-import { countdownParts, formatDateTimeLong, formatDayHeading, formatDayShort, formatTime, localDayKey, pad2, PHASE_LABELS, roundLabel } from '../format';
+import { countdownParts, formatDayHeading, formatDayShort, formatTime, localDayKey, pad2, PHASE_LABELS, roundLabel } from '../format';
 import { escapeHtml } from '../html';
 import { go, pick } from '../router';
 import { drawCalibrationChart } from '../charts/calibrationChart';
@@ -49,15 +49,16 @@ function emptyState(title: string, detail: string): string {
 
 // El próximo partido (o la serie en curso), destacado y más grande que el resto
 function featureCard(m: Match, tz: string): string {
-  const when = m.start_utc ? escapeHtml(formatDateTimeLong(m.start_utc, tz)) : 'Fecha a confirmar';
+  // Mismo encabezado que las demás tarjetas: estado + horario resaltado a la izquierda, fase y ronda a la derecha
+  // (el día ya está en el título de arriba)
   const pill = m.status === 'live'
     ? '<span class="pill live"><span class="dot" aria-hidden="true"></span>En vivo</span>'
-    : `<span class="pill gold">Próximo · ${PHASE_LABELS[m.phase]} · ${escapeHtml(roundLabel(m.round))}</span>`;
+    : `<span class="pills"><span class="pill gold">Próximo</span><span class="pill time">${escapeHtml(formatTime(m.start_utc, tz))}</span></span>`;
   const middle = middleOf(m);
   return `
     <article class="bezel feature${m.status === 'live' ? ' live' : ''}" id="hoy" data-id="${escapeHtml(m.id)}">
       <div class="core">
-        <div class="match-head">${pill}<span class="label">${when} · Bo${m.best_of}</span></div>
+        <div class="match-head">${pill}<span class="label">${PHASE_LABELS[m.phase]} · ${escapeHtml(roundLabel(m.round))} · Bo${m.best_of}</span></div>
         <div class="teams">
           <div class="team">${teamWithFav(m, 'team1')}</div>
           ${middle}
