@@ -122,7 +122,12 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
         oe_names = {t: resolve_team(t, ups) for t in teams}
         # Primer día de Worlds según el calendario: antes de eso no hay período "Worlds 2026"
         worlds_start = min((m["date"] for m in schedule if m["date"]), default=None)
-        team_stats_by_name, players_payload = build_team_and_player_stats(oe_games, oe_names, shorts, worlds_start,
+        # Las partidas de Worlds que Oracle's Elixir (se baja una vez por día) todavía no tiene salen de
+        # Leaguepedia o lolesports, así stats y meta se actualizan con cada build
+        fresh = lolesports.to_oe_games(lp_games + live_games, lp_players + live_players,
+                                       lambda name: oe_names.get(name) or name)
+        all_games = sorted(oe_games + lolesports.missing_from(oe_games, fresh), key=lambda g: g["date"])
+        team_stats_by_name, players_payload = build_team_and_player_stats(all_games, oe_names, shorts, worlds_start,
                                                                           forms)
         for name in teams:
             canonical = aliases.get(name, name)
@@ -136,11 +141,7 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
         teams_payload.sort(key=lambda t: -t["rating"])
         errors += validate_stats(teams_payload, players_payload)
         # Meta (campeones, lados, ritmo, regiones) con las partidas de Worlds y la guía del parche anterior
-        # Las partidas de Worlds que Oracle's Elixir (se baja una vez por día) todavía no tiene salen de
-        # Leaguepedia o lolesports, así el meta se actualiza con cada build
-        fresh = lolesports.to_oe_games(lp_games + live_games, lp_players + live_players,
-                                       lambda name: oe_names.get(name) or name)
-        meta_stats = build_meta(oe_games + lolesports.missing_from(oe_games, fresh), schedule, worlds_start)
+        meta_stats = build_meta(all_games, schedule, worlds_start)
         errors += validate_meta(meta_stats["champions"])
     current = [] if errors else make_predictions(schedule, run.ratings, now, aliases, adjust)
     errors += validate_predictions(attach_predictions(schedule, [], current))

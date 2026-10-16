@@ -62,5 +62,9 @@ def test_finished_games_become_oracles_games_that_meta_can_count():
     assert (g["page"], g["winner"], g["blue"], g["date"][:10]) == ("WLDs", "red", "Karmine Corp", "2026-10-15")
     assert g["teams"]["blue"]["gamelength"] == "2106" and g["teams"]["blue"]["ban1"] == ""
     assert g["players"]["red"]["jng"]["champion"] == "Lee Sin" and g["players"]["red"]["jng"]["teamkills"] == "20"
+    # Las stats de jugadores necesitan el rol y el mismo nombre que Oracle's Elixir (sin desambiguar)
+    assert g["players"]["red"]["jng"]["position"] == "jng"
+    lp = lolesports.to_oe_games(games, [{**p, "Link": p["Link"] + " (Real Name)"} for p in players], lambda n: n)
+    assert lp[0]["players"]["red"]["jng"]["playername"] == g["players"]["red"]["jng"]["playername"]
     # Si Oracle's Elixir ya tiene esa partida, no se cuenta dos veces
     assert lolesports.missing_from([g], oe) == [] and lolesports.missing_from([], oe) == oe

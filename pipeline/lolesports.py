@@ -11,6 +11,8 @@ from datetime import datetime, timedelta, timezone
 
 import requests
 
+from pipeline.games import display_name
+
 API_URL = "https://esports-api.lolesports.com/persisted/gw"
 FEED_URL = "https://feed.lolesports.com/livestats/v1"
 # Clave pública que usa el propio sitio de lolesports (no es un secreto)
@@ -163,9 +165,9 @@ def to_oe_games(game_rows: list[dict], player_rows: list[dict], oe_name) -> list
                            "kills": g.get(f"Team{n}Kills") or "", "patch": g.get("Patch") or "",
                            **{f"ban{i}": b for i, b in enumerate(bans[:5], start=1)}}
             sides[side] = {OE_ROLES[r["RoleNumber"]]: {
-                "champion": r.get("Champion") or "", "kills": r.get("Kills") or "", "deaths": r.get("Deaths") or "",
+                "position": OE_ROLES[r["RoleNumber"]], "champion": r.get("Champion") or "", "kills": r.get("Kills") or "", "deaths": r.get("Deaths") or "",
                 "assists": r.get("Assists") or "", "teamkills": teams[side]["kills"], "total cs": r.get("CS") or "",
-                "damagetochampions": r.get("DamageToChampions") or "", "playername": r.get("Link") or ""}
+                "damagetochampions": r.get("DamageToChampions") or "", "playername": display_name(r.get("Link") or "")}
                 for r in players.get((g["GameId"], n), []) if r.get("RoleNumber") in OE_ROLES}
         games.append({"date": g.get("DateTimeUTC") or "", "match_id": g["MatchId"], "game": int(g["GameInMatch"]),
                       "page": "WLDs", "region": None, "blue": teams["blue"]["teamname"], "red": teams["red"]["teamname"],
