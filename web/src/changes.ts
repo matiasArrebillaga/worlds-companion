@@ -8,6 +8,12 @@ export function finishedSince(old: Match[], fresh: Match[]): Match[] {
   return fresh.filter((m) => m.status === 'finished' && before.has(m.id) && before.get(m.id) !== 'finished');
 }
 
+// "GEN vs BLG": el cruce en el orden del calendario, sin marcador (modo sin spoilers)
+export function matchupLine(m: Match): string | null {
+  if (!m.team1 || !m.team2) return null;
+  return `${m.team1.short} vs ${m.team2.short}`;
+}
+
 // "GEN 3–1 BLG": el ganador primero, con su marcador
 export function resultLine(m: Match): string | null {
   if (!m.winner || !m.score || !m.team1 || !m.team2) return null;

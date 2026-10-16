@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { finishedSince, resultLine } from './changes';
+import { finishedSince, matchupLine, resultLine } from './changes';
 import type { Match } from './types';
 
 const match = (id: string, status: Match['status'], extra: Partial<Match> = {}): Match => ({
@@ -24,5 +24,11 @@ describe('resultLine', () => {
 
   it('needs a winner and a score', () => {
     expect(resultLine(match('a', 'live'))).toBeNull();
+  });
+});
+
+describe('matchupLine', () => {
+  it('keeps the schedule order and hides who won', () => {
+    expect(matchupLine(match('a', 'finished', { winner: 'team2', score: [1, 3] }))).toBe('GEN vs BLG');
   });
 });

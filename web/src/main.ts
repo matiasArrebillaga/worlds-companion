@@ -3,11 +3,11 @@ import { isNewer, loadData, loadMeta, type SiteData } from './data';
 import { setChampionIcons } from './theme/champions';
 import { setTeams } from './theme/regions';
 import { localDayKey, resolveTimeZone } from './format';
-import { dayKeyOf, markStarted } from './schedule';
+import { dayKeyOf, markStarted, spoilersHidden } from './schedule';
 import { renderCalendar } from './views/calendar';
 import { canGoBack, markNewStep, parseHash, rememberScroll, savedScroll, syncDepth, tabFor, type Route } from './router';
 import { renderLive, renderUpdated, setActiveTab, showToast, withTransition } from './views/layout';
-import { finishedSince, resultLine } from './changes';
+import { finishedSince, matchupLine, resultLine } from './changes';
 import { escapeHtml } from './html';
 import { installTooltip } from './tooltip';
 import { verdict } from './predictions';
@@ -74,10 +74,12 @@ const SKELETON = `<div class="stack" aria-busy="true" aria-label="Cargando parti
 
 // Aviso de los partidos que terminaron desde la última carga, y destello en su tarjeta
 function announce(finished: Match[]): void {
+  // Con "Ocultar resultados" activado, el aviso dice qué serie terminó pero no quién ganó
+  const hide = spoilersHidden(localStorage);
   const lines = finished.flatMap((m) => {
-    const line = resultLine(m);
+    const line = hide ? matchupLine(m) : resultLine(m);
     if (!line) return [];
-    const v = verdict(m);
+    const v = hide ? null : verdict(m);
     const mark = v === 'hit' ? '<span class="verdict hit">✓ Acertó</span>' : v === 'miss' ? '<span class="verdict miss">✗ Falló</span>' : '';
     return [`<span class="toast-line"><b>${escapeHtml(line)}</b><span class="muted">terminó la serie</span>${mark}</span>`];
   });
@@ -148,7 +150,7 @@ async function start(): Promise<void> {
     withTransition(() => route(data, restore));
     linkClicked = false;
   });
-  // Selector de paleta junto al logo: al cambiar se redibuja la vista para que los gráficos tomen los colores nuevos
+  // Selector de paleta (pie de página): al cambiar se redibuja la vista para que los gráficos tomen los colores nuevos
   const palette = document.getElementById('palette') as HTMLSelectElement;
   palette.innerHTML = PALETTES.map((p) => `<option value="${p.id}">${p.name}</option>`).join('');
   palette.value = storedPalette(localStorage);
