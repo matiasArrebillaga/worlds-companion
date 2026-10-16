@@ -66,6 +66,6 @@ export function bracketGrid(layout: Layout, items: Map<string, BracketMatch>, tz
 // Botones Play-In · Suiza · Eliminatoria (group = nombre del data-atributo de los botones)
 export function stageButtons(group: string, selected: Stage): string {
   const buttons = STAGES.map(([id, text]) =>
-    `<button type="button" data-${group}="${id}" aria-pressed="${id === selected}">${escapeHtml(text)}</button>`).join('');
+    `<button type="button" data-${group}="${id}"${id === selected ? ' aria-current="page"' : ''}>${escapeHtml(text)}</button>`).join('');
   return `<div class="subtabs" role="group" aria-label="Fase del torneo">${buttons}</div>`;
 }

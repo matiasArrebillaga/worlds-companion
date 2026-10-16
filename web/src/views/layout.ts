@@ -49,14 +49,14 @@ export function showToast(html: string): void {
   hideToast = window.setTimeout(() => el.classList.remove('show'), 6000);
 }
 
-// "Actualizado hace X": siempre visible, en dorado si los datos están atrasados en día de partido
+// "Actualizado hace X": siempre visible, en blanco si los datos están atrasados en día de partido.
+// Sin punto rojo: el rojo que late es solo para "en vivo"
 export function renderUpdated(meta: Meta, now: Date, matchDay: boolean): void {
   const el = document.getElementById('updated');
   if (!el) return;
   const stale = isStale(meta.updated_at, now, matchDay);
   el.classList.toggle('stale', stale);
-  const text = `Actualizado ${relativeTime(meta.updated_at, now)}`;
-  el.innerHTML = stale
-    ? `${escapeHtml(text)} · puede estar atrasado`
-    : `<span class="dot" aria-hidden="true"></span>${escapeHtml(text)}`;
+  // En el celular se oculta "Actualizado" (.upd-word) para que la barra entre en un renglón
+  const when = escapeHtml(relativeTime(meta.updated_at, now));
+  el.innerHTML = `<span class="upd-word">Actualizado </span>${when}${stale ? ' · puede estar atrasado' : ''}`;
 }

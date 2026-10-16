@@ -102,7 +102,7 @@ export function how(text: string, question = '¿Cómo se lee?'): string {
 // Pestañas de sección (subrayadas) y filtros (chips que bajan de línea, nunca se deslizan)
 export function subtabs(group: string, options: [string, string][], current: string, label: string): string {
   const buttons = options.map(([id, text]) =>
-    `<button type="button" data-${group}="${id}" aria-pressed="${id === current}">${escapeHtml(text)}</button>`).join('');
+    `<button type="button" data-${group}="${id}"${id === current ? ' aria-current="page"' : ''}>${escapeHtml(text)}</button>`).join('');
   return `<div class="subtabs" role="group" aria-label="${label}">${buttons}</div>`;
 }
 

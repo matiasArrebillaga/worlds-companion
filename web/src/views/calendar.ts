@@ -219,7 +219,7 @@ function bracketView(matches: Match[], tz: string, current: Stage): string {
 
 function seg(options: [string, string][], selected: string, label: string): string {
   const buttons = options.map(([id, text]) =>
-    `<button type="button" data-sub="${id}" aria-pressed="${id === selected}">${escapeHtml(text)}</button>`).join('');
+    `<button type="button" data-sub="${id}"${id === selected ? ' aria-current="page"' : ''}>${escapeHtml(text)}</button>`).join('');
   return `<div class="seg" role="group" aria-label="${label}">${buttons}</div>`;
 }
 
@@ -269,7 +269,6 @@ export function renderCalendar(el: HTMLElement, data: SiteData, tz: string, rout
     <section class="stack">
       <span class="eyebrow">Worlds 2026</span>
       <h1>Calendario</h1>
-      <p class="muted">Horarios en tu zona horaria. Los partidos sin hora confirmada dicen "a confirmar".</p>
       ${seg(SUBS, sub, 'Vista del calendario')}
     </section>
     ${sub === 'lista' ? `<div class="cal${spoilersHidden(localStorage) ? ' hide-res' : ''}">${todayAside(matches, tz)}<div class="stack timeline">${body}</div>${resultsAside(matches, tz)}</div>` : body}`;

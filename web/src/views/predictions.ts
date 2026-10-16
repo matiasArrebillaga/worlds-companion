@@ -36,8 +36,10 @@ function empty(title: string, detail: string): string {
 }
 
 function seg(group: string, options: [string, string][], selected: string, label: string, small = false): string {
+  // Las pestañas (van en la URL) marcan la actual con aria-current; los filtros son botones que se prenden y apagan
+  const mark = (on: boolean) => (group === 'ptab' ? (on ? 'aria-current="page"' : '') : `aria-pressed="${on}"`);
   const buttons = options.map(([id, text]) =>
-    `<button type="button" data-${group}="${id}" aria-pressed="${id === selected}">${escapeHtml(text)}</button>`).join('');
+    `<button type="button" data-${group}="${id}" ${mark(id === selected)}>${escapeHtml(text)}</button>`).join('');
   return `<div class="seg${small ? ' small' : ''}" role="group" aria-label="${label}">${buttons}</div>`;
 }
 

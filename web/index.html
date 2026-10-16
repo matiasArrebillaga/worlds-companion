@@ -17,10 +17,7 @@
   </head>
   <body>
     <header class="topbar">
-      <div class="brand">
-        <a class="wordmark" href="#/" aria-label="Worlds Companion, ir al Calendario"><span class="hexmark" aria-hidden="true"></span>Worlds Companion</a>
-        <select class="palette" id="palette" aria-label="Paleta de colores"></select>
-      </div>
+      <a class="wordmark" href="#/" aria-label="Worlds Companion, ir al Calendario"><span class="hexmark" aria-hidden="true"></span>Worlds Companion</a>
       <nav class="tabs" aria-label="Secciones">
         <a class="tab" href="#/" data-tab="#/"><i class="dot live-dot" aria-hidden="true"></i>Calendario</a>
         <a class="tab" href="#/equipos" data-tab="#/equipos">Equipos</a>
@@ -34,6 +31,8 @@
 
     <footer class="site-footer">
       <div class="rule" aria-hidden="true"><i></i></div>
+      <!-- Paleta de colores: se elige una vez, así que vive acá y no en la barra de arriba -->
+      <label class="palette-pick">Paleta <select class="palette" id="palette"></select></label>
       <p>Worlds Companion no está respaldado por Riot Games y no refleja las opiniones de Riot Games ni de nadie involucrado oficialmente en la producción o gestión de League of Legends. League of Legends y Riot Games son marcas registradas de Riot Games, Inc.</p>
       <p>Worlds Companion se creó bajo la política «Legal Jibber Jabber» de Riot Games usando recursos propiedad de Riot Games. Riot Games no respalda ni patrocina este proyecto.</p>
       <p>Datos: <a href="https://lol.fandom.com" target="_blank" rel="noopener">Leaguepedia</a> (CC-BY-SA) y <a href="https://oracleselixir.com" target="_blank" rel="noopener">Oracle's Elixir</a>. Íconos de campeones: Data Dragon (Riot Games). Logos de equipos: Leaguepedia; son marcas de cada equipo. Proyecto personal sin fines de lucro.</p>

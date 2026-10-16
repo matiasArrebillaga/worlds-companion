@@ -168,8 +168,10 @@ Riot Games (ni el de League of Legends ni el de Worlds). Fotos de jugadores: no.
 - Todo como variables CSS en `:root`; nunca colores sueltos en componentes.
 - Un color, una tarea: navegación activa y hovers en blanco (`fg`), sin degradés ni brillos; bordes lisos de 1 px.
 - Paletas alternativas (Arena; Grafito y Papel, minimalistas oscura y clara, sin panal) en un
-  desplegable junto al logo; la tabla de arriba es la de por defecto. En Papel los logos llevan un contorno fino. Valores en `styles.css` (`:root[data-palette]`), lista en `web/src/theme/palette.ts`, guardada en el navegador.
-- Contraste mínimo WCAG AA. No transmitir información solo con color: lado como chip AZUL/ROJO, resultado como V/D.
+  desplegable del pie de página; la tabla de arriba es la de por defecto. En Papel los logos llevan un contorno fino. Valores en `styles.css` (`:root[data-palette]`), lista en `web/src/theme/palette.ts`, guardada en el navegador.
+- Contraste mínimo WCAG AA. Atenuar con color (`--fg3`), no con `opacity` en texto. Letra mínima de 12 px
+  (11,5 en etiquetas chicas en mayúsculas); campos de texto de 16 px en el celular (si no, iOS hace zoom).
+  Toques de 44 px en el celular. No transmitir información solo con color: lado como chip AZUL/ROJO, resultado como V/D.
 - Colores por región: valores en `styles.css` (`--region-*`), elección por equipo en `web/src/theme/regions.ts`.
 - Tipografía (Google Fonts): Saira Condensed 600–700 para títulos (mayúsculas, leve espaciado),
   Plus Jakarta Sans para texto, JetBrains Mono con `tabular-nums` para números.
