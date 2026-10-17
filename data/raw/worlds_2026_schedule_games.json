@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-17T20:41:43Z",
+ "fetched_at": "2026-10-17T21:11:57Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -788,8 +788,8 @@
   {
    "GameId": "2026 Season World Championship/Play-In_Round 2_2_4",
    "MatchId": "2026 Season World Championship/Play-In_Round 2_2",
-   "Blue": "",
-   "Red": "",
+   "Blue": "MVK Esports",
+   "Red": "FURIA",
    "Winner": ""
   },
   {
