@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-17T19:41:23Z",
+ "fetched_at": "2026-10-17T20:41:43Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -79,7 +79,7 @@
    "Team1": "MVK Esports",
    "Team2": "FURIA",
    "Team1Score": "2",
-   "Team2Score": "0",
+   "Team2Score": "1",
    "Winner": "",
    "DateTimeUTC": "2026-10-17 18:00:00",
    "HasTime": "1",
