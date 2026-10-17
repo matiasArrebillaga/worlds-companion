@@ -4,7 +4,7 @@ import { countdownParts, formatDayHeading, formatDayShort, formatTime, localDayK
 import { escapeHtml } from '../html';
 import { go, pick } from '../router';
 import { drawCalibrationChart } from '../charts/calibrationChart';
-import { withTransition } from './layout';
+import { showFromTop, withTransition } from './layout';
 import { dayKeyOf, featuredMatch, groupByDay, nextMatch, recentResults, SPOILERS_KEY, spoilersHidden } from '../schedule';
 import { PENDING, swissRounds, swissStandings } from '../swiss';
 import { teamMark, teamRegionColor } from '../theme/regions';
@@ -270,8 +270,8 @@ export function renderCalendar(el: HTMLElement, data: SiteData, tz: string, rout
     <section class="stack">
       <span class="eyebrow">Worlds 2026</span>
       <h1>Calendario</h1>
-      ${seg(SUBS, sub, 'Vista del calendario')}
     </section>
+    <div class="pinbar">${seg(SUBS, sub, 'Vista del calendario')}</div>
     ${sub === 'lista' ? `<div class="cal${spoilersHidden(localStorage) ? ' hide-res' : ''}">${todayAside(matches, tz)}<div class="stack timeline">${body}</div>${resultsAside(matches, tz)}</div>` : body}`;
 
   stopTimer();
@@ -322,6 +322,7 @@ export function renderCalendar(el: HTMLElement, data: SiteData, tz: string, rout
       renderCalendar(el, data, tz, next);
       // Volver el foco al botón elegido (el re-render reemplaza los botones)
       el.querySelector<HTMLButtonElement>(`button[data-${key}="${value}"]`)?.focus();
+      showFromTop(el);
       // Al entrar a la lista o a la suiza, ir a lo de hoy (como al abrir la página)
       const toSwiss = next.sub === 'bracket' && pick(next.stage ?? null, STAGE_IDS, currentStage(matches)) === 'suiza';
       if (button.dataset.stage === 'suiza' || (button.dataset.sub && (next.sub === 'lista' || toSwiss))) {

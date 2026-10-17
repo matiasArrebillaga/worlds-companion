@@ -2,7 +2,7 @@ import type { SiteData } from '../data';
 import { PHASE_LABELS } from '../format';
 import { escapeHtml } from '../html';
 import { go, pick } from '../router';
-import { withTransition } from './layout';
+import { showFromTop, withTransition } from './layout';
 import { adjustedWinrate, defaultSample, flexPicks, kOptions, minutes, mirages, paceRows, PHASES, presenceShifts, range, sampleOptions, sideVerdict } from '../meta';
 import { FEW_GAMES, fmt, pct, ROLE_LABELS, signed, sortBy } from '../stats';
 import type { ChampionEntry, MetaSample, SampleId, SideSplit, WinrateNoise } from '../types';
@@ -243,10 +243,9 @@ export function renderMeta(el: HTMLElement, data: SiteData, tabParam: string | n
     <section class="stack">
       <span class="eyebrow">Parche ${escapeHtml(data.meta.worlds_patch ?? '—')} · datos de Oracle's Elixir</span>
       <h1>Meta</h1>
-      <div class="subhead">${subtabs('tab', TABS, tab, 'Secciones del meta')}${samples}</div>
-      ${guide}
     </section>
-    <section class="stack">${body}</section>`;
+    <div class="pinbar"><div class="subhead">${subtabs('tab', TABS, tab, 'Secciones del meta')}${samples}</div></div>
+    <section class="stack">${guide}${body}</section>`;
 
   el.onclick = (event) => {
     const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button');
@@ -259,6 +258,7 @@ export function renderMeta(el: HTMLElement, data: SiteData, tabParam: string | n
         go(`#/meta/${next}`);
         renderMeta(el, data, next);
         el.querySelector<HTMLButtonElement>(`button[data-tab="${next}"]`)?.focus();
+        showFromTop(el);
       });
       return;
     }
