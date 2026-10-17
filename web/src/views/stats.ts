@@ -1,7 +1,7 @@
 import type { SiteData } from '../data';
 import { escapeHtml } from '../html';
 import { go, pick } from '../router';
-import { withTransition } from './layout';
+import { showFromTop, withTransition } from './layout';
 import { logoImg, REGION_LEAGUES } from '../theme/regions';
 import { minutes } from '../meta';
 import { FEW_GAMES, fmt, formRanking, PERIODS, pct, periodOf, ROLE_LABELS, signed, sortBy, vsWorldsRows, type Period } from '../stats';
@@ -185,9 +185,9 @@ export function renderStats(el: HTMLElement, data: SiteData, tabParam: string | 
     <section class="stack">
       <span class="eyebrow">Datos de Oracle's Elixir</span>
       <h1>Equipos</h1>
-      <div class="subhead">${subtabs('tab', TABS, tab, 'Secciones de estadísticas')}
-        ${tab === 'analisis' ? '' : `<div class="seg small" role="group" aria-label="Período">${periods}</div>`}</div>
     </section>
+    <div class="pinbar"><div class="subhead">${subtabs('tab', TABS, tab, 'Secciones de estadísticas')}
+      ${tab === 'analisis' ? '' : `<div class="seg small" role="group" aria-label="Período">${periods}</div>`}</div></div>
     <section class="stack">${body}</section>`;
 
   const table: Table | null = tab === 'analisis' ? null : tab;
@@ -202,6 +202,7 @@ export function renderStats(el: HTMLElement, data: SiteData, tabParam: string | 
         go(`#/equipos/${next}`);
         renderStats(el, data, next);
         el.querySelector<HTMLButtonElement>(`button[data-tab="${next}"]`)?.focus();
+        showFromTop(el);
       });
       return;
     }

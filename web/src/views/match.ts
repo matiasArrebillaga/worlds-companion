@@ -6,7 +6,7 @@ import type { ChampionCount, GameDetail, GamePlayer, GameSide, Match, PlayerEntr
 import { drawEloChart } from '../charts/eloChart';
 import { go, pick } from '../router';
 import { firstDay } from '../schedule';
-import { withTransition } from './layout';
+import { showFromTop, withTransition } from './layout';
 import { favMark, predictionBlock } from './matchCard';
 import { champHex } from './player';
 import { notFound } from './team';
@@ -183,8 +183,8 @@ export function renderMatch(el: HTMLElement, data: SiteData, tz: string, param: 
         ${heroSide(b, favMark(m, 'team2'), 'r')}
       </h1></div></div>
       ${predictionBlock(m)}
-      ${hasGames ? `<div class="subhead">${subtabs('tab', TABS, tab, 'Secciones del partido')}</div>` : ''}
     </section>
+    ${hasGames ? `<div class="pinbar"><div class="subhead">${subtabs('tab', TABS, tab, 'Secciones del partido')}</div></div>` : ''}
     ${tab === 'partidas' ? `<section class="stack">${gamesTab(m, games, b, data.players.players)}</section>` : `
     <section class="stack"><h2>Temporada 2026</h2><div class="bezel"><div class="core">
       <div class="mirror mhead" aria-hidden="true"><span>${logoImg(a.logo) || escapeHtml(a.short)}</span><span></span><span></span><span></span><span>${logoImg(b.logo) || escapeHtml(b.short)}</span></div>
@@ -233,6 +233,7 @@ export function renderMatch(el: HTMLElement, data: SiteData, tz: string, param: 
       go(`#/partido/${encodeURIComponent(m.id)}/${next}`);
       destroy = renderMatch(el, data, tz, param, next);
       el.querySelector<HTMLButtonElement>(`button[data-tab="${next}"]`)?.focus();
+      showFromTop(el);
     });
   };
   return () => { alive = false; destroy(); el.onclick = null; };

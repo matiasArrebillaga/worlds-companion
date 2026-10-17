@@ -60,3 +60,40 @@ export function renderUpdated(meta: Meta, now: Date, matchDay: boolean): void {
   const when = escapeHtml(relativeTime(meta.updated_at, now));
   el.innerHTML = `<span class="upd-word">Actualizado </span>${when}${stale ? ' · puede estar atrasado' : ''}`;
 }
+
+// Barra de pestañas fija (.pinbar): queda pegada debajo de la barra superior al deslizar.
+// Sus alturas van a variables CSS (--topbar-h, --pinbar-h) para ubicar lo que se pega debajo
+// (encabezados de tabla, columna lateral) y el salto a "hoy"
+export function trackStickyBars(view: HTMLElement): void {
+  const root = document.documentElement.style;
+  const topbar = document.querySelector<HTMLElement>('.topbar');
+  let pinbar: HTMLElement | null = null;
+  const measure = () => {
+    root.setProperty('--topbar-h', `${topbar?.offsetHeight ?? 0}px`);
+    root.setProperty('--pinbar-h', `${pinbar?.offsetHeight ?? 0}px`);
+  };
+  const sizes = new ResizeObserver(measure);
+  if (topbar) sizes.observe(topbar);
+  // Cada vista dibuja su propia barra: al cambiar, se mide la nueva
+  new MutationObserver(() => {
+    const found = view.querySelector<HTMLElement>('.pinbar');
+    if (found === pinbar) return;
+    if (pinbar) sizes.unobserve(pinbar);
+    pinbar = found;
+    if (pinbar) sizes.observe(pinbar);
+    measure();
+  }).observe(view, { childList: true, subtree: true });
+}
+
+// Al cambiar de pestaña con la barra ya pegada arriba, la pestaña nueva se ve desde su principio
+// (justo debajo de la barra) en vez de quedar a la altura del scroll de la anterior
+export function showFromTop(view: HTMLElement): void {
+  const pinbar = view.querySelector<HTMLElement>('.pinbar');
+  const content = pinbar?.nextElementSibling;
+  if (!pinbar || !content) return;
+  const stuckBottom = (parseFloat(getComputedStyle(pinbar).top) || 0) + pinbar.offsetHeight;
+  // Lugar en la página donde empieza el contenido (el sticky no cambia el flujo)
+  const contentTop = content.getBoundingClientRect().top + window.scrollY;
+  const target = Math.max(0, contentTop - stuckBottom - 16);
+  if (window.scrollY > target) window.scrollTo(0, target);
+}

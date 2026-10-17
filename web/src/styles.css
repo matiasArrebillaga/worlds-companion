@@ -106,7 +106,8 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 .eyebrow::before { content: ""; width: 7px; height: 7px; background: var(--gold); transform: rotate(45deg); }
 .label { font: 500 12px/1.3 var(--f-data); letter-spacing: .12em; text-transform: uppercase; color: var(--fg2); }
 .muted { color: var(--fg2); }
-.stack { display: grid; gap: 14px; align-content: start; }
+/* minmax(0, 1fr): la columna nunca crece más que la pantalla por un texto largo sin cortes */
+.stack { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; align-content: start; }
 .grid { display: grid; gap: 16px; }
 .g2 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); }
 .g3 { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
@@ -162,6 +163,17 @@ h2 { font-size: 1.3rem; line-height: 1.1; }
 .updated.stale { color: var(--fg); }
 .upd-word { white-space: pre; }
 @media (max-width: 480px) { .upd-word { display: none; } }
+
+/* Barra de pestañas de cada sección: queda pegada debajo de la barra superior al deslizar, para cambiar
+   de pestaña sin volver arriba. --topbar-h y --pinbar-h los mide views/layout.ts */
+.pinbar {
+  position: sticky; top: calc(env(safe-area-inset-top, 0px) + var(--topbar-h, 56px)); z-index: 9;
+  /* Ocupa todo el ancho (también el margen de .app) y queda a 14 px del título, como antes */
+  margin: -34px -16px -8px; padding: 8px 16px;
+  background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(12px);
+}
+.pinbar:has(.subhead) { padding-bottom: 0; margin-bottom: 0; }
+.pinbar .seg { display: flex; width: fit-content; }
 
 /* Barra inferior (celular) */
 .bottombar {
@@ -328,7 +340,7 @@ h1 a { text-decoration: none; }
 .seg.small button { padding: 8px 10px; font-size: 12px; }
 .small-note { margin: 0; font-size: 13px; }
 
-.tools { display: grid; gap: 12px; }
+.tools { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .chips .label { margin-right: 4px; }
 .chip { min-height: 40px; padding: 0 14px; background: transparent; border: 1px solid var(--line-ctl); color: var(--fg2); cursor: pointer;
@@ -539,9 +551,9 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
    PC: línea de tiempo (una tarjeta por fila) + columna lateral fija con lo de hoy.
    Celular: solo la línea de tiempo. La vista abre en #hoy (próximo partido o ronda en curso). */
 
-#hoy { scroll-margin-top: 84px; }
+#hoy { scroll-margin-top: calc(var(--topbar-h, 56px) + var(--pinbar-h, 0px) + 24px); }
 /* Que se vea también el título del día, arriba de la tarjeta */
-#hoy.feature { scroll-margin-top: 128px; }
+#hoy.feature { scroll-margin-top: calc(var(--topbar-h, 56px) + var(--pinbar-h, 0px) + 68px); }
 .mu.tbd { color: var(--fg2); font-size: 13px; }
 .cal { display: grid; gap: 28px; align-items: start; }
 @media (max-width: 959px) { .cal-aside { display: none; } }
@@ -555,7 +567,7 @@ details.how p { margin: 8px 0 0; max-width: 68ch; color: var(--fg); }
 /* PC ancha: la lista centrada, "Hoy" a la izquierda y "Últimos resultados" a la derecha, fijos al bajar */
 @media (min-width: 1180px) {
   .cal { grid-template-columns: 240px minmax(0, 1fr) 240px; gap: 24px; }
-  .cal-aside { position: sticky; top: 84px; }
+  .cal-aside { position: sticky; top: calc(var(--topbar-h, 56px) + var(--pinbar-h, 0px) + 24px); }
 }
 
 /* PC ancha (16:9 desde 1500 px): más ancho y todo un poco más grande. El celular no cambia */
@@ -783,7 +795,7 @@ html { -webkit-tap-highlight-color: transparent; }
 
 /* PC: el encabezado de las tablas largas queda pegado debajo de la barra superior */
 @media (min-width: 880px) {
-  .airy thead tr:last-child th { position: sticky; top: 56px; z-index: 2; background: var(--bg); box-shadow: inset 0 -1px 0 var(--line-ctl); }
+  .airy thead tr:last-child th { position: sticky; top: calc(var(--topbar-h, 56px) + var(--pinbar-h, 0px)); z-index: 2; background: var(--bg); box-shadow: inset 0 -1px 0 var(--line-ctl); }
 }
 
 /* ================= Feel =================

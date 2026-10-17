@@ -6,7 +6,7 @@ import { localDayKey, resolveTimeZone } from './format';
 import { dayKeyOf, markStarted, spoilersHidden } from './schedule';
 import { renderCalendar } from './views/calendar';
 import { canGoBack, markNewStep, parseHash, rememberScroll, savedScroll, syncDepth, tabFor, type Route } from './router';
-import { renderLive, renderUpdated, setActiveTab, showToast, withTransition } from './views/layout';
+import { renderLive, renderUpdated, setActiveTab, showToast, trackStickyBars, withTransition } from './views/layout';
 import { finishedSince, matchupLine, resultLine } from './changes';
 import { escapeHtml } from './html';
 import { installTooltip } from './tooltip';
@@ -127,6 +127,7 @@ function refreshUpdated(data: SiteData): void {
 
 async function start(): Promise<void> {
   installTooltip();
+  trackStickyBars(view);
   view.innerHTML = SKELETON;
   let data: SiteData;
   try {
