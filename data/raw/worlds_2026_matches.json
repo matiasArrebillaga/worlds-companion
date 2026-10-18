@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-17T21:28:22Z",
+ "fetched_at": "2026-10-18T18:49:32Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -95,8 +95,8 @@
    "BestOf": "5",
    "Team1": "Karmine Corp",
    "Team2": "MVK Esports",
-   "Team1Score": "",
-   "Team2Score": "",
+   "Team1Score": "1",
+   "Team2Score": "0",
    "Winner": "",
    "DateTimeUTC": "2026-10-18 18:00:00",
    "HasTime": "1",
