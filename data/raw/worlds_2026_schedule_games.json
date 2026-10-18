@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-18T19:49:48Z",
+ "fetched_at": "2026-10-18T20:19:56Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -811,21 +811,7 @@
    "MatchId": "2026 Season World Championship/Play-In_Round 3_1",
    "Blue": "MVK Esports",
    "Red": "Karmine Corp",
-   "Winner": ""
-  },
-  {
-   "GameId": "2026 Season World Championship/Play-In_Round 3_1_4",
-   "MatchId": "2026 Season World Championship/Play-In_Round 3_1",
-   "Blue": "",
-   "Red": "",
-   "Winner": ""
-  },
-  {
-   "GameId": "2026 Season World Championship/Play-In_Round 3_1_5",
-   "MatchId": "2026 Season World Championship/Play-In_Round 3_1",
-   "Blue": "",
-   "Red": "",
-   "Winner": ""
+   "Winner": "2"
   }
  ]
 }
