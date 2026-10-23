@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-10T23:42:05Z",
+ "fetched_at": "2026-10-18T20:19:56Z",
  "rows": [
   {
    "Team": "Anyone's Legend",
@@ -34,6 +34,10 @@
    "OverviewPage": "2026 Season World Championship/Main Event"
   },
   {
+   "Team": "Karmine Corp",
+   "OverviewPage": "2026 Season World Championship/Main Event"
+  },
+  {
    "Team": "LØS",
    "OverviewPage": "2026 Season World Championship/Main Event"
   },
@@ -47,10 +51,6 @@
   },
   {
    "Team": "T1",
-   "OverviewPage": "2026 Season World Championship/Main Event"
-  },
-  {
-   "Team": "TBD",
    "OverviewPage": "2026 Season World Championship/Main Event"
   },
   {
