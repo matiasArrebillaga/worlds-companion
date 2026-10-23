@@ -1,0 +1,96 @@
+"""Qué ligas e internacionales sigue el sitio, cómo se agrupan en torneos y en qué estado está cada uno.
+
+Un torneo es una página de Leaguepedia (OverviewPage) en las ligas, o el evento completo en los internacionales
+(Worlds tiene una página para el Play-In y otra para el Main Event).
+"""
+import re
+from datetime import date, timedelta
+from pathlib import Path
+
+# Id de liga → nombre en el campo League de Leaguepedia (los mismos de LEAGUE_REGIONS en pipeline/history.py),
+# sigla, región (color del rombito) e id de la API de lolesports
+TRACKED: dict[str, dict] = {
+    "lck": {"league": "LoL Champions Korea", "short": "LCK", "region": "KR", "international": False,
+            "lolesports_id": "98767991310872058"},
+    "lpl": {"league": "Tencent LoL Pro League", "short": "LPL", "region": "CN", "international": False,
+            "lolesports_id": "98767991314006698"},
+    "lec": {"league": "LoL EMEA Championship", "short": "LEC", "region": "EU", "international": False,
+            "lolesports_id": "98767991302996019"},
+    "lcs": {"league": "League of Legends Championship Series", "short": "LCS", "region": "NA", "international": False,
+            "lolesports_id": "98767991299243165"},
+    "fst": {"league": "First Stand", "short": "FST", "region": None, "international": True,
+            "lolesports_id": "113464388705111224"},
+    "msi": {"league": "Mid-Season Invitational", "short": "MSI", "region": None, "international": True,
+            "lolesports_id": "98767991325878492"},
+    "worlds": {"league": "World Championship", "short": "WORLDS", "region": None, "international": True,
+               "lolesports_id": "98767975604431411"},
+}
+LEAGUE_IDS = {info["league"]: league_id for league_id, info in TRACKED.items()}
+
+# Un torneo está "activo" desde 2 días antes de empezar hasta 2 días después de terminar
+# (cubre husos horarios y los resultados que Leaguepedia carga tarde)
+ACTIVE_MARGIN = timedelta(days=2)
+
+# Worlds 2026: el torneo que el sitio sigue hoy. Se usa si todavía no hay descubrimiento guardado.
+# La página es el prefijo común de Play-In y Main Event (fetch usa LIKE "<página>%")
+WORLDS_2026 = {"id": "worlds-2026", "league": "worlds", "name": "Worlds 2026", "year": 2026,
+               "pages": ["2026 Season World Championship"], "is_playoffs": False,
+               "start": "2026-10-14", "end": "2026-11-15"}
+
+
+def slug(text: str) -> str:
+    """'LCK/2027 Season/Rounds 1-2' → 'lck-2027-season-rounds-1-2'."""
+    return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
+
+
+def _keep(r: dict) -> bool:
+    """Solo ligas seguidas, nivel principal y sin clasificatorios (salvo los de Worlds: el Play-In figura así)."""
+    league_id = LEAGUE_IDS.get(r.get("League", ""))
+    if league_id is None or r.get("TournamentLevel") != "Primary":
+        return False
+    return r.get("IsQualifier") != "1" or league_id == "worlds"
+
+
+def group_tournaments(rows: list[dict]) -> list[dict]:
+    """Filas de Tournaments → torneos, ordenados por fecha de inicio (los sin fecha al final)."""
+    by_id: dict[str, dict] = {}
+    for r in rows:
+        if not _keep(r):
+            continue
+        league_id = LEAGUE_IDS[r["League"]]
+        year = int(r["Year"])
+        international = TRACKED[league_id]["international"]
+        # Internacional: un torneo por evento y año. Liga: uno por página.
+        tid = f"{league_id}-{year}" if international else slug(r["OverviewPage"])
+        start, end = r.get("DateStart") or None, r.get("Date") or None
+        t = by_id.setdefault(tid, {
+            "id": tid, "league": league_id, "year": year, "pages": [], "is_playoffs": r.get("IsPlayoffs") == "1",
+            "name": f"{TRACKED[league_id]['short']} {year}" if international else (r.get("Name") or r["OverviewPage"]),
+            "start": start, "end": end,
+        })
+        if r["OverviewPage"] not in t["pages"]:
+            t["pages"].append(r["OverviewPage"])
+        # El evento va del primer inicio al último fin de sus páginas
+        if start and (t["start"] is None or start < t["start"]):
+            t["start"] = start
+        if end and (t["end"] is None or end > t["end"]):
+            t["end"] = end
+    for t in by_id.values():
+        t["pages"].sort()
+    return sorted(by_id.values(), key=lambda t: (t["start"] is None, t["start"] or "", t["id"]))
+
+
+def status(tournament: dict, today: str) -> str:
+    """'upcoming' | 'active' | 'finished' según las fechas de Leaguepedia (today en YYYY-MM-DD)."""
+    if not tournament["start"]:
+        return "upcoming"  # anunciado sin fecha todavía
+    day = date.fromisoformat(today)
+    if day < date.fromisoformat(tournament["start"]) - ACTIVE_MARGIN:
+        return "upcoming"
+    end = tournament["end"] or tournament["start"]
+    return "active" if day <= date.fromisoformat(end) + ACTIVE_MARGIN else "finished"
+
+
+def tournament_dir(raw_dir: Path, tournament_id: str) -> Path:
+    """Carpeta de los datos crudos de un torneo."""
+    return raw_dir / tournament_id
