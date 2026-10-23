@@ -979,7 +979,9 @@ html { -webkit-tap-highlight-color: transparent; }
 @media (min-width: 1160px) {
   .duel-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 520px) minmax(0, 1fr); column-gap: 16px; }
   .duel-grid::before, .duel-grid::after, .duel-grid > .duel { grid-column: 2; }
-  .duel-grid > .pchamps { display: flex; padding-top: 12px; }
+  .duel-grid > .pchamps { display: flex; padding-top: 12px; padding-bottom: 12px; }
+  /* Línea entre roles también en los campeones de los costados, a la altura del divisor de cada duelo */
+  .duel-grid > .pchamps:nth-child(n+4) { border-top: 1px solid var(--line); }
   .duel-champs { display: none; }
 }
 
