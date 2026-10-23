@@ -5,8 +5,11 @@ Un torneo es una página de Leaguepedia (OverviewPage) en las ligas, o el evento
 """
 import json
 import re
-from datetime import date, timedelta
+import sys
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+
+from pipeline import utc_now_iso
 
 # Id de liga → nombre en el campo League de Leaguepedia (los mismos de LEAGUE_REGIONS en pipeline/history.py),
 # sigla, región (color del rombito) e id de la API de lolesports
@@ -167,3 +170,35 @@ def index_payload(raw_dir: Path, today: str, now: str) -> dict:
                     for lid, info in TRACKED.items()],
         "tournaments": listed,
     }
+
+
+def match_times(raw_dir: Path, today: str) -> list[datetime]:
+    """Horarios confirmados (HasTime=1) de los partidos de los torneos que no terminaron."""
+    times = []
+    for t in known_tournaments(raw_dir, today):
+        path = raw_file(raw_dir, t["id"], "matches")
+        if status(t, today) == "finished" or not path.exists():
+            continue
+        for r in json.loads(path.read_text(encoding="utf-8"))["rows"]:
+            if r.get("DateTimeUTC") and r.get("HasTime") == "1":
+                times.append(datetime.strptime(r["DateTimeUTC"], "%Y-%m-%d %H:%M:%S").replace(tzinfo=timezone.utc))
+    return sorted(times)
+
+
+def in_match_window(times: list[datetime], now: datetime, before: timedelta = timedelta(hours=6),
+                    after: timedelta = timedelta(hours=24)) -> bool:
+    """¿Hay un partido que empezó hace menos de 6 h o empieza dentro de 24 h? (la cadena de 30 min sigue)"""
+    return any(now - before <= t <= now + after for t in times)
+
+
+def main() -> None:
+    if "--match-window" in sys.argv:
+        now_iso = utc_now_iso()
+        now = datetime.strptime(now_iso, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+        busy = in_match_window(match_times(Path("data/raw"), now_iso[:10]), now)
+        print("match window: yes" if busy else "match window: no")
+        sys.exit(0 if busy else 1)
+
+
+if __name__ == "__main__":
+    main()

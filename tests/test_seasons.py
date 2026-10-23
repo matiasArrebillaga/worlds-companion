@@ -1,4 +1,5 @@
 import json
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from pipeline import seasons
@@ -128,3 +129,24 @@ def test_index_payload_in_worlds_mode(tmp_path):
     assert [t["id"] for t in index["tournaments"]] == ["worlds-2026"]
     assert index["tournaments"][0]["status"] == "active"
     assert {lg["id"] for lg in index["leagues"]} == set(seasons.TRACKED)
+
+
+NOW = datetime(2027, 1, 14, 12, 0, tzinfo=timezone.utc)
+
+
+def test_in_match_window_edges():
+    assert seasons.in_match_window([NOW - timedelta(hours=6)], NOW) is True
+    assert seasons.in_match_window([NOW - timedelta(hours=6, minutes=1)], NOW) is False
+    assert seasons.in_match_window([NOW + timedelta(hours=24)], NOW) is True
+    assert seasons.in_match_window([NOW + timedelta(hours=24, minutes=1)], NOW) is False
+    assert seasons.in_match_window([], NOW) is False
+
+
+def test_match_times_skips_unconfirmed_times_and_finished_tournaments(tmp_path):
+    write_matches(tmp_path, "worlds-2026", [
+        {"DateTimeUTC": "2026-10-22 08:00:00", "HasTime": "1"},
+        {"DateTimeUTC": "2026-10-23 00:00:00", "HasTime": "0"},  # a confirmar: no cuenta
+        {"DateTimeUTC": "", "HasTime": ""},
+    ])
+    assert seasons.match_times(tmp_path, "2026-10-22") == [datetime(2026, 10, 22, 8, 0, tzinfo=timezone.utc)]
+    assert seasons.match_times(tmp_path, "2026-12-01") == []  # Worlds 2026 ya terminó

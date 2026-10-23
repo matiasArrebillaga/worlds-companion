@@ -22,19 +22,24 @@ concurrency:
 jobs:
   tick:
     runs-on: ubuntu-latest
-    # Solo durante Worlds 2026 (hasta el 15/11 inclusive, por husos horarios).
+    # Solo en días de partido: lo decide pipeline.seasons --match-window.
     # Desde workflow_run solo se reengancha tras corridas del cron, para no abrir cadenas nuevas con cada push.
     if: >-
       github.event_name == 'workflow_dispatch' ||
       github.event.workflow_run.event == 'schedule'
     timeout-minutes: 40
     steps:
-      - name: Wait 30 minutes, trigger the update and re-trigger this tick
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Wait 30 minutes, trigger the update and re-trigger this tick (only around match days)
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
         run: |
-          if [ "$(date -u +%Y%m%d)" -gt 20261115 ]; then echo "Worlds terminó: fin de la cadena"; exit 0; fi
+          # Sin partidos entre 6 h atrás y 24 h adelante se corta la cadena; la corrida de cada 6 h la reengancha
+          if ! python -m pipeline.seasons --match-window; then echo "No matches soon: end of the chain"; exit 0; fi
           sleep 1800
           gh workflow run update.yml
           gh workflow run tick.yml
