@@ -68,3 +68,13 @@ def test_finished_games_become_oracles_games_that_meta_can_count():
     assert lp[0]["players"]["red"]["jng"]["playername"] == g["players"]["red"]["jng"]["playername"]
     # Si Oracle's Elixir ya tiene esa partida, no se cuenta dos veces
     assert lolesports.missing_from([g], oe) == [] and lolesports.missing_from([], oe) == oe
+
+
+def test_started_matches_asks_for_the_given_league(monkeypatch):
+    seen = {}
+    def fake_get(session, url, **params):
+        seen.update(params)
+        return {"data": {"schedule": {"events": []}}}
+    monkeypatch.setattr(lolesports, "_get", fake_get)
+    assert lolesports.started_matches(None, "2027-01-01", league_id="98767991310872058") == []
+    assert seen["leagueId"] == "98767991310872058"

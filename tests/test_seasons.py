@@ -80,3 +80,24 @@ def test_no_module_uses_the_old_flat_file_names():
     for module in ("pipeline/fetch.py", "pipeline/build.py", "pipeline/assets.py", "pipeline/history.py"):
         source = Path(module).read_text(encoding="utf-8")
         assert "worlds_2026_" not in source and "lolesports_2026_" not in source, module
+
+
+import json
+
+
+def test_write_discovery_always_rewrites_fetched_at(tmp_path):
+    path = tmp_path / "tournaments_2027.json"
+    seasons.write_discovery(path, [{"a": "1"}], "2026-12-01T00:00:00Z")
+    seasons.write_discovery(path, [{"a": "1"}], "2026-12-02T00:00:00Z")
+    assert json.loads(path.read_text(encoding="utf-8")) == {"fetched_at": "2026-12-02T00:00:00Z", "rows": [{"a": "1"}]}
+
+
+def test_known_tournaments_adds_worlds_2026_and_discovered_years(tmp_path):
+    seasons.write_discovery(seasons.discovery_file(tmp_path, 2027),
+                            [row("LCK/2027 Season/Cup", "LoL Champions Korea")], "x")
+    ids = [t["id"] for t in seasons.known_tournaments(tmp_path, "2026-12-01")]
+    assert ids == ["worlds-2026", "lck-2027-season-cup"]
+
+
+def test_known_tournaments_without_discovery_is_just_worlds_2026(tmp_path):
+    assert [t["id"] for t in seasons.known_tournaments(tmp_path, "2026-10-22")] == ["worlds-2026"]

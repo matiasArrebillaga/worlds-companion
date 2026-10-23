@@ -3,6 +3,7 @@
 Un torneo es una página de Leaguepedia (OverviewPage) en las ligas, o el evento completo en los internacionales
 (Worlds tiene una página para el Play-In y otra para el Main Event).
 """
+import json
 import re
 from datetime import date, timedelta
 from pathlib import Path
@@ -110,3 +111,30 @@ RAW_FILES = {
 
 def raw_file(raw_dir: Path, tournament_id: str, key: str) -> Path:
     return tournament_dir(raw_dir, tournament_id) / RAW_FILES[key]
+
+
+TOURNAMENT_FIELDS = "Name,OverviewPage,League,Year,DateStart,Date,IsPlayoffs,TournamentLevel,IsQualifier"
+
+
+def discovery_file(raw_dir: Path, year: int) -> Path:
+    return raw_dir / f"tournaments_{year}.json"
+
+
+def write_discovery(path: Path, rows: list[dict], now: str) -> None:
+    """Guarda el descubrimiento siempre, aunque no cambie: el commit diario evita que GitHub apague el cron
+    (lo hace en repos públicos tras 60 días sin actividad)."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({"fetched_at": now, "rows": rows}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+
+
+def known_tournaments(raw_dir: Path, today: str) -> list[dict]:
+    """Worlds 2026 + los torneos descubiertos del año de `today` y del siguiente."""
+    year = int(today[:4])
+    rows = []
+    for y in (year, year + 1):
+        path = discovery_file(raw_dir, y)
+        if path.exists():
+            rows += json.loads(path.read_text(encoding="utf-8"))["rows"]
+    found = [t for t in group_tournaments(rows) if t["id"] != WORLDS_2026["id"]]
+    # Las páginas de Worlds 2026 descubiertas se agrupan como "worlds-2026": se usa la constante, que ya tiene caché
+    return [WORLDS_2026] + found

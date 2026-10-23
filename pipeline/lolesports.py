@@ -1,4 +1,4 @@
-"""Estadísticas de cada partida de Worlds desde la API no oficial de lolesports (la que usa lolesports.com).
+"""Estadísticas de cada partida de los torneos seguidos desde la API no oficial de lolesports (la que usa lolesports.com).
 
 Leaguepedia carga el scoreboard a mano, horas después de cada partida; lolesports lo tiene en vivo (~10 s de atraso).
 Mientras Leaguepedia no tenga una partida, la pestaña Partidas usa esta. Lo que lolesports no da:
@@ -28,9 +28,9 @@ def _get(session, url: str, **params) -> dict:
     return response.json()
 
 
-def started_matches(session, since: str) -> list[dict]:
-    """Series de Worlds desde `since` (ISO) que ya empezaron. La primera página del calendario trae las recientes."""
-    events = _get(session, f"{API_URL}/getSchedule", hl="en-US", leagueId=WORLDS_LEAGUE_ID)["data"]["schedule"]["events"]
+def started_matches(session, since: str, league_id: str = WORLDS_LEAGUE_ID) -> list[dict]:
+    """Series de la liga desde `since` (ISO) que ya empezaron. La primera página del calendario trae las recientes."""
+    events = _get(session, f"{API_URL}/getSchedule", hl="en-US", leagueId=league_id)["data"]["schedule"]["events"]
     return [e for e in events if e["type"] == "match" and e["state"] != "unstarted" and e["startTime"] >= since]
 
 
@@ -43,12 +43,13 @@ def _window_time(now: datetime, first_frame: str) -> str:
     return t.strftime("%Y-%m-%dT%H:%M:%S.000Z")
 
 
-def fetch_games(session, since: str, cached: list[dict], now: datetime | None = None) -> list[dict]:
+def fetch_games(session, since: str, cached: list[dict], now: datetime | None = None,
+                league_id: str = WORLDS_LEAGUE_ID) -> list[dict]:
     """Último cuadro de cada partida jugada o en curso. Las terminadas que ya están en caché no se vuelven a pedir."""
     now = now or datetime.now(timezone.utc)
     done = {g["game_id"]: g for g in cached if g["last_frame"]["gameState"] == "finished"}
     out = []
-    for event in started_matches(session, since):
+    for event in started_matches(session, since, league_id):
         match = _get(session, f"{API_URL}/getEventDetails", hl="en-US", id=event["match"]["id"])["data"]["event"]["match"]
         codes = {t["id"]: t["code"] for t in match["teams"]}
         for game in match["games"]:
