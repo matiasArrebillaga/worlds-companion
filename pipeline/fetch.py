@@ -59,12 +59,6 @@ def write_if_changed(path: Path, rows: list[dict], now: str) -> bool:
     return True
 
 
-def pages_where(field: str, pages: list[str]) -> str:
-    """'(Campo LIKE "pág1%" OR Campo LIKE "pág2%")': el prefijo cubre las subpáginas (Play-In, Main Event)."""
-    quoted = [p.replace('"', '\\"') for p in pages]
-    return "(" + " OR ".join(f'{field} LIKE "{p}%"' for p in quoted) + ")"
-
-
 def targets(known: list[dict], today: str) -> list[tuple[str, bool]]:
     """(id, completo) de cada torneo a bajar: los activos completos; los próximos, solo el calendario
     (para saber cuándo tienen partidos con fecha). Los terminados no se vuelven a bajar."""
@@ -80,7 +74,8 @@ def fetch_tournament(session, tournament: dict, now: str, full: bool) -> list[st
     """Baja un torneo a data/raw/<id>/. Con full=False solo el calendario. Devuelve los equipos que aparecen."""
     tid, pages = tournament["id"], tournament["pages"]
     file = lambda key: raw_file(RAW_DIR, tid, key)  # noqa: E731
-    where = pages_where("OverviewPage", pages)
+    # Páginas exactas: con un prefijo, "Split 1" traería también las filas de "Split 1 Playoffs"
+    where = leaguepedia.in_clause("OverviewPage", pages)
 
     matches = leaguepedia.cargo_query(session, tables="MatchSchedule", fields=MATCH_FIELDS, where=where,
                                       order_by="DateTime_UTC,MatchId")
@@ -101,7 +96,7 @@ def fetch_tournament(session, tournament: dict, now: str, full: bool) -> list[st
     # Lado y ganador de cada partida: Leaguepedia los carga enseguida, mucho antes que el scoreboard
     schedule_games = leaguepedia.cargo_query(session, tables="MatchScheduleGame",
                                              fields="GameId,MatchId,Blue,Red,Winner",
-                                             where=pages_where("MatchId", pages), order_by="GameId")
+                                             where=where, order_by="GameId")
     write_if_changed(file("schedule_games"), schedule_games, now)
 
     # Stats en vivo de lolesports mientras Leaguepedia no cargue el scoreboard. Si falla, queda la caché

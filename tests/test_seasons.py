@@ -67,7 +67,8 @@ def test_status_without_dates_is_upcoming():
 
 def test_worlds_2026_constant_and_raw_dir():
     assert seasons.WORLDS_2026["id"] == "worlds-2026"
-    assert seasons.WORLDS_2026["pages"] == ["2026 Season World Championship"]
+    assert seasons.WORLDS_2026["pages"] == ["2026 Season World Championship/Main Event",
+                                            "2026 Season World Championship/Play-In"]
     assert seasons.tournament_dir(Path("data/raw"), "worlds-2026") == Path("data/raw/worlds-2026")
 
 

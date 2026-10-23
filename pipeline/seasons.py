@@ -36,9 +36,10 @@ LEAGUE_IDS = {info["league"]: league_id for league_id, info in TRACKED.items()}
 ACTIVE_MARGIN = timedelta(days=2)
 
 # Worlds 2026: el torneo que el sitio sigue hoy. Se usa si todavía no hay descubrimiento guardado.
-# La página es el prefijo común de Play-In y Main Event (fetch usa LIKE "<página>%")
+# Páginas exactas de Leaguepedia (fetch filtra con OverviewPage IN (...))
 WORLDS_2026 = {"id": "worlds-2026", "league": "worlds", "name": "Worlds 2026", "year": 2026,
-               "pages": ["2026 Season World Championship"], "is_playoffs": False,
+               "pages": ["2026 Season World Championship/Main Event", "2026 Season World Championship/Play-In"],
+               "is_playoffs": False,
                "start": "2026-10-14", "end": "2026-11-15"}
 
 

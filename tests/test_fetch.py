@@ -42,11 +42,21 @@ def test_roster_teams_skips_tbd_and_dedupes():
     assert fetch.roster_teams(rosters) == ["G2 Esports", "T1"]
 
 
-def test_pages_where_matches_each_page_as_a_prefix():
-    assert fetch.pages_where("OverviewPage", ["2026 Season World Championship"]) == (
-        '(OverviewPage LIKE "2026 Season World Championship%")')
-    assert fetch.pages_where("MatchId", ["LCK/2027 Season/Cup", 'A "B"']) == (
-        '(MatchId LIKE "LCK/2027 Season/Cup%" OR MatchId LIKE "A \\"B\\"%")')
+def test_fetch_tournament_filters_by_exact_pages(tmp_path, monkeypatch):
+    # "Split 1" y "Split 1 Playoffs" son páginas hermanas: un prefijo las mezclaría
+    from pipeline import leaguepedia
+    monkeypatch.setattr(fetch, "RAW_DIR", tmp_path)
+    queries = []
+    monkeypatch.setattr(leaguepedia, "cargo_query", lambda session, **kw: queries.append(kw) or [])
+    split = {"id": "lpl-2027-split-1", "league": "lpl", "pages": ["LPL/2027 Season/Split 1"], "start": "2027-01-14"}
+    monkeypatch.setattr(fetch.lolesports, "fetch_games", lambda *args, **kwargs: [])
+    fetch.fetch_tournament(None, split, "2027-01-14T00:00:00Z", full=True)
+    pages_queries = [q for q in queries if q["tables"] != "Teams"]
+    assert {q["tables"] for q in pages_queries} == {
+        "MatchSchedule", "ScoreboardGames", "ScoreboardPlayers", "MatchScheduleGame", "TournamentRosters"}
+    for q in pages_queries:
+        assert q["where"] == 'OverviewPage IN ("LPL/2027 Season/Split 1")'
+        assert "LIKE" not in q["where"]
 
 
 def test_targets_are_active_fully_and_upcoming_only_matches():
