@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-23T19:10:26Z",
+ "fetched_at": "2026-10-23T20:10:55Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -195,7 +195,7 @@
    "MatchId": "2026 Season World Championship/Main Event_Round 1_3",
    "Blue": "Movistar KOI",
    "Red": "Bilibili Gaming",
-   "Winner": ""
+   "Winner": "1"
   },
   {
    "GameId": "2026 Season World Championship/Main Event_Round 1_4_1",
