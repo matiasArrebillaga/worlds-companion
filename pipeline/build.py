@@ -21,9 +21,10 @@ from pipeline.games import build_games
 from pipeline.history import CURRENT_YEAR, load_aliases, load_season_games
 from pipeline.meta import build_meta
 from pipeline.schedule import UNDECIDED_TEAMS, build_schedule, short_name
+from pipeline import seasons
 from pipeline.seasons import WORLDS_2026, raw_file
 from pipeline.stats import build_team_and_player_stats, elo_history, series_list
-from pipeline.validate import (validate_games, validate_lineups, validate_meta, validate_predictions, validate_ratings,
+from pipeline.validate import (validate_games, validate_index, validate_lineups, validate_meta, validate_predictions, validate_ratings,
                                validate_schedule, validate_stats, validate_tournament)
 
 RAW_DIR = Path("data/raw")
@@ -155,6 +156,8 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
         bracket_sim = tournament.payload(schedule, main_event_teams(rosters), series, lambda n: short_name(n, shorts))
         errors += validate_tournament(bracket_sim)
     errors += validate_games(games_detail, {m["id"] for m in schedule})
+    index = seasons.index_payload(raw_dir, now[:10], now)
+    errors += validate_index(index)
     if errors:
         raise ValueError("validation failed:\n- " + "\n- ".join(errors))
 
@@ -185,6 +188,7 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
     _write(out_dir / "players.json", {"players": players_payload})
     _write(out_dir / "tournament.json", {"updated_at": now, "model_version": MODEL_VERSION, **bracket_sim})
     _write(out_dir / "games.json", {"updated_at": now, "matches": games_detail})
+    _write(out_dir / "index.json", index)
 
 
 def main() -> None:
@@ -192,7 +196,7 @@ def main() -> None:
         build(RAW_DIR, OUT_DIR, utc_now_iso(), freeze_predictions="--freeze" in sys.argv)
     except ValueError as error:
         sys.exit(str(error))
-    print(f"wrote {OUT_DIR}/schedule.json, meta.json, elo.json, teams.json, players.json, champions.json, tournament.json and games.json")
+    print(f"wrote {OUT_DIR}/schedule.json, meta.json, elo.json, teams.json, players.json, champions.json, tournament.json, games.json and index.json")
 
 
 if __name__ == "__main__":

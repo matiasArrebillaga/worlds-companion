@@ -142,3 +142,23 @@ def validate_games(games: dict[str, list[dict]], match_ids: set[str]) -> list[st
                 if len(g[side]["players"]) > 5:
                     errors.append(f"games: {mid} game {g['n']} {side} has {len(g[side]['players'])} players")
     return errors
+
+
+SITE_MODES = {"worlds-2026", "season"}
+TOURNAMENT_STATUSES = {"upcoming", "active", "finished"}
+
+
+def validate_index(index: dict) -> list[str]:
+    """index.json: modo conocido, torneo por defecto que existe, ids únicos y estados válidos."""
+    errors = []
+    if index.get("mode") not in SITE_MODES:
+        errors.append(f"index: unknown mode {index.get('mode')!r}")
+    ids = [t["id"] for t in index.get("tournaments", [])]
+    if index.get("default") not in ids:
+        errors.append(f"index: default {index.get('default')!r} is not a listed tournament")
+    for tid in sorted({i for i in ids if ids.count(i) > 1}):
+        errors.append(f"index: duplicate tournament {tid}")
+    for t in index.get("tournaments", []):
+        if t.get("status") not in TOURNAMENT_STATUSES:
+            errors.append(f"index: {t['id']} has invalid status {t.get('status')!r}")
+    return errors

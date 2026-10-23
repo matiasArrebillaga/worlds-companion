@@ -148,3 +148,10 @@ def test_build_writes_team_and_player_stats(tmp_path):
     assert t1["id"] == "t1" and len(t1["elo_history"]) == 12 and t1["series"]
     assert len(t1["roster"]) == 5 and t1["worlds"] is None
     assert {p["team_id"] for p in players["players"]} == {"t1", "g2-esports"}
+
+
+def test_build_writes_the_index_in_worlds_mode(tmp_path):
+    write_raw(tmp_path / "raw")
+    run(tmp_path)
+    index = json.loads((tmp_path / "out" / "index.json").read_text(encoding="utf-8"))
+    assert index["mode"] == "worlds-2026" and index["default"] == "worlds-2026"

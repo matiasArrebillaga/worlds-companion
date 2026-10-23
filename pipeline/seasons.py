@@ -138,3 +138,32 @@ def known_tournaments(raw_dir: Path, today: str) -> list[dict]:
     found = [t for t in group_tournaments(rows) if t["id"] != WORLDS_2026["id"]]
     # Las páginas de Worlds 2026 descubiertas se agrupan como "worlds-2026": se usa la constante, que ya tiene caché
     return [WORLDS_2026] + found
+
+
+def has_dated_match(raw_dir: Path, tournament_id: str) -> bool:
+    """¿El torneo tiene al menos un partido con fecha cargada? (los "a confirmar" no cuentan)"""
+    path = raw_file(raw_dir, tournament_id, "matches")
+    if not path.exists():
+        return False
+    return any(r.get("DateTimeUTC") for r in json.loads(path.read_text(encoding="utf-8"))["rows"])
+
+
+def site_mode(tournaments: list[dict], raw_dir: Path) -> str:
+    """'season' desde que algún torneo de 2027 en adelante tiene un partido con fecha; si no, 'worlds-2026'."""
+    started = any(t["year"] >= 2027 and has_dated_match(raw_dir, t["id"]) for t in tournaments)
+    return "season" if started else "worlds-2026"
+
+
+def index_payload(raw_dir: Path, today: str, now: str) -> dict:
+    """Contrato de web/public/data/index.json: modo del sitio, ligas y torneos con su estado."""
+    tournaments = known_tournaments(raw_dir, today)
+    mode = site_mode(tournaments, raw_dir)
+    listed = [{"id": t["id"], "league": t["league"], "name": t["name"], "status": status(t, today),
+               "is_playoffs": t["is_playoffs"], "start": t["start"], "end": t["end"]} for t in tournaments]
+    # Por ahora el sitio abre siempre en Worlds 2026; el Plan 4 elige el torneo por defecto en modo "season"
+    return {
+        "updated_at": now, "mode": mode, "default": WORLDS_2026["id"],
+        "leagues": [{"id": lid, "short": info["short"], "region": info["region"], "international": info["international"]}
+                    for lid, info in TRACKED.items()],
+        "tournaments": listed,
+    }

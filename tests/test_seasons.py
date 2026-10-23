@@ -99,3 +99,32 @@ def test_known_tournaments_adds_worlds_2026_and_discovered_years(tmp_path):
 
 def test_known_tournaments_without_discovery_is_just_worlds_2026(tmp_path):
     assert [t["id"] for t in seasons.known_tournaments(tmp_path, "2026-10-22")] == ["worlds-2026"]
+
+
+def write_matches(raw_dir, tid, rows):
+    path = seasons.raw_file(raw_dir, tid, "matches")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps({"fetched_at": "x", "rows": rows}), encoding="utf-8")
+
+
+def test_has_dated_match_ignores_matches_to_be_confirmed(tmp_path):
+    write_matches(tmp_path, "lck-2027-cup", [{"DateTimeUTC": ""}, {"DateTimeUTC": None}])
+    assert seasons.has_dated_match(tmp_path, "lck-2027-cup") is False
+    write_matches(tmp_path, "lck-2027-cup", [{"DateTimeUTC": "2027-01-14 08:00:00"}])
+    assert seasons.has_dated_match(tmp_path, "lck-2027-cup") is True
+    assert seasons.has_dated_match(tmp_path, "missing") is False
+
+
+def test_site_mode_switches_with_the_first_dated_2027_match(tmp_path):
+    lck = {**seasons.WORLDS_2026, "id": "lck-2027-cup", "league": "lck", "year": 2027}
+    assert seasons.site_mode([seasons.WORLDS_2026, lck], tmp_path) == "worlds-2026"
+    write_matches(tmp_path, "lck-2027-cup", [{"DateTimeUTC": "2027-01-14 08:00:00"}])
+    assert seasons.site_mode([seasons.WORLDS_2026, lck], tmp_path) == "season"
+
+
+def test_index_payload_in_worlds_mode(tmp_path):
+    index = seasons.index_payload(tmp_path, "2026-10-22", "2026-10-22T12:00:00Z")
+    assert index["mode"] == "worlds-2026" and index["default"] == "worlds-2026"
+    assert [t["id"] for t in index["tournaments"]] == ["worlds-2026"]
+    assert index["tournaments"][0]["status"] == "active"
+    assert {lg["id"] for lg in index["leagues"]} == set(seasons.TRACKED)
