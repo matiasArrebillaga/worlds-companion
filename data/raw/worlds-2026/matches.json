@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-23T20:10:55Z",
+ "fetched_at": "2026-10-23T21:11:22Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -163,9 +163,9 @@
    "BestOf": "1",
    "Team1": "Anyone's Legend",
    "Team2": "Karmine Corp",
-   "Team1Score": "",
-   "Team2Score": "",
-   "Winner": "",
+   "Team1Score": "0",
+   "Team2Score": "1",
+   "Winner": "2",
    "DateTimeUTC": "2026-10-23 20:00:00",
    "HasTime": "1",
    "IsNullified": "0",
