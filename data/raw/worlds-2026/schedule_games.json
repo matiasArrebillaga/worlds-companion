@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-23T20:10:55Z",
+ "fetched_at": "2026-10-23T20:41:08Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -200,8 +200,8 @@
   {
    "GameId": "2026 Season World Championship/Main Event_Round 1_4_1",
    "MatchId": "2026 Season World Championship/Main Event_Round 1_4",
-   "Blue": "",
-   "Red": "",
+   "Blue": "Karmine Corp",
+   "Red": "Anyone's Legend",
    "Winner": ""
   },
   {
