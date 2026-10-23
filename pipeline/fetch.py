@@ -12,17 +12,9 @@ from pipeline import assets, leaguepedia, lolesports, utc_now_iso
 from pipeline.games import DETAIL_FIELDS, PLAYER_FIELDS
 from pipeline.history import GAME_FIELDS
 from pipeline.schedule import UNDECIDED_TEAMS
+from pipeline.seasons import WORLDS_2026, raw_file
 
 RAW_DIR = Path("data/raw")
-MATCHES_FILE = RAW_DIR / "worlds_2026_matches.json"
-TEAMS_FILE = RAW_DIR / "worlds_2026_teams.json"
-GAMES_FILE = RAW_DIR / "worlds_2026_games.json"
-GAME_PLAYERS_FILE = RAW_DIR / "worlds_2026_game_players.json"
-ROSTERS_FILE = RAW_DIR / "worlds_2026_rosters.json"
-SCHEDULE_GAMES_FILE = RAW_DIR / "worlds_2026_schedule_games.json"
-LOLESPORTS_FILE = RAW_DIR / "lolesports_2026_games.json"
-WORLDS_START = "2026-10-14"
-TOURNAMENT_PREFIX = "2026 Season World Championship"
 
 # DateTime_UTC se renombra para que la clave no venga con espacios ("DateTime UTC")
 MATCH_FIELDS = ",".join([
@@ -74,51 +66,51 @@ def main() -> None:
         session,
         tables="MatchSchedule",
         fields=MATCH_FIELDS,
-        where=f'OverviewPage LIKE "{TOURNAMENT_PREFIX}%"',
+        where=f'OverviewPage LIKE "{WORLDS_2026["pages"][0]}%"',
         order_by="DateTime_UTC,MatchId",
     )
-    changed = write_if_changed(MATCHES_FILE, matches, now)
+    changed = write_if_changed(raw_file(RAW_DIR, WORLDS_2026["id"], "matches"), matches, now)
     print(f"matches: {len(matches)} ({'updated' if changed else 'unchanged'})")
 
     # Además de lo que usa el Elo, el detalle de cada partida (draft y objetivos) para la pestaña Partidas
     games = leaguepedia.cargo_query(
         session, tables="ScoreboardGames", fields=f"{GAME_FIELDS},{DETAIL_FIELDS}",
-        where=f'OverviewPage LIKE "{TOURNAMENT_PREFIX}%"', order_by="DateTime_UTC,GameId",
+        where=f'OverviewPage LIKE "{WORLDS_2026["pages"][0]}%"', order_by="DateTime_UTC,GameId",
     )
-    changed = write_if_changed(GAMES_FILE, games, now)
+    changed = write_if_changed(raw_file(RAW_DIR, WORLDS_2026["id"], "games"), games, now)
     print(f"games: {len(games)} ({'updated' if changed else 'unchanged'})")
 
     game_players = leaguepedia.cargo_query(
         session, tables="ScoreboardPlayers", fields=PLAYER_FIELDS,
-        where=f'OverviewPage LIKE "{TOURNAMENT_PREFIX}%"', order_by="GameId,Side,Role_Number",
+        where=f'OverviewPage LIKE "{WORLDS_2026["pages"][0]}%"', order_by="GameId,Side,Role_Number",
     )
-    changed = write_if_changed(GAME_PLAYERS_FILE, game_players, now)
+    changed = write_if_changed(raw_file(RAW_DIR, WORLDS_2026["id"], "game_players"), game_players, now)
     print(f"game players: {len(game_players)} ({'updated' if changed else 'unchanged'})")
 
     # Lado y ganador de cada partida: Leaguepedia los carga enseguida, mucho antes que el scoreboard
     schedule_games = leaguepedia.cargo_query(
         session, tables="MatchScheduleGame", fields="GameId,MatchId,Blue,Red,Winner",
-        where=f'MatchId LIKE "{TOURNAMENT_PREFIX}%"', order_by="GameId",
+        where=f'MatchId LIKE "{WORLDS_2026["pages"][0]}%"', order_by="GameId",
     )
-    write_if_changed(SCHEDULE_GAMES_FILE, schedule_games, now)
+    write_if_changed(raw_file(RAW_DIR, WORLDS_2026["id"], "schedule_games"), schedule_games, now)
 
     # Stats en vivo de lolesports mientras Leaguepedia no cargue el scoreboard. Si falla, queda la caché
     try:
-        live = lolesports.fetch_games(requests.Session(), WORLDS_START, read_rows(LOLESPORTS_FILE))
-        changed = write_if_changed(LOLESPORTS_FILE, live, now)
+        live = lolesports.fetch_games(requests.Session(), WORLDS_2026["start"], read_rows(raw_file(RAW_DIR, WORLDS_2026["id"], "lolesports")))
+        changed = write_if_changed(raw_file(RAW_DIR, WORLDS_2026["id"], "lolesports"), live, now)
         print(f"lolesports games: {len(live)} ({'updated' if changed else 'unchanged'})")
     except Exception as error:  # noqa: BLE001 — API sin documentar: nunca debe frenar la actualización
         print(f"lolesports: skipped ({error})")
 
     rosters = leaguepedia.cargo_query(
         session, tables="TournamentRosters", fields="Team,OverviewPage",
-        where=f'OverviewPage LIKE "{TOURNAMENT_PREFIX}%"', order_by="OverviewPage,Team",
+        where=f'OverviewPage LIKE "{WORLDS_2026["pages"][0]}%"', order_by="OverviewPage,Team",
     )
-    write_if_changed(ROSTERS_FILE, rosters, now)
+    write_if_changed(raw_file(RAW_DIR, WORLDS_2026["id"], "rosters"), rosters, now)
     print(f"participants: {len(roster_teams(rosters))}")
 
     # Solo se piden los equipos que todavía no están en caché
-    cached = read_rows(TEAMS_FILE)
+    cached = read_rows(raw_file(RAW_DIR, WORLDS_2026["id"], "teams"))
     known = {t["Name"] for t in cached}
     # Así se bajan las siglas de los inscriptos aunque los cruces sigan en TBD
     wanted = sorted(set(team_names(matches)) | set(roster_teams(rosters)))
@@ -126,7 +118,7 @@ def main() -> None:
     if missing:
         fetched = leaguepedia.cargo_query(session, tables="Teams", fields=TEAM_FIELDS, where=teams_where(missing))
         teams = sorted(cached + fetched, key=lambda t: t["Name"])
-        write_if_changed(TEAMS_FILE, teams, now)
+        write_if_changed(raw_file(RAW_DIR, WORLDS_2026["id"], "teams"), teams, now)
     print(f"teams: {len(known) + len(missing)} ({len(missing)} new)")
 
     # Imágenes (logos que falten y versión de Data Dragon). Si falla, los datos ya quedaron guardados

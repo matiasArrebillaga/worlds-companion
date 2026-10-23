@@ -69,6 +69,7 @@ def test_load_season_adds_worlds_games_for_the_current_year(tmp_path):
     write_rows(tmp_path / "history_2026_games.json", [SG])
     worlds = {**SG, "MatchId": "w1", "OverviewPage": "2026 Season World Championship/Main Event",
               "DateTimeUTC": "2026-10-23 08:00:00"}
-    write_rows(tmp_path / "worlds_2026_games.json", [worlds])
+    (tmp_path / "worlds-2026").mkdir()
+    write_rows(tmp_path / "worlds-2026" / "games.json", [worlds])
     games = load_season_games(tmp_path, 2026)
     assert [(g["match_id"], g["region"]) for g in games] == [("m1", "KR"), ("w1", None)]

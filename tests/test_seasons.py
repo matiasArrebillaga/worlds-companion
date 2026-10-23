@@ -67,3 +67,16 @@ def test_worlds_2026_constant_and_raw_dir():
     assert seasons.WORLDS_2026["id"] == "worlds-2026"
     assert seasons.WORLDS_2026["pages"] == ["2026 Season World Championship"]
     assert seasons.tournament_dir(Path("data/raw"), "worlds-2026") == Path("data/raw/worlds-2026")
+
+
+def test_raw_file_lives_in_the_tournament_folder():
+    assert seasons.raw_file(Path("data/raw"), "worlds-2026", "matches") == Path("data/raw/worlds-2026/matches.json")
+    assert seasons.raw_file(Path("data/raw"), "worlds-2026", "lolesports") == Path(
+        "data/raw/worlds-2026/lolesports_games.json")
+
+
+def test_no_module_uses_the_old_flat_file_names():
+    # Si un módulo sigue leyendo data/raw/worlds_2026_*.json, el cron volvería a crear los archivos viejos
+    for module in ("pipeline/fetch.py", "pipeline/build.py", "pipeline/assets.py", "pipeline/history.py"):
+        source = Path(module).read_text(encoding="utf-8")
+        assert "worlds_2026_" not in source and "lolesports_2026_" not in source, module

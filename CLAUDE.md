@@ -38,10 +38,12 @@ No me dejes tareas para hacer a mí: implementá vos.
 
 ```
 data/raw/               # descargas sin modificar + fetched_at (commiteado: caché del cron; no editar a mano)
+data/raw/<torneo>/      #   una carpeta por torneo (worlds-2026/, lck-2027-...): matches, games, rosters, teams...
 data/processed/         # datos limpios (no se commitea; se regenera)
 data/teams.csv          # alias de equipos → id canónico y región (a mano)
 data/predictions.jsonl  # predicciones congeladas, append-only
 pipeline/               # fetch, build (limpieza, stats, validación, export a JSON)
+                        #   seasons.py: ligas e internacionales que se siguen, torneos, estados y modo del sitio
                         #   stats.py: agregados de equipos y jugadores (Oracle's Elixir) + historia del Elo
                         #   meta.py: campeones, draft, lados, ritmo y regiones (Oracle's Elixir)
 models/                 # Elo y modelos de predicción

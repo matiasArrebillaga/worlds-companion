@@ -94,3 +94,19 @@ def status(tournament: dict, today: str) -> str:
 def tournament_dir(raw_dir: Path, tournament_id: str) -> Path:
     """Carpeta de los datos crudos de un torneo."""
     return raw_dir / tournament_id
+
+
+# Archivos crudos de cada torneo (dentro de data/raw/<torneo>/), con {fetched_at, rows}
+RAW_FILES = {
+    "matches": "matches.json",               # MatchSchedule
+    "teams": "teams.json",                   # Teams (nombre y sigla)
+    "games": "games.json",                   # ScoreboardGames
+    "game_players": "game_players.json",     # ScoreboardPlayers
+    "rosters": "rosters.json",               # TournamentRosters
+    "schedule_games": "schedule_games.json", # MatchScheduleGame (lado y ganador de cada partida)
+    "lolesports": "lolesports_games.json",   # stats en vivo de lolesports
+}
+
+
+def raw_file(raw_dir: Path, tournament_id: str, key: str) -> Path:
+    return tournament_dir(raw_dir, tournament_id) / RAW_FILES[key]

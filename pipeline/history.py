@@ -111,7 +111,7 @@ def load_season_games(raw_dir: Path, year: int, aliases: dict[str, str] | None =
     if not games_file.exists():
         raise FileNotFoundError(f"{games_file} is missing: run python -m pipeline.fetch_history")
     rows = _rows(games_file)
-    worlds_file = raw_dir / f"worlds_{year}_games.json"
+    worlds_file = raw_dir / f"worlds-{year}" / "games.json"
     if year == CURRENT_YEAR and worlds_file.exists():
         rows = rows + _rows(worlds_file)
     return normalize_games(rows, page_regions(_rows(tournaments_file)), aliases)
