@@ -67,3 +67,32 @@ def test_discover_keeps_the_previous_file_when_leaguepedia_fails(tmp_path, monke
     fetch.discover(None, "2026-12-01T00:00:00Z")
     saved = json.loads(seasons.discovery_file(tmp_path, 2027).read_text(encoding="utf-8"))
     assert saved == {"fetched_at": "old", "rows": [{"kept": "1"}]}
+
+
+def test_discover_survives_a_network_error(tmp_path, monkeypatch):
+    import requests
+    from pipeline import leaguepedia
+    monkeypatch.setattr(fetch, "RAW_DIR", tmp_path)
+    def boom(*args, **kwargs):
+        raise requests.ConnectionError("no network")
+    monkeypatch.setattr(leaguepedia, "cargo_query", boom)
+    fetch.discover(None, "2026-12-01T00:00:00Z")
+
+
+def test_main_keeps_going_when_one_tournament_fails(monkeypatch):
+    import requests
+    from pipeline import assets, leaguepedia, seasons
+    monkeypatch.setattr(leaguepedia, "make_session", lambda: None)
+    monkeypatch.setattr(fetch, "discover", lambda session, now: None)
+    known = [{"id": "a", "start": "2000-01-01", "end": "2100-01-01"},
+             {"id": "b", "start": "2000-01-01", "end": "2100-01-01"}]
+    monkeypatch.setattr(seasons, "known_tournaments", lambda raw_dir, today: known)
+    done = []
+    def fake_fetch(session, tournament, now, full):
+        if tournament["id"] == "a":
+            raise requests.ConnectionError("down")
+        done.append(tournament["id"])
+    monkeypatch.setattr(fetch, "fetch_tournament", fake_fetch)
+    monkeypatch.setattr(assets, "main", lambda session: done.append("assets"))
+    fetch.main()
+    assert done == ["b", "assets"]

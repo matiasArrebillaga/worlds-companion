@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from pipeline import seasons
@@ -80,9 +81,6 @@ def test_no_module_uses_the_old_flat_file_names():
     for module in ("pipeline/fetch.py", "pipeline/build.py", "pipeline/assets.py", "pipeline/history.py"):
         source = Path(module).read_text(encoding="utf-8")
         assert "worlds_2026_" not in source and "lolesports_2026_" not in source, module
-
-
-import json
 
 
 def test_write_discovery_always_rewrites_fetched_at(tmp_path):

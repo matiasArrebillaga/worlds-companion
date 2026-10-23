@@ -140,7 +140,7 @@ def discover(session, now: str) -> None:
             rows = leaguepedia.cargo_query(
                 session, tables="Tournaments", fields=seasons.TOURNAMENT_FIELDS,
                 where=f'Year="{y}" AND ' + leaguepedia.in_clause("League", leagues), order_by="DateStart,OverviewPage")
-        except leaguepedia.LeaguepediaError as error:
+        except (leaguepedia.LeaguepediaError, requests.RequestException) as error:
             print(f"discovery {y}: skipped ({error})")
             continue
         seasons.write_discovery(seasons.discovery_file(RAW_DIR, y), rows, now)
@@ -153,7 +153,10 @@ def main() -> None:
     discover(session, now)
     known = {t["id"]: t for t in seasons.known_tournaments(RAW_DIR, now[:10])}
     for tid, full in targets(list(known.values()), now[:10]):
-        fetch_tournament(session, known[tid], now, full)
+        try:
+            fetch_tournament(session, known[tid], now, full)
+        except (leaguepedia.LeaguepediaError, requests.RequestException) as error:  # queda la caché del torneo
+            print(f"{tid}: skipped ({error})")
 
     # Imágenes (logos que falten y versión de Data Dragon). Si falla, los datos ya quedaron guardados
     try:
