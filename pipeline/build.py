@@ -21,8 +21,10 @@ from pipeline.games import build_games
 from pipeline.history import CURRENT_YEAR, load_aliases, load_season_games
 from pipeline.meta import build_meta
 from pipeline.schedule import UNDECIDED_TEAMS, build_schedule, short_name
+from pipeline import seasons
+from pipeline.seasons import WORLDS_2026, raw_file
 from pipeline.stats import build_team_and_player_stats, elo_history, series_list
-from pipeline.validate import (validate_games, validate_lineups, validate_meta, validate_predictions, validate_ratings,
+from pipeline.validate import (validate_games, validate_index, validate_lineups, validate_meta, validate_predictions, validate_ratings,
                                validate_schedule, validate_stats, validate_tournament)
 
 RAW_DIR = Path("data/raw")
@@ -77,8 +79,10 @@ def elo_payload(teams, run, regions, shorts, aliases, accuracy, now, role_model,
 
 def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDICTIONS_FILE,
           aliases_file: Path = ALIASES_FILE, freeze_predictions: bool = False) -> None:
-    matches_raw = _read(raw_dir / "worlds_2026_matches.json")
-    shorts = {t["Name"]: t.get("Short") or t["Name"] for t in _rows_if_exists(raw_dir / "worlds_2026_teams.json")}
+    tid = WORLDS_2026["id"]  # por ahora el sitio construye un solo torneo (Plan 3 suma las ligas)
+    raw = lambda key: raw_file(raw_dir, tid, key)
+    matches_raw = _read(raw("matches"))
+    shorts = {t["Name"]: t.get("Short") or t["Name"] for t in _rows_if_exists(raw("teams"))}
     schedule = build_schedule(matches_raw["rows"], shorts)
 
     # Elo con toda la temporada (ligas + internacionales + lo que va de Worlds)
@@ -86,7 +90,7 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
     games = load_season_games(raw_dir, CURRENT_YEAR, aliases)
     regions = team_regions(games)
     run = run_elo(games, PARAMS, regions)
-    rosters = _rows_if_exists(raw_dir / "worlds_2026_rosters.json")
+    rosters = _rows_if_exists(raw("rosters"))
     teams = participants(schedule, rosters)
 
     # Forma de los jugadores con los datos de Oracle's Elixir de la temporada
@@ -100,13 +104,13 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
 
     # Detalle de cada partida jugada (draft, objetivos y jugadores) para la pestaña Partidas
     # Leaguepedia manda; lolesports completa las partidas que Leaguepedia todavía no cargó
-    lp_games = _rows_if_exists(raw_dir / "worlds_2026_games.json")
-    lp_players = _rows_if_exists(raw_dir / "worlds_2026_game_players.json")
+    lp_games = _rows_if_exists(raw("games"))
+    lp_players = _rows_if_exists(raw("game_players"))
     champion_names = {v: k for k, v in _read(raw_dir / "ddragon_champions.json")["ids"].items()}         if (raw_dir / "ddragon_champions.json").exists() else {}
     live_games, live_players = lolesports.to_leaguepedia_rows(
-        _rows_if_exists(raw_dir / "lolesports_2026_games.json"), matches_raw["rows"],
-        _rows_if_exists(raw_dir / "worlds_2026_schedule_games.json"),
-        _rows_if_exists(raw_dir / "worlds_2026_teams.json"), champion_names)
+        _rows_if_exists(raw("lolesports")), matches_raw["rows"],
+        _rows_if_exists(raw("schedule_games")),
+        _rows_if_exists(raw("teams")), champion_names)
     known = {g["GameId"] for g in lp_games}
     live_games = [g for g in live_games if g["GameId"] not in known]
     live_ids = {g["GameId"] for g in live_games}
@@ -152,6 +156,8 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
         bracket_sim = tournament.payload(schedule, main_event_teams(rosters), series, lambda n: short_name(n, shorts))
         errors += validate_tournament(bracket_sim)
     errors += validate_games(games_detail, {m["id"] for m in schedule})
+    index = seasons.index_payload(raw_dir, now[:10], now)
+    errors += validate_index(index)
     if errors:
         raise ValueError("validation failed:\n- " + "\n- ".join(errors))
 
@@ -182,6 +188,7 @@ def build(raw_dir: Path, out_dir: Path, now: str, predictions_file: Path = PREDI
     _write(out_dir / "players.json", {"players": players_payload})
     _write(out_dir / "tournament.json", {"updated_at": now, "model_version": MODEL_VERSION, **bracket_sim})
     _write(out_dir / "games.json", {"updated_at": now, "matches": games_detail})
+    _write(out_dir / "index.json", index)
 
 
 def main() -> None:
@@ -189,7 +196,7 @@ def main() -> None:
         build(RAW_DIR, OUT_DIR, utc_now_iso(), freeze_predictions="--freeze" in sys.argv)
     except ValueError as error:
         sys.exit(str(error))
-    print(f"wrote {OUT_DIR}/schedule.json, meta.json, elo.json, teams.json, players.json, champions.json, tournament.json and games.json")
+    print(f"wrote {OUT_DIR}/schedule.json, meta.json, elo.json, teams.json, players.json, champions.json, tournament.json, games.json and index.json")
 
 
 if __name__ == "__main__":

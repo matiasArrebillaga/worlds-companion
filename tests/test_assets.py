@@ -1,3 +1,5 @@
+import json
+
 from PIL import Image
 
 from pipeline import assets
@@ -41,3 +43,10 @@ def test_lighten_if_dark_whitens_black_logos_and_keeps_colored_ones(tmp_path):
     assert assets.lighten_if_dark(black) is True
     assert Image.open(black).convert("RGBA").getpixel((0, 0)) == (*assets.LIGHT_RGB, 255)
     assert assets.lighten_if_dark(red) is False
+
+
+def test_known_teams_reads_every_tournament_folder(tmp_path):
+    for tid, names in (("worlds-2026", ["T1", "G2 Esports"]), ("lck-2027-cup", ["T1", "Gen.G"])):
+        (tmp_path / tid).mkdir()
+        (tmp_path / tid / "teams.json").write_text(json.dumps({"fetched_at": "x", "rows": [{"Name": n} for n in names]}))
+    assert assets.known_teams(tmp_path) == ["G2 Esports", "Gen.G", "T1"]

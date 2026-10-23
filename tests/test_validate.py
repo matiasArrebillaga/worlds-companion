@@ -1,6 +1,6 @@
 from collections import Counter
 
-from pipeline.validate import validate_predictions, validate_ratings, validate_schedule
+from pipeline.validate import validate_index, validate_predictions, validate_ratings, validate_schedule
 
 
 def match(**overrides):
@@ -101,3 +101,19 @@ def test_validate_tournament_checks_totals_and_ranges():
     assert validate_tournament(ok) == []
     bad = {**ok, "playin": {"teams": teams("p_win", [0.6, 0.6])}}
     assert validate_tournament(bad) == ["tournament playin: p_win adds up to 1.200, expected 1"]
+
+
+def test_validate_index_accepts_a_good_index():
+    index = {"mode": "worlds-2026", "default": "worlds-2026", "leagues": [],
+             "tournaments": [{"id": "worlds-2026", "status": "active"}]}
+    assert validate_index(index) == []
+
+
+def test_validate_index_rejects_unknown_mode_default_and_duplicates():
+    index = {"mode": "x", "default": "nope", "leagues": [],
+             "tournaments": [{"id": "a", "status": "active"}, {"id": "a", "status": "weird"}]}
+    errors = validate_index(index)
+    assert any("mode" in e for e in errors)
+    assert any("default" in e for e in errors)
+    assert any("duplicate" in e for e in errors)
+    assert any("status" in e for e in errors)

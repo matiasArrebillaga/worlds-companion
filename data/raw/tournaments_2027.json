@@ -1,0 +1,44 @@
+{
+ "fetched_at": "2026-10-23T01:11:39Z",
+ "rows": [
+  {
+   "Name": "First Stand 2027",
+   "OverviewPage": "2027 First Stand",
+   "League": "First Stand",
+   "Year": "2027",
+   "DateStart": "",
+   "Date": "",
+   "IsPlayoffs": "0",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "DateStart__precision": "",
+   "Date__precision": ""
+  },
+  {
+   "Name": "MSI 2027",
+   "OverviewPage": "2027 Mid-Season Invitational",
+   "League": "Mid-Season Invitational",
+   "Year": "2027",
+   "DateStart": "",
+   "Date": "",
+   "IsPlayoffs": "0",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "DateStart__precision": "",
+   "Date__precision": ""
+  },
+  {
+   "Name": "LCS 2027 Promotion",
+   "OverviewPage": "LCS/2027 Season/Promotion",
+   "League": "League of Legends Championship Series",
+   "Year": "2027",
+   "DateStart": "2026-10-05",
+   "Date": "2026-10-12",
+   "IsPlayoffs": "0",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "1",
+   "DateStart__precision": "1",
+   "Date__precision": "1"
+  }
+ ]
+}

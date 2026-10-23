@@ -14,10 +14,10 @@ from PIL import Image
 
 from pipeline import leaguepedia, utc_now_iso
 from pipeline.meta import WORLDS_PATCH
+from pipeline.seasons import RAW_FILES
 from pipeline.stats import slug
 
 RAW_DIR = Path("data/raw")
-TEAMS_FILE = RAW_DIR / "worlds_2026_teams.json"
 DDRAGON_FILE = RAW_DIR / "ddragon_champions.json"
 LOGO_DIR = Path("web/public/img/teams")
 LOGO_WIDTH = 128
@@ -163,10 +163,17 @@ def champion_icons(path: Path = DDRAGON_FILE) -> dict | None:
     return {"base": f"{DDRAGON_URL}/cdn/{cached['version']}/img/champion/", "ids": cached["ids"]}
 
 
+def known_teams(raw_dir: Path = RAW_DIR) -> list[str]:
+    """Equipos de todos los torneos bajados (data/raw/<torneo>/teams.json), sin repetidos."""
+    names = set()
+    for path in raw_dir.glob(f"*/{RAW_FILES['teams']}"):
+        names |= {t["Name"] for t in json.loads(path.read_text(encoding="utf-8"))["rows"]}
+    return sorted(names)
+
+
 def main(session=None) -> None:
     session = session or leaguepedia.make_session()
-    teams = [t["Name"] for t in json.loads(TEAMS_FILE.read_text(encoding="utf-8"))["rows"]]
-    print(f"team logos: {fetch_logos(session, teams)} new")
+    print(f"team logos: {fetch_logos(session, known_teams())} new")
     # Data Dragon es de Riot, no de Leaguepedia: sesión aparte, sin el login
     print(f"champion icons: {'updated' if fetch_champions(requests.Session()) else 'unchanged'}")
 

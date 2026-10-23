@@ -2,9 +2,9 @@ name: Update data and deploy
 
 on:
   schedule:
-    # Cada 30 minutos (en :17 y :47; el minuto 0 está saturado y GitHub saltea corridas) durante Worlds 2026 (15/10 al 14/11; se extiende al 15/11 por husos horarios)
-    - cron: "17,47 * 15-31 10 *"
-    - cron: "17,47 * 1-15 11 *"
+    # Cada 6 horas, todo el año (en :17: el minuto 0 está saturado y GitHub saltea corridas).
+    # Descubre torneos nuevos, baja Oracle's Elixir y reengancha la cadena de 30 minutos de tick.yml en días de partido.
+    - cron: "17 */6 * * *"
   workflow_dispatch:
   push:
     branches: [master]
@@ -50,7 +50,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/raw data/predictions.jsonl web/public/img
-          git diff --cached --quiet || (git commit -m "data: update Worlds 2026 data and frozen predictions" && git push)
+          git diff --cached --quiet || (git commit -m "data: update season data" && git push)
 
       - uses: actions/setup-node@v4
         with:

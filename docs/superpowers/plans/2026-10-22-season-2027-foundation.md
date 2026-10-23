@@ -18,7 +18,7 @@ Este es el plan 1 de 5. Los demás se escriben cuando existe lo que necesitan:
 |---|---|---|
 | 1 (este) | Base por torneo, descubrimiento, `index.json`, cron todo el año (§1, §5, §6.1–2) | ya |
 | 2 | Archivo de Worlds 2026 + prueba y adopción de `elo-3` (§3, §6.3–4) | después de la final (15/11/2026) |
-| 3 | Datos multiliga: `ligas/<liga>/`, meta por parche y liga, split en curso, filtro de 2 parches (§2, §6.5) | noviembre–diciembre 2026 |
+| 3 | Datos multiliga: `ligas/<liga>/`, meta por parche y liga, split en curso, filtro de 2 parches (§2, §6.5); fetch con una consulta por tabla para todos los torneos activos (`OverviewPage IN (...)`) y repartir las filas por torneo (spec §2) | noviembre–diciembre 2026 |
 | 4 | Frontend multiliga: selector, Calendario combinado, vistas por liga, Aciertos por liga, `?liga` (§4, §6.6) | diciembre 2026 – principios de enero 2027 (antes de la LCK Cup) |
 | 5 | Bracket de playoffs de liga y formatos de First Stand / MSI (§3 Torneo, §6.7) | cuando Riot anuncie los formatos (~febrero 2027) |
 

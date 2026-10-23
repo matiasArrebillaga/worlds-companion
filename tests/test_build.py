@@ -24,8 +24,8 @@ ROW = {
 
 def write_raw(raw, rows=(ROW,), history_teams=("T1", "G2 Esports"), rosters=(), without_lineup=()):
     stamp = "2026-10-15T10:00:00Z"
-    write(raw / "worlds_2026_matches.json", {"fetched_at": stamp, "rows": list(rows)})
-    write(raw / "worlds_2026_rosters.json", {"fetched_at": stamp, "rows": [{"Team": t, "OverviewPage": "x"} for t in rosters]})
+    write(raw / "worlds-2026" / "matches.json", {"fetched_at": stamp, "rows": list(rows)})
+    write(raw / "worlds-2026" / "rosters.json", {"fetched_at": stamp, "rows": [{"Team": t, "OverviewPage": "x"} for t in rosters]})
     write(raw / "history_2026_tournaments.json", {"fetched_at": stamp, "rows": [
         {"OverviewPage": "LCK/2026 Season/Cup", "League": "LoL Champions Korea", "Region": "Korea",
          "TournamentLevel": "Primary", "IsQualifier": "0", "Year": "2026"}]})
@@ -54,7 +54,7 @@ def run(tmp_path, freeze=False):
 
 def test_build_writes_contract_files(tmp_path):
     write_raw(tmp_path / "raw")
-    write(tmp_path / "raw" / "worlds_2026_teams.json", {"fetched_at": "x", "rows": [{"Name": "G2 Esports", "Short": "G2"}]})
+    write(tmp_path / "raw" / "worlds-2026" / "teams.json", {"fetched_at": "x", "rows": [{"Name": "G2 Esports", "Short": "G2"}]})
     schedule, meta, elo = run(tmp_path)
     [m] = schedule["matches"]
     assert set(m) == MATCH_KEYS
@@ -148,3 +148,10 @@ def test_build_writes_team_and_player_stats(tmp_path):
     assert t1["id"] == "t1" and len(t1["elo_history"]) == 12 and t1["series"]
     assert len(t1["roster"]) == 5 and t1["worlds"] is None
     assert {p["team_id"] for p in players["players"]} == {"t1", "g2-esports"}
+
+
+def test_build_writes_the_index_in_worlds_mode(tmp_path):
+    write_raw(tmp_path / "raw")
+    run(tmp_path)
+    index = json.loads((tmp_path / "out" / "index.json").read_text(encoding="utf-8"))
+    assert index["mode"] == "worlds-2026" and index["default"] == "worlds-2026"

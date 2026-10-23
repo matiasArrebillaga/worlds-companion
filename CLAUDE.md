@@ -29,7 +29,7 @@ No me dejes tareas para hacer a mí: implementá vos.
 - Datos y modelos: Python 3.12, pandas, numpy (scikit-learn más adelante); matplotlib para exploración.
 - Exploración: notebooks Jupyter en `notebooks/` (no se usan en producción).
 - Frontend: sitio estático Vite + TypeScript sin framework, gráficos con Chart.js (D3 solo si Chart.js no alcanza).
-- Deploy: GitHub Pages, actualizado por GitHub Actions (cron cada 30 minutos durante Worlds).
+- Deploy: GitHub Pages, actualizado por GitHub Actions (cada 6 horas todo el año; cada 30 minutos en días de partido).
 - Flujo: scripts de Python generan JSON en `web/public/data/`; el frontend solo lee esos JSON.
   El frontend nunca llama directamente a APIs externas (la única excepción son las imágenes de campeones,
   que se cargan del CDN de Data Dragon de Riot).
@@ -38,10 +38,12 @@ No me dejes tareas para hacer a mí: implementá vos.
 
 ```
 data/raw/               # descargas sin modificar + fetched_at (commiteado: caché del cron; no editar a mano)
+data/raw/<torneo>/      #   una carpeta por torneo (worlds-2026/, lck-2027-...): matches, games, rosters, teams...
 data/processed/         # datos limpios (no se commitea; se regenera)
 data/teams.csv          # alias de equipos → id canónico y región (a mano)
 data/predictions.jsonl  # predicciones congeladas, append-only
 pipeline/               # fetch, build (limpieza, stats, validación, export a JSON)
+                        #   seasons.py: ligas e internacionales que se siguen, torneos, estados y modo del sitio
                         #   stats.py: agregados de equipos y jugadores (Oracle's Elixir) + historia del Elo
                         #   meta.py: campeones, draft, lados, ritmo y regiones (Oracle's Elixir)
 models/                 # Elo y modelos de predicción
@@ -60,6 +62,7 @@ python -m pipeline.fetch        # descarga datos nuevos a data/raw/
 python -m pipeline.fetch_oracles  # extracto de Oracle's Elixir (como mucho una vez por día)
 python -m pipeline.assets       # logos que falten + versión de Data Dragon (también lo corre pipeline.fetch)
 python -m models.role_form      # reajusta los pesos de la forma por rol (necesita --history)
+python -m pipeline.seasons --match-window  # exit 0 si hay partido entre 6 h atrás y 24 h adelante (lo usa tick.yml)
 python -m pipeline.build        # limpia, corre el Elo, calcula stats, valida y genera los JSON del sitio
 python -m models.elo            # recalcula ratings y predicciones (suelto, para experimentar)
 pytest                          # tests
