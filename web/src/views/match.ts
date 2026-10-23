@@ -1,8 +1,8 @@
 import type { SiteData } from '../data';
 import { escapeHtml } from '../html';
-import { advantage, findById, fmt, pct, ROLE_LABELS, signed, sizes, starterByRole, teamByName } from '../stats';
+import { advantage, fmt, pct, ROLE_LABELS, signed, sizes, starterByRole, teamByName } from '../stats';
 import { logoImg, regionColor } from '../theme/regions';
-import type { ChampionCount, GameDetail, GamePlayer, GameSide, Match, PlayerEntry, Role, TeamEntry } from '../types';
+import type { GameDetail, GamePlayer, GameSide, Match, PlayerEntry, Role, TeamEntry } from '../types';
 import { drawEloChart } from '../charts/eloChart';
 import { go, pick } from '../router';
 import { firstDay } from '../schedule';
@@ -81,6 +81,7 @@ function duel(role: Role, a: PlayerEntry | undefined, b: PlayerEntry | undefined
       ${mirror('KDA', fmt(n(a, (x) => x.season.kda), 1), fmt(n(b, (x) => x.season.kda), 1), gap((x) => x.season.kda, 2))}
       ${mirror('DPM', fmt(n(a, (x) => x.season.dpm)), fmt(n(b, (x) => x.season.dpm)), gap((x) => x.season.dpm, 150))}
       ${mirror('KP', pct(n(a, (x) => x.season.kp)), pct(n(b, (x) => x.season.kp)), gap((x) => x.season.kp, 0.1))}
+      <div class="duel-champs">${playerChamps(a, 'l')}${playerChamps(b, 'r')}</div>
     </div>
   </details>`;
 }
@@ -103,15 +104,13 @@ function heroMiddle(m: Match): string {
     <b class="vs-score" aria-label="${m.score[0]} a ${m.score[1]}">${m.score[0]}<i aria-hidden="true">–</i>${m.score[1]}</b></span>`;
 }
 
-// Campeones más jugados por los titulares del equipo en la temporada
-function topChampions(team: TeamEntry, players: PlayerEntry[]): string {
-  const total = new Map<string, number>();
-  for (const id of team.roster) {
-    const p = findById(players, id);
-    p?.season.champions.forEach((c: ChampionCount) => total.set(c.name, (total.get(c.name) ?? 0) + c.games));
-  }
-  const top = [...total.entries()].sort((x, y) => y[1] - x[1]).slice(0, 5);
-  return `<ul class="champs">${top.map(([name, n]) => `<li>${champHex(name)}<span><b>${escapeHtml(name)}</b><span class="muted num">${n} PJ</span></span></li>`).join('')}</ul>`;
+// Los 3 campeones más jugados por un jugador en la temporada, con partidas y récord (como en su página).
+// side = de qué lado del duelo va (los de la izquierda se alinean hacia el centro)
+function playerChamps(p: PlayerEntry | undefined, side: 'l' | 'r'): string {
+  const top = p?.season.champions.slice(0, 3) ?? [];
+  if (!top.length) return `<div class="pchamps ${side}"><span class="muted">—</span></div>`;
+  return `<ul class="pchamps ${side}" aria-label="Campeones más jugados por ${escapeHtml(p!.name)}">${top.map((c) => `
+    <li>${champHex(c.name)}<b>${escapeHtml(c.name)}</b><span class="muted num">${c.games} PJ · ${c.wins}-${c.games - c.wins}</span></li>`).join('')}</ul>`;
 }
 
 // ---- Pestaña Partidas: el detalle de cada partida ya jugada (Leaguepedia) ----
@@ -266,6 +265,7 @@ export function renderMatch(el: HTMLElement, data: SiteData, tz: string, param: 
     </section>
     ${hasGames ? `<div class="pinbar"><div class="subhead">${subtabs('tab', TABS, tab, 'Secciones del partido')}</div></div>` : ''}
     ${tab === 'partidas' ? `<section class="stack">${gamesTab(m, games, a, b, data.players.players)}</section>` : `
+    <div class="pair">
     <section class="stack"><h2>Temporada 2026</h2><div class="bezel cmp"><div class="core">
       ${mirrorGroup('Nivel', a.short, b.short)}
       ${mirror('Elo', fmt(a.rating), fmt(b.rating), gap(a.rating, b.rating, 100))}
@@ -283,13 +283,15 @@ export function renderMatch(el: HTMLElement, data: SiteData, tz: string, param: 
     <section class="stack"><h2>Elo en 2026</h2>
       <div class="legend"><span><i class="lg-a"></i>${escapeHtml(a.short)}</span><span><i class="lg-b"></i>${escapeHtml(b.short)}</span></div>
       <div class="chart-box"><canvas aria-label="Evolución del Elo de ${escapeHtml(a.short)} y ${escapeHtml(b.short)} en 2026" role="img"></canvas></div></section>
-    <section class="stack"><h2>Duelos por rol</h2><div class="bezel cmp"><div class="core duels">
-      ${roles.map((r) => duel(r, starterByRole(a, data.players.players, r), starterByRole(b, data.players.players, r), a, b)).join('')}</div></div>
-      ${how('Tocá un rol para ver KDA, DPM y KP de la temporada. Forma = la del modelo elo-2: desvíos sobre el promedio del rol (+0.30 es 0,3 desvíos por encima). La barra va hacia el que saca ventaja y llega al borde con 0,5 de forma, 2 de KDA, 150 de DPM o 10 puntos de KP. Se comparan jugadores del mismo rol, así que el DPM es justo.')}</section>
-    <section class="grid g2">
-      <div class="stack"><h2>Campeones de ${escapeHtml(a.short)}</h2>${topChampions(a, data.players.players)}</div>
-      <div class="stack"><h2>Campeones de ${escapeHtml(b.short)}</h2>${topChampions(b, data.players.players)}</div>
-    </section>
+    </div>
+    <section class="stack"><h2>Duelos por rol</h2>
+      <div class="duel-grid">${roles.map((r) => {
+        // Por rol: campeones del de la izquierda · el duelo · campeones del de la derecha (en PC, cada fila de la grilla)
+        const pa = starterByRole(a, data.players.players, r);
+        const pb = starterByRole(b, data.players.players, r);
+        return `${playerChamps(pa, 'l')}${duel(r, pa, pb, a, b)}${playerChamps(pb, 'r')}`;
+      }).join('')}</div>
+      ${how('Tocá un rol para ver KDA, DPM y KP de la temporada. A los costados, los 3 campeones que más jugó cada uno (partidas y récord). Forma = la del modelo elo-2: desvíos sobre el promedio del rol (+0.30 es 0,3 desvíos por encima). La barra va hacia el que saca ventaja y llega al borde con 0,5 de forma, 2 de KDA, 150 de DPM o 10 puntos de KP. Se comparan jugadores del mismo rol, así que el DPM es justo.')}</section>
     <section class="stack"><h2>Enfrentamientos en 2026</h2>
       ${meetings.length ? meetings.map((s) => `<div class="row"><span class="t">${escapeHtml(s.date.slice(5))}</span><span class="m">${escapeHtml(s.page.split('/')[0])}</span><span class="num">${escapeHtml(a.short)} ${s.wins}-${s.losses}</span></div>`).join('')
         : '<div class="state"><b>No se enfrentaron en 2026</b></div>'}

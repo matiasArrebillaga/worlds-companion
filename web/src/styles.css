@@ -930,6 +930,59 @@ html { -webkit-tap-highlight-color: transparent; }
 .duel[open] .duel-more { animation: duel-open .35s var(--ease); }
 @keyframes duel-open { from { opacity: 0; transform: translateY(-6px); } }
 
+/* Previa: temporada y Elo lado a lado en PC (en el celular, uno debajo del otro) */
+.pair { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; }
+@media (min-width: 1000px) {
+  .pair { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; }
+  .pair .cmp { max-width: none; }
+  .pair .chart-box { height: 380px; }
+}
+
+/* Duelos por rol: en PC, campeones de cada jugador a los costados del duelo (una fila de la grilla por rol).
+   La tarjeta es un ::before detrás de la columna del medio, así cada fila crece con su duelo abierto
+   y los campeones siguen alineados con su rol */
+.duel-grid { --c: var(--cut); position: relative; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(5, auto); }
+/* Doble bisel como .bezel: cáscara de 1 px (::before) + núcleo (::after), los dos con la esquina cortada */
+.duel-grid::before, .duel-grid::after { content: ""; grid-column: 1; grid-row: 1 / -1;
+  clip-path: polygon(var(--c) 0, 100% 0, 100% calc(100% - var(--c)), calc(100% - var(--c)) 100%, 0 100%, 0 var(--c)); }
+.duel-grid::before { background: var(--line); }
+.duel-grid::after { margin: 1px; background: var(--card); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--fg) 6%, transparent); }
+.duel-grid > * { position: relative; z-index: 1; } /* por encima de la tarjeta: su clip-path la apila como un elemento posicionado */
+/* Cada rol en su fila, explícito: la tarjeta (::before/::after) ocupa toda la columna del medio y,
+   si se dejara al auto-posicionamiento, los duelos irían a filas nuevas debajo de ella */
+.duel-grid > :nth-child(-n+3) { grid-row: 1; }
+.duel-grid > :nth-child(n+4):nth-child(-n+6) { grid-row: 2; }
+.duel-grid > :nth-child(n+7):nth-child(-n+9) { grid-row: 3; }
+.duel-grid > :nth-child(n+10):nth-child(-n+12) { grid-row: 4; }
+.duel-grid > :nth-child(n+13) { grid-row: 5; }
+.duel-grid > .pchamps.l { grid-column: 1; }
+.duel-grid > .pchamps.r { grid-column: 3; }
+.duel-grid > .duel { grid-column: 1; padding-inline: 18px; }
+.duel-grid > .duel:nth-child(2) { border-top: 0; padding-top: 6px; }
+.duel-grid > .duel:nth-last-child(2) { padding-bottom: 6px; }
+.duel-grid > .pchamps { display: none; }
+/* Campeones de un jugador: tres baldosas chicas (hexágono, nombre, partidas y récord) */
+.pchamps { list-style: none; margin: 0; padding: 0; display: flex; gap: 8px; align-items: flex-start; }
+.pchamps.l { justify-content: flex-end; }
+.pchamps li { display: grid; justify-items: center; gap: 3px; width: 92px; min-width: 0; text-align: center; }
+.pchamps b { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 13px/1.2 var(--f-body); }
+.pchamps .num { font: 12px/1.2 var(--f-data); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* Celular: los campeones aparecen al abrir el rol */
+.duel-champs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding-top: 12px; margin-top: 4px; border-top: 1px dashed var(--line); }
+/* (en vertical: hexágono al costado del nombre, del lado de afuera) */
+.duel-champs .pchamps { flex-direction: column; gap: 8px; }
+.duel-champs .pchamps li { width: 100%; grid-template-columns: 30px minmax(0, 1fr); column-gap: 8px; row-gap: 2px; justify-items: start; text-align: left; }
+.duel-champs .pchamps li .champ { grid-row: span 2; width: 30px; height: 34px; }
+.duel-champs .pchamps.r li { grid-template-columns: minmax(0, 1fr) 30px; justify-items: end; text-align: right; }
+.duel-champs .pchamps.r li .champ { grid-column: 2; grid-row: 1 / span 2; }
+.duel-champs .pchamps.r li > :not(.champ) { grid-column: 1; }
+@media (min-width: 1160px) {
+  .duel-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 520px) minmax(0, 1fr); column-gap: 16px; }
+  .duel-grid::before, .duel-grid::after, .duel-grid > .duel { grid-column: 2; }
+  .duel-grid > .pchamps { display: flex; padding-top: 12px; }
+  .duel-champs { display: none; }
+}
+
 /* Partido › Partidas: una tarjeta por partida (equipos, objetivos, bans y jugadores) */
 .game .core { display: grid; gap: 4px; }
 .game-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
