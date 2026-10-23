@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { advantage, findById, fmt, formRanking, pct, periodOf, signed, sortBy, starterByRole, teamByName, vsWorldsRows } from './stats';
+import { advantage, findById, sizes, fmt, formRanking, pct, periodOf, signed, sortBy, starterByRole, teamByName, vsWorldsRows } from './stats';
 import type { PlayerEntry, TeamEntry, TeamStats } from './types';
 
 describe('periodOf', () => {
@@ -86,5 +86,17 @@ describe('advantage', () => {
     expect(advantage(2000, 1600, 100)).toEqual({ side: 'a', width: 100 });
     expect(advantage(0.5, 0.5, 0.2)).toBeNull();
     expect(advantage(null, 0.5, 0.2)).toBeNull();
+  });
+});
+
+describe('sizes', () => {
+  it('draws both sides against the bigger one', () => {
+    expect(sizes(4, 12)).toEqual([expect.closeTo(33.3, 1), 100]);
+    expect(sizes(3, 0)).toEqual([100, 0]);
+  });
+
+  it('skips missing data and empty rows', () => {
+    expect(sizes(null, 3)).toBeNull();
+    expect(sizes(0, 0)).toBeNull();
   });
 });

@@ -77,8 +77,9 @@ function head(m: Match, time: string, next: boolean): string {
 }
 
 // Barra de probabilidad de ganar la serie, dividida: cada equipo ocupa su parte desde su lado
-// y el favorito va en dorado (como el rombito)
-export function predictionBar(m: Match): string {
+// y el favorito va en dorado (como el rombito). named = con la sigla junto a cada porcentaje
+// (en el Cara a cara la barra no está pegada a los equipos, como en las tarjetas)
+export function predictionBar(m: Match, named = false): string {
   const p = m.prediction;
   if (!p || !m.team1 || !m.team2) return '';
   const fav = favorite(m);
@@ -90,7 +91,7 @@ export function predictionBar(m: Match): string {
     `<i class="${fav === side ? 'fav' : ''}" style="flex-grow:${(share * 100).toFixed(1)}"></i>`;
   return `
     <div class="pred" role="img" aria-label="${label}">
-      <div class="ends"><span class="pct${fav === 'team1' ? ' fav' : ''}">${p1}</span><span class="pct${fav === 'team2' ? ' fav' : ''}">${p2}</span></div>
+      <div class="ends"><span class="pct${fav === 'team1' ? ' fav' : ''}">${named ? `${escapeHtml(m.team1.short)} ` : ''}${p1}</span><span class="pct${fav === 'team2' ? ' fav' : ''}">${p2}${named ? ` ${escapeHtml(m.team2.short)}` : ''}</span></div>
       <div class="track" aria-hidden="true">${part(p.p_team1_series, 'team1')}${part(1 - p.p_team1_series, 'team2')}</div>
     </div>`;
 }
@@ -111,10 +112,10 @@ function verdictHtml(m: Match): string {
 }
 
 // Barra + chance por partida + veredicto, todo junto (próximo partido y Cara a cara)
-export function predictionBlock(m: Match): string {
+export function predictionBlock(m: Match, named = false): string {
   if (!m.prediction || !m.team1 || !m.team2) return '';
   const odds = oddsText(m);
-  return `${predictionBar(m)}${odds ? `<p class="pred-game">${odds}</p>` : ''}${verdictHtml(m)}`;
+  return `${predictionBar(m, named)}${odds ? `<p class="pred-game">${odds}</p>` : ''}${verdictHtml(m)}`;
 }
 
 export function matchCard(m: Match, tz: string, next = false): string {

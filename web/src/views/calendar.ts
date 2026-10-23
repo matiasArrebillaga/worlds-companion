@@ -182,7 +182,7 @@ function swissView(matches: Match[]): string {
       <h2 class="day-title">${escapeHtml(roundLabel(r.round))}${r.round === current ? ' · en curso' : ''}</h2>
       ${r.groups.map((g) => `
         <div class="grp">
-          <div class="grp-h" style="${recordTint(g.record)}"><span>${g.record === PENDING ? 'Cruces a confirmar' : g.record}</span><small>Bo${g.matches[0].best_of}</small></div>
+          <div class="grp-h" style="${recordTint(g.record)}"><span>${g.record === PENDING ? 'A confirmar' : g.record}</span><small>Bo${g.matches[0].best_of}</small></div>
           ${g.matches.some((m) => m.team1 || m.team2)
             ? g.matches.map(matchup).join('')
             : `<div class="mu tbd">${g.matches.length} ${g.matches.length === 1 ? 'cruce' : 'cruces'} · se definen al terminar la ronda anterior</div>`}

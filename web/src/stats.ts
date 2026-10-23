@@ -75,3 +75,13 @@ export function advantage(a: number | null, b: number | null, scale: number): { 
   if (a === null || b === null || a === b) return null;
   return { side: a > b ? 'a' : 'b', width: Math.min(100, (Math.abs(a - b) / scale) * 100) };
 }
+
+// Barras "mariposa" para cantidades que arrancan en 0 (kills, torres, oro, % de partidas): cada lado se dibuja
+// contra el mayor de los dos, así el que más tiene llena su mitad y el otro muestra cuánto le falta.
+// null si falta un dato o los dos son 0 (no hay nada que comparar)
+export function sizes(a: number | null, b: number | null): [number, number] | null {
+  if (a === null || b === null) return null;
+  const max = Math.max(a, b);
+  if (max <= 0) return null;
+  return [(a / max) * 100, (b / max) * 100];
+}

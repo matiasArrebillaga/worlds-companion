@@ -93,10 +93,14 @@ function summary(elo: Elo): string {
       <div class="bezel"><div class="core kpi"><span class="label">Brier score</span><b>${a.brier.toFixed(3)}</b><span class="muted">0 es perfecto · moneda = 0.250</span></div></div>
     </div>
     <h2>Calibración</h2>
-    <p class="muted">Si el modelo está bien calibrado, los favoritos al 60–70% ganan entre el 60 y el 70% de las veces. Con pocos partidos estos números saltan mucho.</p>
-    <div class="chart-box calib-chart"><canvas data-calibration role="img" aria-label="Calibración: chance predicha del favorito contra cuántas veces ganó, por franja"></canvas></div>
-    ${how('Cada punto es una franja de partidos (favoritos al 50–60%, al 60–70%…). Horizontal: la chance que el modelo le daba al favorito, en promedio. Vertical: cuántas veces ganó de verdad. Sobre la línea dorada, el modelo acertó la medida; debajo, se confió de más; arriba, se quedó corto. El tamaño del punto es la cantidad de partidos: un punto chico lejos de la línea puede ser pura suerte.')}
-    <details class="how"><summary>Ver los números</summary><div class="calib">${a.calibration.map(calibrationRow).join('')}</div></details>`;
+    <div class="calib-wrap">
+      <div class="chart-box calib-chart"><canvas data-calibration role="img" aria-label="Calibración: chance predicha del favorito contra cuántas veces ganó, por franja"></canvas></div>
+      <div class="stack calib-text">
+        <p class="muted">Si el modelo está bien calibrado, los favoritos al 60–70% ganan entre el 60 y el 70% de las veces. Con pocos partidos estos números saltan mucho.</p>
+        <p class="muted">Cada punto es una franja de partidos (favoritos al 50–60%, al 60–70%…). Horizontal: la chance que el modelo le daba al favorito, en promedio. Vertical: cuántas veces ganó de verdad. Sobre la línea dorada, el modelo acertó la medida; debajo, se confió de más; arriba, se quedó corto. El tamaño del punto es la cantidad de partidos: un punto chico lejos de la línea puede ser pura suerte.</p>
+        <details class="how"><summary>Ver los números</summary><div class="calib">${a.calibration.map(calibrationRow).join('')}</div></details>
+      </div>
+    </div>`;
 }
 
 // Una fila por partido evaluado: quién era favorito, cómo terminó y si el modelo acertó

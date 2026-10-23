@@ -862,22 +862,31 @@ html { -webkit-tap-highlight-color: transparent; }
 /* Paneles laterales (angostos): la sorpresa baja a su propio renglón para no tapar el marcador */
 .row .m .upset { display: block; width: fit-content; margin: 4px 0 0; }
 
-/* Cara a cara: barra desde el centro hacia el que saca ventaja; su valor en dorado */
-.mirror { grid-template-columns: 64px minmax(0, 1fr) 96px minmax(0, 1fr) 64px; gap: 8px; }
-.mirror .num { text-align: right; }
+/* Cara a cara: filas espejo. Número | barra | etiqueta | barra | número; cada mitad tiene un riel tenue
+   (hasta dónde puede llegar la barra) y el número del que saca ventaja va del color de su barra */
+.mirror { grid-template-columns: 64px minmax(0, 1fr) 112px minmax(0, 1fr) 64px; gap: 10px; font-variant-numeric: tabular-nums; }
+.mirror .num { text-align: right; color: var(--fg2); }
 .mirror .num:last-child { text-align: left; }
-.mirror > .label { text-align: center; }
-.mirror .lead { color: var(--fg); font-weight: 700; }
-.mbar { position: relative; height: 6px; }
-.mbar i { position: absolute; top: 0; bottom: 0; background: var(--data); }
+.mirror > .label { text-align: center; white-space: nowrap; letter-spacing: .06em; }
+.mirror .lead { color: var(--data); font-weight: 700; }
+.mbar { position: relative; height: 8px; background: var(--data-soft); }
+.mbar.off { background: none; }
+.mbar i { position: absolute; top: 0; bottom: 0; background: var(--line-ctl); transform-origin: right; animation: grow .7s var(--ease); }
+.mbar i.on { background: var(--data); }
 .mbar.l i { right: 0; }
-.mbar.r i { left: 0; }
+.mbar.r i { left: 0; transform-origin: left; }
 .lg-a { background: var(--data); height: 2px !important; }
 .lg-b { background: repeating-linear-gradient(90deg, var(--gold) 0 6px, transparent 6px 10px); height: 2px !important; }
-@media (max-width: 480px) { .mirror { grid-template-columns: 52px minmax(0, 1fr) 84px minmax(0, 1fr) 52px; gap: 6px; } }
-.mirror.mhead { padding-top: 0; }
-.mirror.mhead span:first-child { text-align: right; }
-.mirror.mhead .logo { width: 28px; height: 28px; }
+@media (max-width: 480px) { .mirror { grid-template-columns: 50px minmax(0, 1fr) 88px minmax(0, 1fr) 50px; gap: 6px; } }
+@media (prefers-reduced-motion: reduce) { .mbar i { animation: none; } }
+/* Encabezado de grupo: siglas sobre cada columna y el nombre del grupo al medio */
+.mirror.mgroup { padding: 14px 0 6px; }
+.mirror.mgroup:first-child { padding-top: 0; }
+.mirror.mgroup .num { font: 700 1rem/1 var(--f-display); letter-spacing: .06em; color: var(--fg); }
+.mirror.mgroup > .label { color: var(--gold); }
+/* Tablas de comparación: angostas y centradas, así el número queda cerca de su barra */
+.cmp { width: 100%; max-width: 720px; }
+.game .cmp { margin-inline: auto; }
 
 /* Cara a cara: encabezado con los dos logos enfrentados */
 .vs-hero { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; font: inherit; text-transform: none; }
@@ -889,6 +898,12 @@ html { -webkit-tap-highlight-color: transparent; }
 .vs-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 14px/1.2 var(--f-body); color: var(--fg2); }
 .vs-mid { display: grid; justify-items: center; gap: 6px; }
 .vs-mid b { font: 700 1.3rem/1 var(--f-display); letter-spacing: .2em; color: var(--fg3); }
+/* Marcador de la serie en el centro del encabezado; el que perdió queda atenuado */
+.vs-mid b.vs-score { font: 700 clamp(2.2rem, 8vw, 3.4rem)/1 var(--f-data); letter-spacing: 0; color: var(--fg); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.vs-score i { font-style: normal; color: var(--fg3); margin-inline: .15em; }
+.vs-side.lost .logo { opacity: .5; filter: grayscale(.6); }
+.vs-side.lost .vs-short { color: var(--fg3); }
+.hero-core { display: grid; gap: 16px; }
 @media (min-width: 880px) { .vs-side .logo { width: 88px; height: 88px; } .vs-hero { gap: 32px; } }
 
 /* Duelos por rol: cada rol se abre al tocarlo (<details>) */
@@ -915,22 +930,46 @@ html { -webkit-tap-highlight-color: transparent; }
 .duel[open] .duel-more { animation: duel-open .35s var(--ease); }
 @keyframes duel-open { from { opacity: 0; transform: translateY(-6px); } }
 
-/* Partido › Partidas: una tarjeta por partida (objetivos, draft y duelos por rol) */
-.game-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+/* Partido › Partidas: una tarjeta por partida (equipos, objetivos, bans y jugadores) */
+.game .core { display: grid; gap: 4px; }
+.game-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .game-head h3 { margin: 0; font: 700 1.2rem/1 var(--f-display); letter-spacing: .04em; text-transform: uppercase; }
-.game-sides { display: flex; justify-content: space-between; padding: 12px 0 4px; }
-.game-sides > span { display: inline-flex; align-items: center; gap: 8px; }
-.side { padding: 4px 6px; border: 1px solid currentColor; font: 700 12px/1 var(--f-data); letter-spacing: .08em; }
+.game-sides { display: flex; justify-content: space-between; gap: 12px; padding: 14px 0 6px; }
+.gt { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.gt.r { flex-direction: row-reverse; }
+.gt b { font: 700 1.4rem/1 var(--f-display); letter-spacing: .04em; text-transform: uppercase; }
+.gt .logo { width: 28px; height: 28px; flex: none; }
+.gt.lost b { color: var(--fg3); }
+.gt.lost .logo { opacity: .5; filter: grayscale(.6); }
+.side { padding: 4px 6px; border: 1px solid currentColor; font: 700 12px/1 var(--f-data); letter-spacing: .08em; text-transform: uppercase; }
 .side.blue { color: var(--blue); }
 .side.red { color: var(--red); }
-.draft { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
-.draft-side { display: grid; gap: 6px; align-content: start; }
-.draft-side .picks, .draft-side .bans { display: flex; flex-wrap: wrap; gap: 4px; }
-.draft-side.r .picks, .draft-side.r .bans { justify-content: flex-end; }
-.draft .bans .champ { width: 22px; height: 25px; font-size: 9px; opacity: .7; filter: grayscale(1); }
+/* Bans: chicos, grises y en una línea por equipo */
+.bans-row { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.bans-row .bans { display: flex; flex-wrap: wrap; gap: 4px; }
+.bans-row .bans.r { justify-content: flex-end; }
+.bans-row .champ { width: 24px; height: 27px; font-size: 9px; opacity: .7; filter: grayscale(1); }
+@media (max-width: 480px) { .bans-row .bans { gap: 2px; } .bans-row .champ { width: 20px; height: 23px; } }
 .game .duels { border-top: 1px solid var(--line); }
 .game .duel-names .champ { width: 28px; height: 32px; }
-@media (max-width: 480px) { .draft-side .picks { gap: 2px; } .draft .picks .champ { width: 26px; height: 30px; } }
+/* Scoreboard de PC: tabla espejada, el rol al medio; en el celular quedan los duelos desplegables */
+.sb { display: none; width: 100%; border-collapse: collapse; font: 500 14px/1.2 var(--f-data); font-variant-numeric: tabular-nums; }
+.sb th { padding: 10px 8px; border-bottom: 1px solid var(--line); font: 500 12px/1 var(--f-data); letter-spacing: .1em; text-transform: uppercase; color: var(--fg2); text-align: center; }
+.sb td { padding: 8px; border-bottom: 1px solid var(--line); text-align: center; color: var(--fg2); white-space: nowrap; }
+.sb tr:last-child td { border-bottom: 0; }
+.sb td.lead { color: var(--data); font-weight: 700; }
+.sb .who { text-align: left; }
+.sb .who.r { text-align: right; }
+.sb td.who > span { display: inline-flex; align-items: center; gap: 10px; }
+.sb td.who.r > span { flex-direction: row-reverse; }
+.sb td.who a, .sb td.who b { font: 700 1.15rem/1 var(--f-display); text-transform: uppercase; text-decoration: none; color: var(--fg); }
+.sb td.who a:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
+.sb .champ { width: 28px; height: 32px; }
+.sb td.role { color: var(--fg); padding-inline: 16px; }
+@media (min-width: 880px) {
+  .game .sb { display: table; border-top: 1px solid var(--line); }
+  .game .duels { display: none; }
+}
 
 /* Tablas, filas de Análisis y tarjetas de líderes: la fila o tarjeta entera lleva a la página del equipo o jugador
    (el link de la sigla o el nombre la cubre); los gráficos con tooltip quedan por encima */
@@ -953,5 +992,8 @@ html { -webkit-tap-highlight-color: transparent; }
 .tip.on { opacity: 1; }
 [data-tip] { cursor: help; }
 
-/* Gráfico de calibración: cuadrado-ish para que la diagonal se lea a 45° */
+/* Gráfico de calibración: cuadrado-ish para que la diagonal se lea a 45°; en PC, la explicación al lado */
 .calib-chart { height: 300px; max-width: 520px; }
+.calib-wrap { display: grid; gap: 16px; }
+.calib-text p { margin: 0; max-width: 62ch; }
+@media (min-width: 880px) { .calib-wrap { grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 32px; align-items: start; } }
