@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-23T20:41:08Z",
+ "fetched_at": "2026-10-23T21:29:32Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Play-In_Round 1_1_1",
@@ -823,6 +823,39 @@
    "Team2Towers": "3",
    "Team2RiftHeralds": "1",
    "Team2VoidGrubs": "0",
+   "Team2Atakhans": "",
+   "DateTimeUTC__precision": "0"
+  },
+  {
+   "GameId": "2026 Season World Championship/Main Event_Round 1_4_1",
+   "MatchId": "2026 Season World Championship/Main Event_Round 1_4",
+   "OverviewPage": "2026 Season World Championship/Main Event",
+   "Team1": "Karmine Corp",
+   "Team2": "Anyone's Legend",
+   "Winner": "1",
+   "DateTimeUTC": "2026-10-23 20:16:00",
+   "GameInMatch": "1",
+   "Gamelength": "33:16",
+   "Patch": "26.20",
+   "Team1Picks": "Jax,Jarvan IV,Orianna,Kalista,Renata Glasc",
+   "Team1Bans": "Vi,Qiyana,Cassiopeia,Seraphine,Nautilus",
+   "Team1Gold": "64797",
+   "Team1Kills": "12",
+   "Team1Dragons": "3",
+   "Team1Barons": "2",
+   "Team1Towers": "8",
+   "Team1RiftHeralds": "0",
+   "Team1VoidGrubs": "0",
+   "Team1Atakhans": "",
+   "Team2Picks": "Olaf,Nocturne,Akali,Miss Fortune,Neeko",
+   "Team2Bans": "Jayce,Rumble,Syndra,Ezreal,Lulu",
+   "Team2Gold": "56720",
+   "Team2Kills": "4",
+   "Team2Dragons": "2",
+   "Team2Barons": "0",
+   "Team2Towers": "3",
+   "Team2RiftHeralds": "1",
+   "Team2VoidGrubs": "3",
    "Team2Atakhans": "",
    "DateTimeUTC__precision": "0"
   }
