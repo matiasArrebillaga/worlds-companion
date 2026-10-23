@@ -12,22 +12,23 @@ from pathlib import Path
 from pipeline import utc_now_iso
 
 # Id de liga → nombre en el campo League de Leaguepedia (los mismos de LEAGUE_REGIONS en pipeline/history.py),
-# sigla, región (color del rombito) e id de la API de lolesports
+# nombre para mostrar (los internacionales se llaman "<nombre> <año>"), sigla, región (color del rombito)
+# e id de la API de lolesports
 TRACKED: dict[str, dict] = {
-    "lck": {"league": "LoL Champions Korea", "short": "LCK", "region": "KR", "international": False,
+    "lck": {"name": "LCK", "league": "LoL Champions Korea", "short": "LCK", "region": "KR", "international": False,
             "lolesports_id": "98767991310872058"},
-    "lpl": {"league": "Tencent LoL Pro League", "short": "LPL", "region": "CN", "international": False,
+    "lpl": {"name": "LPL", "league": "Tencent LoL Pro League", "short": "LPL", "region": "CN", "international": False,
             "lolesports_id": "98767991314006698"},
-    "lec": {"league": "LoL EMEA Championship", "short": "LEC", "region": "EU", "international": False,
+    "lec": {"name": "LEC", "league": "LoL EMEA Championship", "short": "LEC", "region": "EU", "international": False,
             "lolesports_id": "98767991302996019"},
-    "lcs": {"league": "League of Legends Championship Series", "short": "LCS", "region": "NA", "international": False,
-            "lolesports_id": "98767991299243165"},
-    "fst": {"league": "First Stand", "short": "FST", "region": None, "international": True,
+    "lcs": {"name": "LCS", "league": "League of Legends Championship Series", "short": "LCS", "region": "NA",
+            "international": False, "lolesports_id": "98767991299243165"},
+    "fst": {"name": "First Stand", "league": "First Stand", "short": "FST", "region": None, "international": True,
             "lolesports_id": "113464388705111224"},
-    "msi": {"league": "Mid-Season Invitational", "short": "MSI", "region": None, "international": True,
+    "msi": {"name": "MSI", "league": "Mid-Season Invitational", "short": "MSI", "region": None, "international": True,
             "lolesports_id": "98767991325878492"},
-    "worlds": {"league": "World Championship", "short": "WORLDS", "region": None, "international": True,
-               "lolesports_id": "98767975604431411"},
+    "worlds": {"name": "Worlds", "league": "World Championship", "short": "WORLDS", "region": None,
+               "international": True, "lolesports_id": "98767975604431411"},
 }
 LEAGUE_IDS = {info["league"]: league_id for league_id, info in TRACKED.items()}
 
@@ -48,12 +49,21 @@ def slug(text: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", text.lower()).strip("-")
 
 
+def league_tournament_id(page: str) -> str:
+    """Id de un torneo de liga, sin la palabra "Season" del año: 'LCK/2027 Season/Rounds 1-2' → 'lck-2027-rounds-1-2'."""
+    return slug(page.replace(" Season/", "/", 1))
+
+
 def _keep(r: dict) -> bool:
-    """Solo ligas seguidas, nivel principal y sin clasificatorios (salvo los de Worlds: el Play-In figura así)."""
+    """Solo ligas seguidas, nivel principal y sin clasificatorios.
+    Excepción: el Play-In de Worlds figura como clasificatorio. Se reconoce por la página del evento, porque las
+    finales regionales (ej. 'LPL/2026 Season/Regional Finals') también llevan League "World Championship"."""
     league_id = LEAGUE_IDS.get(r.get("League", ""))
     if league_id is None or r.get("TournamentLevel") != "Primary":
         return False
-    return r.get("IsQualifier") != "1" or league_id == "worlds"
+    if r.get("IsQualifier") != "1":
+        return True
+    return r.get("OverviewPage", "").startswith(f"{r.get('Year')} Season World Championship")
 
 
 def group_tournaments(rows: list[dict]) -> list[dict]:
@@ -66,11 +76,11 @@ def group_tournaments(rows: list[dict]) -> list[dict]:
         year = int(r["Year"])
         international = TRACKED[league_id]["international"]
         # Internacional: un torneo por evento y año. Liga: uno por página.
-        tid = f"{league_id}-{year}" if international else slug(r["OverviewPage"])
+        tid = f"{league_id}-{year}" if international else league_tournament_id(r["OverviewPage"])
         start, end = r.get("DateStart") or None, r.get("Date") or None
         t = by_id.setdefault(tid, {
             "id": tid, "league": league_id, "year": year, "pages": [], "is_playoffs": r.get("IsPlayoffs") == "1",
-            "name": f"{TRACKED[league_id]['short']} {year}" if international else (r.get("Name") or r["OverviewPage"]),
+            "name": f"{TRACKED[league_id]['name']} {year}" if international else (r.get("Name") or r["OverviewPage"]),
             "start": start, "end": end,
         })
         if r["OverviewPage"] not in t["pages"]:
@@ -125,8 +135,12 @@ def discovery_file(raw_dir: Path, year: int) -> Path:
 
 
 def write_discovery(path: Path, rows: list[dict], now: str) -> None:
-    """Guarda el descubrimiento siempre, aunque no cambie: el commit diario evita que GitHub apague el cron
-    (lo hace en repos públicos tras 60 días sin actividad)."""
+    """Guarda el descubrimiento siempre, aunque no cambie: el commit de cada 6 horas evita que GitHub apague el
+    cron (lo hace en repos públicos tras 60 días sin actividad).
+    Si Leaguepedia devuelve 0 filas para un año que ya tenía, se conservan las anteriores (un hueco de la API no
+    debe borrar la lista de torneos); solo se renueva fetched_at."""
+    if not rows and path.exists():
+        rows = json.loads(path.read_text(encoding="utf-8"))["rows"]
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps({"fetched_at": now, "rows": rows}, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
 
@@ -152,16 +166,17 @@ def has_dated_match(raw_dir: Path, tournament_id: str) -> bool:
     return any(r.get("DateTimeUTC") for r in json.loads(path.read_text(encoding="utf-8"))["rows"])
 
 
-def site_mode(tournaments: list[dict], raw_dir: Path) -> str:
-    """'season' desde que algún torneo de 2027 en adelante tiene un partido con fecha; si no, 'worlds-2026'."""
-    started = any(t["year"] >= 2027 and has_dated_match(raw_dir, t["id"]) for t in tournaments)
-    return "season" if started else "worlds-2026"
+def site_mode(raw_dir: Path) -> str:
+    """'season' desde que algún torneo que no sea Worlds 2026 tiene un partido con fecha; si no, 'worlds-2026'.
+    Mira todas las carpetas de data/raw/ (no solo los años descubiertos): una vez en 'season', queda para siempre."""
+    others = [p.parent.name for p in raw_dir.glob(f"*/{RAW_FILES['matches']}") if p.parent.name != WORLDS_2026["id"]]
+    return "season" if any(has_dated_match(raw_dir, tid) for tid in others) else "worlds-2026"
 
 
 def index_payload(raw_dir: Path, today: str, now: str) -> dict:
     """Contrato de web/public/data/index.json: modo del sitio, ligas y torneos con su estado."""
     tournaments = known_tournaments(raw_dir, today)
-    mode = site_mode(tournaments, raw_dir)
+    mode = site_mode(raw_dir)
     listed = [{"id": t["id"], "league": t["league"], "name": t["name"], "status": status(t, today),
                "is_playoffs": t["is_playoffs"], "start": t["start"], "end": t["end"]} for t in tournaments]
     # Por ahora el sitio abre siempre en Worlds 2026; el Plan 4 elige el torneo por defecto en modo "season"
