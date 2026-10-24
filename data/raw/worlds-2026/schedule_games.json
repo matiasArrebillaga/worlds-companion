@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-23T23:42:41Z",
+ "fetched_at": "2026-10-24T00:43:05Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -223,14 +223,14 @@
    "MatchId": "2026 Season World Championship/Main Event_Round 1_7",
    "Blue": "LØS",
    "Red": "T1",
-   "Winner": ""
+   "Winner": "2"
   },
   {
    "GameId": "2026 Season World Championship/Main Event_Round 1_8_1",
    "MatchId": "2026 Season World Championship/Main Event_Round 1_8",
-   "Blue": "",
-   "Red": "",
-   "Winner": ""
+   "Blue": "LYON (2024 American Team)",
+   "Red": "Team Secret Whales",
+   "Winner": "1"
   },
   {
    "GameId": "2026 Season World Championship/Main Event_Round 2_1_1",
