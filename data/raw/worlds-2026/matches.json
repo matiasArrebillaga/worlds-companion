@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-24T19:53:54Z",
+ "fetched_at": "2026-10-24T20:54:33Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -299,9 +299,9 @@
    "BestOf": "1",
    "Team1": "LYON (2024 American Team)",
    "Team2": "Karmine Corp",
-   "Team1Score": "",
-   "Team2Score": "",
-   "Winner": "",
+   "Team1Score": "1",
+   "Team2Score": "0",
+   "Winner": "1",
    "DateTimeUTC": "2026-10-24 20:00:00",
    "HasTime": "1",
    "IsNullified": "0",
