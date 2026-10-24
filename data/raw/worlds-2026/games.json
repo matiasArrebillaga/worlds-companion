@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-24T00:43:05Z",
+ "fetched_at": "2026-10-24T01:13:14Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Play-In_Round 1_1_1",
@@ -955,6 +955,39 @@
    "Team2Towers": "10",
    "Team2RiftHeralds": "0",
    "Team2VoidGrubs": "3",
+   "Team2Atakhans": "",
+   "DateTimeUTC__precision": "0"
+  },
+  {
+   "GameId": "2026 Season World Championship/Main Event_Round 1_8_1",
+   "MatchId": "2026 Season World Championship/Main Event_Round 1_8",
+   "OverviewPage": "2026 Season World Championship/Main Event",
+   "Team1": "LYON (2024 American Team)",
+   "Team2": "Team Secret Whales",
+   "Winner": "1",
+   "DateTimeUTC": "2026-10-24 00:12:00",
+   "GameInMatch": "1",
+   "Gamelength": "26:49",
+   "Patch": "26.20",
+   "Team1Picks": "K'Sante,Nocturne,Anivia,Ezreal,Alistar",
+   "Team1Bans": "Vi,Qiyana,Cassiopeia,Jhin,Corki",
+   "Team1Gold": "57695",
+   "Team1Kills": "22",
+   "Team1Dragons": "2",
+   "Team1Barons": "1",
+   "Team1Towers": "9",
+   "Team1RiftHeralds": "1",
+   "Team1VoidGrubs": "3",
+   "Team1Atakhans": "",
+   "Team2Picks": "Rumble,Lee Sin,Ryze,Kai'Sa,Nautilus",
+   "Team2Bans": "Syndra,Renata Glasc,Olaf,Orianna,Galio",
+   "Team2Gold": "46307",
+   "Team2Kills": "6",
+   "Team2Dragons": "1",
+   "Team2Barons": "0",
+   "Team2Towers": "1",
+   "Team2RiftHeralds": "0",
+   "Team2VoidGrubs": "0",
    "Team2Atakhans": "",
    "DateTimeUTC__precision": "0"
   }
