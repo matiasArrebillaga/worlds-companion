@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-24T20:54:33Z",
+ "fetched_at": "2026-10-24T21:24:48Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -263,8 +263,8 @@
   {
    "GameId": "2026 Season World Championship/Main Event_Round 2_5_1",
    "MatchId": "2026 Season World Championship/Main Event_Round 2_5",
-   "Blue": "",
-   "Red": "",
+   "Blue": "Team Secret Whales",
+   "Red": "Invictus Gaming",
    "Winner": ""
   },
   {
