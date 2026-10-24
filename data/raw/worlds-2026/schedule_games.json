@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-24T18:23:20Z",
+ "fetched_at": "2026-10-24T18:53:33Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -244,7 +244,7 @@
    "MatchId": "2026 Season World Championship/Main Event_Round 2_2",
    "Blue": "Movistar KOI",
    "Red": "CTBC Flying Oyster",
-   "Winner": ""
+   "Winner": "1"
   },
   {
    "GameId": "2026 Season World Championship/Main Event_Round 2_3_1",
