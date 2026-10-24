@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-24T20:54:33Z",
+ "fetched_at": "2026-10-24T21:55:00Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -316,9 +316,9 @@
    "BestOf": "1",
    "Team1": "Invictus Gaming",
    "Team2": "Team Secret Whales",
-   "Team1Score": "",
-   "Team2Score": "",
-   "Winner": "",
+   "Team1Score": "1",
+   "Team2Score": "0",
+   "Winner": "1",
    "DateTimeUTC": "2026-10-24 21:00:00",
    "HasTime": "1",
    "IsNullified": "0",
