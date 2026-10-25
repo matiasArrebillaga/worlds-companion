@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-25T18:03:03Z",
+ "fetched_at": "2026-10-25T19:03:18Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -401,9 +401,9 @@
    "BestOf": "1",
    "Team1": "Top Esports",
    "Team2": "G2 Esports",
-   "Team1Score": "",
-   "Team2Score": "",
-   "Winner": "",
+   "Team1Score": "1",
+   "Team2Score": "0",
+   "Winner": "1",
    "DateTimeUTC": "2026-10-25 18:00:00",
    "HasTime": "1",
    "IsNullified": "0",
