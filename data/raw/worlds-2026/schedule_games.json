@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-25T00:26:04Z",
+ "fetched_at": "2026-10-25T01:26:23Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -286,7 +286,7 @@
    "MatchId": "2026 Season World Championship/Main Event_Round 2_8",
    "Blue": "Team Liquid",
    "Red": "Bilibili Gaming",
-   "Winner": ""
+   "Winner": "2"
   },
   {
    "GameId": "2026 Season World Championship/Main Event_Round 3_1_1",
