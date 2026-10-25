@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-25T20:03:39Z",
+ "fetched_at": "2026-10-25T20:56:52Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -312,22 +312,15 @@
   {
    "GameId": "2026 Season World Championship/Main Event_Round 3_3_2",
    "MatchId": "2026 Season World Championship/Main Event_Round 3_3",
-   "Blue": "",
-   "Red": "",
-   "Winner": ""
-  },
-  {
-   "GameId": "2026 Season World Championship/Main Event_Round 3_3_3",
-   "MatchId": "2026 Season World Championship/Main Event_Round 3_3",
-   "Blue": "",
-   "Red": "",
-   "Winner": ""
+   "Blue": "Dplus Kia",
+   "Red": "Movistar KOI",
+   "Winner": "1"
   },
   {
    "GameId": "2026 Season World Championship/Main Event_Round 3_4_1",
    "MatchId": "2026 Season World Championship/Main Event_Round 3_4",
-   "Blue": "",
-   "Red": "",
+   "Blue": "LYON (2024 American Team)",
+   "Red": "Gen.G",
    "Winner": ""
   },
   {

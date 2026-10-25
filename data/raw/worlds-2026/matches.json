@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-25T20:03:39Z",
+ "fetched_at": "2026-10-25T20:56:52Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -418,9 +418,9 @@
    "BestOf": "3",
    "Team1": "Dplus Kia",
    "Team2": "Movistar KOI",
-   "Team1Score": "1",
+   "Team1Score": "2",
    "Team2Score": "0",
-   "Winner": "",
+   "Winner": "1",
    "DateTimeUTC": "2026-10-25 19:00:00",
    "HasTime": "1",
    "IsNullified": "0",
