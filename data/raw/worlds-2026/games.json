@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-24T23:25:38Z",
+ "fetched_at": "2026-10-25T00:56:11Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Play-In_Round 1_1_1",
@@ -1186,6 +1186,39 @@
    "Team2Towers": "11",
    "Team2RiftHeralds": "1",
    "Team2VoidGrubs": "2",
+   "Team2Atakhans": "",
+   "DateTimeUTC__precision": "0"
+  },
+  {
+   "GameId": "2026 Season World Championship/Main Event_Round 2_7_1",
+   "MatchId": "2026 Season World Championship/Main Event_Round 2_7",
+   "OverviewPage": "2026 Season World Championship/Main Event",
+   "Team1": "Dplus Kia",
+   "Team2": "T1",
+   "Winner": "1",
+   "DateTimeUTC": "2026-10-24 23:19:00",
+   "GameInMatch": "1",
+   "Gamelength": "41:31",
+   "Patch": "26.20",
+   "Team1Picks": "K'Sante,Jarvan IV,Viktor,Kalista,Renata Glasc",
+   "Team1Bans": "Nocturne,Locke,Rumble,Akali,Taliyah",
+   "Team1Gold": "84273",
+   "Team1Kills": "10",
+   "Team1Dragons": "2",
+   "Team1Barons": "1",
+   "Team1Towers": "9",
+   "Team1RiftHeralds": "1",
+   "Team1VoidGrubs": "2",
+   "Team1Atakhans": "",
+   "Team2Picks": "Jayce,Vi,Anivia,Caitlyn,Neeko",
+   "Team2Bans": "Syndra,Cassiopeia,Qiyana,Orianna,Olaf",
+   "Team2Gold": "79327",
+   "Team2Kills": "8",
+   "Team2Dragons": "4",
+   "Team2Barons": "1",
+   "Team2Towers": "6",
+   "Team2RiftHeralds": "0",
+   "Team2VoidGrubs": "1",
    "Team2Atakhans": "",
    "DateTimeUTC__precision": "0"
   }
