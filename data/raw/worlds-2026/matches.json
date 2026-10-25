@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-25T22:04:45Z",
+ "fetched_at": "2026-10-25T22:34:54Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -435,7 +435,7 @@
    "BestOf": "3",
    "Team1": "Gen.G",
    "Team2": "LYON (2024 American Team)",
-   "Team1Score": "0",
+   "Team1Score": "1",
    "Team2Score": "1",
    "Winner": "",
    "DateTimeUTC": "2026-10-25 22:00:00",
