@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-25T03:57:24Z",
+ "fetched_at": "2026-10-25T18:03:03Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -384,9 +384,9 @@
    "BestOf": "1",
    "Team1": "Hanwha Life Esports",
    "Team2": "Invictus Gaming",
-   "Team1Score": "",
-   "Team2Score": "",
-   "Winner": "",
+   "Team1Score": "0",
+   "Team2Score": "1",
+   "Winner": "2",
    "DateTimeUTC": "2026-10-25 17:00:00",
    "HasTime": "1",
    "IsNullified": "0",

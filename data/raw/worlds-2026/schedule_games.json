@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-25T17:32:40Z",
+ "fetched_at": "2026-10-25T18:03:03Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -293,7 +293,7 @@
    "MatchId": "2026 Season World Championship/Main Event_Round 3_1",
    "Blue": "Invictus Gaming",
    "Red": "Hanwha Life Esports",
-   "Winner": ""
+   "Winner": "1"
   },
   {
    "GameId": "2026 Season World Championship/Main Event_Round 3_2_1",
