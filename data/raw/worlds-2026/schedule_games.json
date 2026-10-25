@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-25T18:03:03Z",
+ "fetched_at": "2026-10-25T18:33:12Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -298,8 +298,8 @@
   {
    "GameId": "2026 Season World Championship/Main Event_Round 3_2_1",
    "MatchId": "2026 Season World Championship/Main Event_Round 3_2",
-   "Blue": "",
-   "Red": "",
+   "Blue": "Top Esports",
+   "Red": "G2 Esports",
    "Winner": ""
   },
   {
