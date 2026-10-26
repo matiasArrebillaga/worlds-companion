@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-26T18:46:43Z",
+ "fetched_at": "2026-10-26T19:47:12Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -486,8 +486,8 @@
    "BestOf": "3",
    "Team1": "LØS",
    "Team2": "Team Secret Whales",
-   "Team1Score": "",
-   "Team2Score": "",
+   "Team1Score": "1",
+   "Team2Score": "0",
    "Winner": "",
    "DateTimeUTC": "2026-10-26 19:00:00",
    "HasTime": "1",
