@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-25T23:35:20Z",
+ "fetched_at": "2026-10-26T17:15:59Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -340,8 +340,8 @@
   {
    "GameId": "2026 Season World Championship/Main Event_Round 3_5_1",
    "MatchId": "2026 Season World Championship/Main Event_Round 3_5",
-   "Blue": "",
-   "Red": "",
+   "Blue": "T1",
+   "Red": "CTBC Flying Oyster",
    "Winner": ""
   },
   {
