@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-26T22:18:17Z",
+ "fetched_at": "2026-10-26T22:44:59Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -377,14 +377,7 @@
    "MatchId": "2026 Season World Championship/Main Event_Round 3_8",
    "Blue": "Team Liquid",
    "Red": "Anyone's Legend",
-   "Winner": ""
-  },
-  {
-   "GameId": "2026 Season World Championship/Main Event_Round 3_8_3",
-   "MatchId": "2026 Season World Championship/Main Event_Round 3_8",
-   "Blue": "",
-   "Red": "",
-   "Winner": ""
+   "Winner": "1"
   },
   {
    "GameId": "2026 Season World Championship/Main Event_Round 4_1_1",
