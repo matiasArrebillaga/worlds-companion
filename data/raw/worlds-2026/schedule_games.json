@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-26T17:46:17Z",
+ "fetched_at": "2026-10-26T18:16:29Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -347,8 +347,8 @@
   {
    "GameId": "2026 Season World Championship/Main Event_Round 3_6_1",
    "MatchId": "2026 Season World Championship/Main Event_Round 3_6",
-   "Blue": "",
-   "Red": "",
+   "Blue": "Bilibili Gaming",
+   "Red": "Karmine Corp",
    "Winner": ""
   },
   {

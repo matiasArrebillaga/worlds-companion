@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-26T00:05:33Z",
+ "fetched_at": "2026-10-26T18:16:29Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Play-In_Round 1_1_1",
@@ -1483,6 +1483,39 @@
    "Team2Towers": "3",
    "Team2RiftHeralds": "0",
    "Team2VoidGrubs": "3",
+   "Team2Atakhans": "",
+   "DateTimeUTC__precision": "0"
+  },
+  {
+   "GameId": "2026 Season World Championship/Main Event_Round 3_5_1",
+   "MatchId": "2026 Season World Championship/Main Event_Round 3_5",
+   "OverviewPage": "2026 Season World Championship/Main Event",
+   "Team1": "T1",
+   "Team2": "CTBC Flying Oyster",
+   "Winner": "1",
+   "DateTimeUTC": "2026-10-26 17:12:00",
+   "GameInMatch": "1",
+   "Gamelength": "27:23",
+   "Patch": "26.20",
+   "Team1Picks": "Ambessa,Vi,Galio,Jhin,Rakan",
+   "Team1Bans": "K'Sante,Draven,Syndra,Poppy,Nautilus",
+   "Team1Gold": "56708",
+   "Team1Kills": "14",
+   "Team1Dragons": "1",
+   "Team1Barons": "1",
+   "Team1Towers": "7",
+   "Team1RiftHeralds": "1",
+   "Team1VoidGrubs": "1",
+   "Team1Atakhans": "",
+   "Team2Picks": "Rumble,Qiyana,Ryze,Kai'Sa,Alistar",
+   "Team2Bans": "Renata Glasc,Nocturne,Cassiopeia,Anivia,Ahri",
+   "Team2Gold": "50539",
+   "Team2Kills": "6",
+   "Team2Dragons": "2",
+   "Team2Barons": "0",
+   "Team2Towers": "4",
+   "Team2RiftHeralds": "0",
+   "Team2VoidGrubs": "2",
    "Team2Atakhans": "",
    "DateTimeUTC__precision": "0"
   }
