@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-26T19:47:12Z",
+ "fetched_at": "2026-10-26T20:17:24Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -361,8 +361,8 @@
   {
    "GameId": "2026 Season World Championship/Main Event_Round 3_7_2",
    "MatchId": "2026 Season World Championship/Main Event_Round 3_7",
-   "Blue": "",
-   "Red": "",
+   "Blue": "Team Secret Whales",
+   "Red": "LØS",
    "Winner": ""
   },
   {

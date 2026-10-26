@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-26T18:16:29Z",
+ "fetched_at": "2026-10-26T20:17:24Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Play-In_Round 1_1_1",
@@ -1516,6 +1516,39 @@
    "Team2Towers": "4",
    "Team2RiftHeralds": "0",
    "Team2VoidGrubs": "2",
+   "Team2Atakhans": "",
+   "DateTimeUTC__precision": "0"
+  },
+  {
+   "GameId": "2026 Season World Championship/Main Event_Round 3_6_1",
+   "MatchId": "2026 Season World Championship/Main Event_Round 3_6",
+   "OverviewPage": "2026 Season World Championship/Main Event",
+   "Team1": "Bilibili Gaming",
+   "Team2": "Karmine Corp",
+   "Winner": "1",
+   "DateTimeUTC": "2026-10-26 18:03:00",
+   "GameInMatch": "1",
+   "Gamelength": "36:20",
+   "Patch": "26.20",
+   "Team1Picks": "Ambessa,Jarvan IV,Orianna,Kai'Sa,Nautilus",
+   "Team1Bans": "Renata Glasc,Vi,Qiyana,Syndra,Cassiopeia",
+   "Team1Gold": "74989",
+   "Team1Kills": "14",
+   "Team1Dragons": "3",
+   "Team1Barons": "1",
+   "Team1Towers": "9",
+   "Team1RiftHeralds": "0",
+   "Team1VoidGrubs": "3",
+   "Team1Atakhans": "",
+   "Team2Picks": "Rumble,Lee Sin,Viktor,Jhin,Alistar",
+   "Team2Bans": "Locke,Nocturne,Camille,Ezreal,Lulu",
+   "Team2Gold": "66274",
+   "Team2Kills": "11",
+   "Team2Dragons": "3",
+   "Team2Barons": "0",
+   "Team2Towers": "4",
+   "Team2RiftHeralds": "1",
+   "Team2VoidGrubs": "0",
    "Team2Atakhans": "",
    "DateTimeUTC__precision": "0"
   }
