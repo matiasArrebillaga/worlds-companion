@@ -138,10 +138,21 @@ async function start(): Promise<void> {
   }
   refreshUpdated(data);
   window.setInterval(() => refreshUpdated(data), 60_000);
-  window.setInterval(async () => {
+  let checking = false;
+  const checkNow = async (): Promise<void> => {
+    if (checking) return; // evita dos descargas a la vez (intervalo + volver a la pestaña)
+    checking = true;
     data = await refreshIfNewer(data);
     refreshUpdated(data);
-  }, REFRESH_EVERY_MS);
+    checking = false;
+  };
+  window.setInterval(checkNow, REFRESH_EVERY_MS);
+  // En segundo plano (o con el celular bloqueado) el navegador congela los temporizadores:
+  // al volver a la pestaña se busca enseguida, sin esperar al próximo intervalo
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') void checkNow();
+  });
+  window.addEventListener('online', () => void checkNow());
   window.addEventListener('hashchange', (event) => {
     // Todavía no se redibujó: el scroll es el de la página que se deja
     rememberScroll(new URL(event.oldURL).hash, window.scrollY);
