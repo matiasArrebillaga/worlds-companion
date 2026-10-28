@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-28T21:33:32Z",
+ "fetched_at": "2026-10-28T22:03:49Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -391,20 +391,13 @@
    "MatchId": "2026 Season World Championship/Main Event_Round 4_1",
    "Blue": "T1",
    "Red": "Movistar KOI",
-   "Winner": ""
-  },
-  {
-   "GameId": "2026 Season World Championship/Main Event_Round 4_1_3",
-   "MatchId": "2026 Season World Championship/Main Event_Round 4_1",
-   "Blue": "",
-   "Red": "",
-   "Winner": ""
+   "Winner": "1"
   },
   {
    "GameId": "2026 Season World Championship/Main Event_Round 4_2_1",
    "MatchId": "2026 Season World Championship/Main Event_Round 4_2",
-   "Blue": "",
-   "Red": "",
+   "Blue": "LYON (2024 American Team)",
+   "Red": "Invictus Gaming",
    "Winner": ""
   },
   {
