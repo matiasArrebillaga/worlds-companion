@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-29T22:14:49Z",
+ "fetched_at": "2026-10-29T23:15:16Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -571,8 +571,8 @@
    "BestOf": "3",
    "Team1": "Top Esports",
    "Team2": "Bilibili Gaming",
-   "Team1Score": "",
-   "Team2Score": "",
+   "Team1Score": "0",
+   "Team2Score": "1",
    "Winner": "",
    "DateTimeUTC": "2026-10-29 23:00:00",
    "HasTime": "1",
