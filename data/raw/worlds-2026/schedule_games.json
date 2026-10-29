@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-29T23:15:16Z",
+ "fetched_at": "2026-10-29T23:45:26Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -438,8 +438,8 @@
   {
    "GameId": "2026 Season World Championship/Main Event_Round 4_4_2",
    "MatchId": "2026 Season World Championship/Main Event_Round 4_4",
-   "Blue": "",
-   "Red": "",
+   "Blue": "Bilibili Gaming",
+   "Red": "Top Esports",
    "Winner": ""
   },
   {
