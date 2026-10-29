@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-29T00:04:49Z",
+ "fetched_at": "2026-10-29T00:34:58Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -412,7 +412,7 @@
    "MatchId": "2026 Season World Championship/Main Event_Round 4_2",
    "Blue": "LYON (2024 American Team)",
    "Red": "Invictus Gaming",
-   "Winner": ""
+   "Winner": "2"
   },
   {
    "GameId": "2026 Season World Championship/Main Event_Round 4_3_1",

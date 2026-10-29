@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-29T00:04:49Z",
+ "fetched_at": "2026-10-29T00:34:58Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -537,9 +537,9 @@
    "BestOf": "3",
    "Team1": "Invictus Gaming",
    "Team2": "LYON (2024 American Team)",
-   "Team1Score": "1",
+   "Team1Score": "2",
    "Team2Score": "1",
-   "Winner": "",
+   "Winner": "1",
    "DateTimeUTC": "2026-10-28 23:00:00",
    "HasTime": "1",
    "IsNullified": "0",
