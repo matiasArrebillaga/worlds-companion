@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-30T23:28:19Z",
+ "fetched_at": "2026-10-30T23:58:32Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -475,13 +475,13 @@
    "MatchId": "2026 Season World Championship/Main Event_Round 4_6",
    "Blue": "G2 Esports",
    "Red": "Hanwha Life Esports",
-   "Winner": ""
+   "Winner": "2"
   },
   {
    "GameId": "2026 Season World Championship/Main Event_Round 4_6_2",
    "MatchId": "2026 Season World Championship/Main Event_Round 4_6",
-   "Blue": "",
-   "Red": "",
+   "Blue": "Hanwha Life Esports",
+   "Red": "G2 Esports",
    "Winner": ""
   },
   {
