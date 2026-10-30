@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-30T22:27:04Z",
+ "fetched_at": "2026-10-30T22:58:10Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -589,8 +589,8 @@
    "Team1": "Team Liquid",
    "Team2": "LØS",
    "Team1Score": "1",
-   "Team2Score": "1",
-   "Winner": "",
+   "Team2Score": "2",
+   "Winner": "2",
    "DateTimeUTC": "2026-10-30 20:00:00",
    "HasTime": "1",
    "IsNullified": "0",
