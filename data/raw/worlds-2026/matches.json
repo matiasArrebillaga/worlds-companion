@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-31T23:08:49Z",
+ "fetched_at": "2026-10-31T23:39:04Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -657,8 +657,8 @@
    "Team1": "Hanwha Life Esports",
    "Team2": "Bilibili Gaming",
    "Team1Score": "0",
-   "Team2Score": "1",
-   "Winner": "",
+   "Team2Score": "2",
+   "Winner": "2",
    "DateTimeUTC": "2026-10-31 23:00:00",
    "HasTime": "1",
    "IsNullified": "0",

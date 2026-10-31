@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-10-31T23:08:49Z",
+ "fetched_at": "2026-10-31T23:39:04Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -531,14 +531,7 @@
    "MatchId": "2026 Season World Championship/Main Event_Round 5_3",
    "Blue": "Bilibili Gaming",
    "Red": "Hanwha Life Esports",
-   "Winner": ""
-  },
-  {
-   "GameId": "2026 Season World Championship/Main Event_Round 5_3_3",
-   "MatchId": "2026 Season World Championship/Main Event_Round 5_3",
-   "Blue": "",
-   "Red": "",
-   "Winner": ""
+   "Winner": "1"
   },
   {
    "GameId": "2026 Season World Championship/Main Event_Semifinals_1_1",
