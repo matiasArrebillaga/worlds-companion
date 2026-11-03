@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-01T00:39:33Z",
+ "fetched_at": "2026-11-03T23:07:25Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -673,8 +673,8 @@
    "BestOf": "5",
    "Team1": "Top Esports",
    "Team2": "Invictus Gaming",
-   "Team1Score": "",
-   "Team2Score": "",
+   "Team1Score": "0",
+   "Team2Score": "1",
    "Winner": "",
    "DateTimeUTC": "2026-11-03 22:00:00",
    "HasTime": "1",
