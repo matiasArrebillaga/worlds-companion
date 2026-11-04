@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-04T00:08:02Z",
+ "fetched_at": "2026-11-04T00:38:22Z",
  "rows": [
   {
    "game_id": "115660588583171787",
@@ -17591,6 +17591,239 @@
        "creepScore": 29,
        "currentHealth": 368,
        "maxHealth": 3120
+      }
+     ]
+    }
+   }
+  },
+  {
+   "game_id": "115660540726095112",
+   "number": 3,
+   "start_time": "2026-11-03T22:00:00Z",
+   "teams": {
+    "blue": "TES",
+    "red": "IG"
+   },
+   "patch": "16.20.826.3891",
+   "metadata": {
+    "patchVersion": "16.20.826.3891",
+    "blueTeamMetadata": {
+     "esportsTeamId": "99566404854685458",
+     "participantMetadata": [
+      {
+       "participantId": 1,
+       "esportsPlayerId": "101388912796120370",
+       "summonerName": "TES 369",
+       "championId": "Rumble",
+       "role": "top"
+      },
+      {
+       "participantId": 2,
+       "esportsPlayerId": "99566404820654675",
+       "summonerName": "TES Tian",
+       "championId": "Skarner",
+       "role": "jungle"
+      },
+      {
+       "participantId": 3,
+       "esportsPlayerId": "106368556422916908",
+       "summonerName": "TES Creme",
+       "championId": "Yone",
+       "role": "mid"
+      },
+      {
+       "participantId": 4,
+       "esportsPlayerId": "99566404823220763",
+       "summonerName": "TES JackeyLove",
+       "championId": "Ashe",
+       "role": "bottom"
+      },
+      {
+       "participantId": 5,
+       "esportsPlayerId": "105516599464787723",
+       "summonerName": "TES Zhuo",
+       "championId": "Seraphine",
+       "role": "support"
+      }
+     ]
+    },
+    "redTeamMetadata": {
+     "esportsTeamId": "99566404848691211",
+     "participantMetadata": [
+      {
+       "participantId": 6,
+       "esportsPlayerId": "99566404810113891",
+       "summonerName": "IG TheShy",
+       "championId": "Ornn",
+       "role": "top"
+      },
+      {
+       "participantId": 7,
+       "esportsPlayerId": "103461966880868232",
+       "summonerName": "IG Wei",
+       "championId": "Jayce",
+       "role": "jungle"
+      },
+      {
+       "participantId": 8,
+       "esportsPlayerId": "99566404811346612",
+       "summonerName": "IG Rookie",
+       "championId": "Annie",
+       "role": "mid"
+      },
+      {
+       "participantId": 9,
+       "esportsPlayerId": "113662801804437510",
+       "summonerName": "IG JiaQi",
+       "championId": "Zeri",
+       "role": "bottom"
+      },
+      {
+       "participantId": 10,
+       "esportsPlayerId": "98767991785832912",
+       "summonerName": "IG Meiko",
+       "championId": "Yuumi",
+       "role": "support"
+      }
+     ]
+    }
+   },
+   "first_frame_time": "2026-11-04T00:16:02.183Z",
+   "last_frame": {
+    "rfc460Timestamp": "2026-11-04T00:37:29.835Z",
+    "gameState": "in_game",
+    "blueTeam": {
+     "totalGold": 37951,
+     "inhibitors": 0,
+     "towers": 2,
+     "barons": 0,
+     "totalKills": 6,
+     "dragons": [
+      "ocean"
+     ],
+     "participants": [
+      {
+       "participantId": 1,
+       "totalGold": 8542,
+       "level": 14,
+       "kills": 2,
+       "deaths": 0,
+       "assists": 2,
+       "creepScore": 167,
+       "currentHealth": 1671,
+       "maxHealth": 2764
+      },
+      {
+       "participantId": 2,
+       "totalGold": 8053,
+       "level": 12,
+       "kills": 2,
+       "deaths": 2,
+       "assists": 1,
+       "creepScore": 165,
+       "currentHealth": 2757,
+       "maxHealth": 2757
+      },
+      {
+       "participantId": 3,
+       "totalGold": 7473,
+       "level": 13,
+       "kills": 0,
+       "deaths": 1,
+       "assists": 0,
+       "creepScore": 197,
+       "currentHealth": 1817,
+       "maxHealth": 2109
+      },
+      {
+       "participantId": 4,
+       "totalGold": 8417,
+       "level": 11,
+       "kills": 1,
+       "deaths": 2,
+       "assists": 3,
+       "creepScore": 206,
+       "currentHealth": 1358,
+       "maxHealth": 1561
+      },
+      {
+       "participantId": 5,
+       "totalGold": 5466,
+       "level": 10,
+       "kills": 1,
+       "deaths": 2,
+       "assists": 4,
+       "creepScore": 22,
+       "currentHealth": 1970,
+       "maxHealth": 1970
+      }
+     ]
+    },
+    "redTeam": {
+     "totalGold": 39871,
+     "inhibitors": 0,
+     "towers": 1,
+     "barons": 0,
+     "totalKills": 7,
+     "dragons": [
+      "hextech",
+      "cloud"
+     ],
+     "participants": [
+      {
+       "participantId": 6,
+       "totalGold": 6553,
+       "level": 14,
+       "kills": 0,
+       "deaths": 1,
+       "assists": 1,
+       "creepScore": 165,
+       "currentHealth": 1791,
+       "maxHealth": 3049
+      },
+      {
+       "participantId": 7,
+       "totalGold": 10505,
+       "level": 13,
+       "kills": 3,
+       "deaths": 0,
+       "assists": 3,
+       "creepScore": 197,
+       "currentHealth": 1572,
+       "maxHealth": 1848
+      },
+      {
+       "participantId": 8,
+       "totalGold": 8291,
+       "level": 13,
+       "kills": 2,
+       "deaths": 0,
+       "assists": 2,
+       "creepScore": 201,
+       "currentHealth": 1739,
+       "maxHealth": 2076
+      },
+      {
+       "participantId": 9,
+       "totalGold": 9139,
+       "level": 11,
+       "kills": 2,
+       "deaths": 3,
+       "assists": 3,
+       "creepScore": 217,
+       "currentHealth": 980,
+       "maxHealth": 1630
+      },
+      {
+       "participantId": 10,
+       "totalGold": 5383,
+       "level": 10,
+       "kills": 0,
+       "deaths": 2,
+       "assists": 5,
+       "creepScore": 16,
+       "currentHealth": 1499,
+       "maxHealth": 1499
       }
      ]
     }
