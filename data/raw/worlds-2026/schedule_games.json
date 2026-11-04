@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-04T02:39:10Z",
+ "fetched_at": "2026-11-04T03:39:36Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -62,14 +62,7 @@
    "MatchId": "2026 Season World Championship/Main Event_Quarterfinals_1",
    "Blue": "Invictus Gaming",
    "Red": "Top Esports",
-   "Winner": ""
-  },
-  {
-   "GameId": "2026 Season World Championship/Main Event_Quarterfinals_1_5",
-   "MatchId": "2026 Season World Championship/Main Event_Quarterfinals_1",
-   "Blue": "",
-   "Red": "",
-   "Winner": ""
+   "Winner": "1"
   },
   {
    "GameId": "2026 Season World Championship/Main Event_Quarterfinals_2_1",
