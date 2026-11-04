@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-04T22:48:50Z",
+ "fetched_at": "2026-11-04T23:19:02Z",
  "rows": [
   {
    "game_id": "115660588583171787",
@@ -18295,6 +18295,238 @@
        "creepScore": 41,
        "currentHealth": 0,
        "maxHealth": 2445
+      }
+     ]
+    }
+   }
+  },
+  {
+   "game_id": "115660540726095117",
+   "number": 2,
+   "start_time": "2026-11-04T22:00:00Z",
+   "teams": {
+    "blue": "GEN",
+    "red": "LYON"
+   },
+   "patch": "16.20.826.3891",
+   "metadata": {
+    "patchVersion": "16.20.826.3891",
+    "blueTeamMetadata": {
+     "esportsTeamId": "100205573495116443",
+     "participantMetadata": [
+      {
+       "participantId": 1,
+       "esportsPlayerId": "99566404532924465",
+       "summonerName": "GEN Kiin",
+       "championId": "Sion",
+       "role": "top"
+      },
+      {
+       "participantId": 2,
+       "esportsPlayerId": "100725844994345151",
+       "summonerName": "GEN Canyon",
+       "championId": "JarvanIV",
+       "role": "jungle"
+      },
+      {
+       "participantId": 3,
+       "esportsPlayerId": "99871276342168416",
+       "summonerName": "GEN Chovy",
+       "championId": "Viktor",
+       "role": "mid"
+      },
+      {
+       "participantId": 4,
+       "esportsPlayerId": "98767975906852059",
+       "summonerName": "GEN Ruler",
+       "championId": "Ashe",
+       "role": "bottom"
+      },
+      {
+       "participantId": 5,
+       "esportsPlayerId": "107454956790371682",
+       "summonerName": "GEN Duro",
+       "championId": "Seraphine",
+       "role": "support"
+      }
+     ]
+    },
+    "redTeamMetadata": {
+     "esportsTeamId": "99566405941863385",
+     "participantMetadata": [
+      {
+       "participantId": 6,
+       "esportsPlayerId": "99322408701435122",
+       "summonerName": "LYON Dhokla",
+       "championId": "Jayce",
+       "role": "top"
+      },
+      {
+       "participantId": 7,
+       "esportsPlayerId": "101389713966873995",
+       "summonerName": "LYON Inspired",
+       "championId": "MonkeyKing",
+       "role": "jungle"
+      },
+      {
+       "participantId": 8,
+       "esportsPlayerId": "107492059066783320",
+       "summonerName": "LYON Saint",
+       "championId": "Cassiopeia",
+       "role": "mid"
+      },
+      {
+       "participantId": 9,
+       "esportsPlayerId": "105388936922706146",
+       "summonerName": "LYON Berserker",
+       "championId": "Mel",
+       "role": "bottom"
+      },
+      {
+       "participantId": 10,
+       "esportsPlayerId": "103103578076943629",
+       "summonerName": "LYON Isles",
+       "championId": "Pyke",
+       "role": "support"
+      }
+     ]
+    }
+   },
+   "first_frame_time": "2026-11-04T23:06:06.852Z",
+   "last_frame": {
+    "rfc460Timestamp": "2026-11-04T23:18:09.776Z",
+    "gameState": "in_game",
+    "blueTeam": {
+     "totalGold": 21515,
+     "inhibitors": 0,
+     "towers": 0,
+     "barons": 0,
+     "totalKills": 5,
+     "dragons": [
+      "mountain"
+     ],
+     "participants": [
+      {
+       "participantId": 1,
+       "totalGold": 4029,
+       "level": 9,
+       "kills": 1,
+       "deaths": 0,
+       "assists": 1,
+       "creepScore": 101,
+       "currentHealth": 2214,
+       "maxHealth": 2214
+      },
+      {
+       "participantId": 2,
+       "totalGold": 4379,
+       "level": 9,
+       "kills": 1,
+       "deaths": 0,
+       "assists": 2,
+       "creepScore": 93,
+       "currentHealth": 1783,
+       "maxHealth": 1805
+      },
+      {
+       "participantId": 3,
+       "totalGold": 4687,
+       "level": 10,
+       "kills": 1,
+       "deaths": 0,
+       "assists": 0,
+       "creepScore": 133,
+       "currentHealth": 1579,
+       "maxHealth": 1579
+      },
+      {
+       "participantId": 4,
+       "totalGold": 4975,
+       "level": 8,
+       "kills": 1,
+       "deaths": 0,
+       "assists": 4,
+       "creepScore": 106,
+       "currentHealth": 1104,
+       "maxHealth": 1258
+      },
+      {
+       "participantId": 5,
+       "totalGold": 3445,
+       "level": 6,
+       "kills": 1,
+       "deaths": 1,
+       "assists": 4,
+       "creepScore": 14,
+       "currentHealth": 1210,
+       "maxHealth": 1270
+      }
+     ]
+    },
+    "redTeam": {
+     "totalGold": 19879,
+     "inhibitors": 0,
+     "towers": 0,
+     "barons": 0,
+     "totalKills": 1,
+     "dragons": [
+      "cloud"
+     ],
+     "participants": [
+      {
+       "participantId": 6,
+       "totalGold": 4251,
+       "level": 9,
+       "kills": 0,
+       "deaths": 1,
+       "assists": 0,
+       "creepScore": 99,
+       "currentHealth": 1517,
+       "maxHealth": 1517
+      },
+      {
+       "participantId": 7,
+       "totalGold": 4633,
+       "level": 9,
+       "kills": 1,
+       "deaths": 1,
+       "assists": 0,
+       "creepScore": 95,
+       "currentHealth": 1755,
+       "maxHealth": 1760
+      },
+      {
+       "participantId": 8,
+       "totalGold": 3926,
+       "level": 9,
+       "kills": 0,
+       "deaths": 0,
+       "assists": 0,
+       "creepScore": 109,
+       "currentHealth": 1252,
+       "maxHealth": 1725
+      },
+      {
+       "participantId": 9,
+       "totalGold": 4351,
+       "level": 9,
+       "kills": 0,
+       "deaths": 1,
+       "assists": 1,
+       "creepScore": 119,
+       "currentHealth": 1452,
+       "maxHealth": 1452
+      },
+      {
+       "participantId": 10,
+       "totalGold": 2718,
+       "level": 6,
+       "kills": 0,
+       "deaths": 2,
+       "assists": 1,
+       "creepScore": 19,
+       "currentHealth": 1104,
+       "maxHealth": 1104
       }
      ]
     }

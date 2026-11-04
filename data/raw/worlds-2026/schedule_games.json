@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-04T22:48:50Z",
+ "fetched_at": "2026-11-04T23:19:02Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -74,8 +74,8 @@
   {
    "GameId": "2026 Season World Championship/Main Event_Quarterfinals_2_2",
    "MatchId": "2026 Season World Championship/Main Event_Quarterfinals_2",
-   "Blue": "",
-   "Red": "",
+   "Blue": "Gen.G",
+   "Red": "LYON (2024 American Team)",
    "Winner": ""
   },
   {
