@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-05T22:29:53Z",
+ "fetched_at": "2026-11-05T23:00:07Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -90,7 +90,7 @@
    "MatchId": "2026 Season World Championship/Main Event_Quarterfinals_3",
    "Blue": "Bilibili Gaming",
    "Red": "Dplus Kia",
-   "Winner": ""
+   "Winner": "1"
   },
   {
    "GameId": "2026 Season World Championship/Main Event_Quarterfinals_3_2",
