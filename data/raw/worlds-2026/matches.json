@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-04T23:49:15Z",
+ "fetched_at": "2026-11-05T00:49:41Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -690,9 +690,9 @@
    "BestOf": "5",
    "Team1": "Gen.G",
    "Team2": "LYON (2024 American Team)",
-   "Team1Score": "2",
+   "Team1Score": "3",
    "Team2Score": "0",
-   "Winner": "",
+   "Winner": "1",
    "DateTimeUTC": "2026-11-04 22:00:00",
    "HasTime": "1",
    "IsNullified": "0",
@@ -740,7 +740,7 @@
    "Phase": "",
    "BestOf": "5",
    "Team1": "Invictus Gaming",
-   "Team2": "TBD",
+   "Team2": "Gen.G",
    "Team1Score": "",
    "Team2Score": "",
    "Winner": "",
