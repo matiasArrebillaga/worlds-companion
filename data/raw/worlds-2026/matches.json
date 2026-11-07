@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-07T01:11:49Z",
+ "fetched_at": "2026-11-07T02:12:11Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -725,8 +725,8 @@
    "Team1": "Karmine Corp",
    "Team2": "T1",
    "Team1Score": "1",
-   "Team2Score": "2",
-   "Winner": "",
+   "Team2Score": "3",
+   "Winner": "2",
    "DateTimeUTC": "2026-11-06 22:00:00",
    "HasTime": "1",
    "IsNullified": "0",
@@ -757,7 +757,7 @@
    "Phase": "",
    "BestOf": "5",
    "Team1": "Bilibili Gaming",
-   "Team2": "TBD",
+   "Team2": "T1",
    "Team1Score": "",
    "Team2Score": "",
    "Winner": "",
