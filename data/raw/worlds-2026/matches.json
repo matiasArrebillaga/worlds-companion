@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-07T22:51:09Z",
+ "fetched_at": "2026-11-07T23:51:35Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -742,7 +742,7 @@
    "Team1": "Invictus Gaming",
    "Team2": "Gen.G",
    "Team1Score": "0",
-   "Team2Score": "1",
+   "Team2Score": "2",
    "Winner": "",
    "DateTimeUTC": "2026-11-07 22:00:00",
    "HasTime": "1",
