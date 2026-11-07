@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-06T23:10:51Z",
+ "fetched_at": "2026-11-07T00:11:17Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -118,13 +118,13 @@
    "MatchId": "2026 Season World Championship/Main Event_Quarterfinals_4",
    "Blue": "Karmine Corp",
    "Red": "T1",
-   "Winner": ""
+   "Winner": "2"
   },
   {
    "GameId": "2026 Season World Championship/Main Event_Quarterfinals_4_3",
    "MatchId": "2026 Season World Championship/Main Event_Quarterfinals_4",
-   "Blue": "",
-   "Red": "",
+   "Blue": "Karmine Corp",
+   "Red": "T1",
    "Winner": ""
   },
   {
