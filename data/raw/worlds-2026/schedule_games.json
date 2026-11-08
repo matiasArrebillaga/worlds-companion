@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-07T23:51:35Z",
+ "fetched_at": "2026-11-08T00:21:46Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -508,8 +508,8 @@
   {
    "GameId": "2026 Season World Championship/Main Event_Semifinals_1_3",
    "MatchId": "2026 Season World Championship/Main Event_Semifinals_1",
-   "Blue": "",
-   "Red": "",
+   "Blue": "Invictus Gaming",
+   "Red": "Gen.G",
    "Winner": ""
   },
   {
