@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-09T01:01:58Z",
+ "fetched_at": "2026-11-09T02:02:25Z",
  "rows": [
   {
    "MatchId": "2026 Season World Championship/Play-In_Round 1_1",
@@ -758,9 +758,9 @@
    "BestOf": "5",
    "Team1": "Bilibili Gaming",
    "Team2": "T1",
-   "Team1Score": "2",
+   "Team1Score": "3",
    "Team2Score": "1",
-   "Winner": "",
+   "Winner": "1",
    "DateTimeUTC": "2026-11-08 22:00:00",
    "HasTime": "1",
    "IsNullified": "0",
@@ -773,7 +773,7 @@
    "Round": "",
    "Phase": "",
    "BestOf": "5",
-   "Team1": "TBD",
+   "Team1": "Bilibili Gaming",
    "Team2": "Gen.G",
    "Team1Score": "",
    "Team2Score": "",
