@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-14T20:01:19Z",
+ "fetched_at": "2026-11-14T20:31:33Z",
  "rows": [
   {
    "game_id": "115660588583171787",
@@ -22154,137 +22154,143 @@
    },
    "first_frame_time": "2026-11-14T19:53:15.072Z",
    "last_frame": {
-    "rfc460Timestamp": "2026-11-14T20:00:29.950Z",
+    "rfc460Timestamp": "2026-11-14T20:30:39.871Z",
     "gameState": "in_game",
     "blueTeam": {
-     "totalGold": 11960,
+     "totalGold": 72919,
      "inhibitors": 0,
-     "towers": 0,
-     "barons": 0,
-     "totalKills": 0,
-     "dragons": [],
+     "towers": 5,
+     "barons": 3,
+     "totalKills": 14,
+     "dragons": [
+      "elder"
+     ],
      "participants": [
       {
        "participantId": 1,
-       "totalGold": 2564,
-       "level": 7,
-       "kills": 0,
-       "deaths": 0,
-       "assists": 0,
-       "creepScore": 65,
-       "currentHealth": 937,
-       "maxHealth": 1366
+       "totalGold": 13695,
+       "level": 20,
+       "kills": 2,
+       "deaths": 1,
+       "assists": 8,
+       "creepScore": 289,
+       "currentHealth": 4048,
+       "maxHealth": 4120
       },
       {
        "participantId": 2,
-       "totalGold": 2461,
-       "level": 6,
-       "kills": 0,
-       "deaths": 0,
-       "assists": 0,
-       "creepScore": 51,
-       "currentHealth": 1474,
-       "maxHealth": 1486
+       "totalGold": 14672,
+       "level": 18,
+       "kills": 2,
+       "deaths": 2,
+       "assists": 9,
+       "creepScore": 275,
+       "currentHealth": 3196,
+       "maxHealth": 3196
       },
       {
        "participantId": 3,
-       "totalGold": 2668,
-       "level": 7,
-       "kills": 0,
-       "deaths": 0,
-       "assists": 0,
-       "creepScore": 76,
-       "currentHealth": 1113,
-       "maxHealth": 1222
+       "totalGold": 14436,
+       "level": 18,
+       "kills": 5,
+       "deaths": 1,
+       "assists": 9,
+       "creepScore": 271,
+       "currentHealth": 2698,
+       "maxHealth": 2698
       },
       {
        "participantId": 4,
-       "totalGold": 2656,
-       "level": 6,
-       "kills": 0,
+       "totalGold": 20404,
+       "level": 18,
+       "kills": 4,
        "deaths": 0,
-       "assists": 0,
-       "creepScore": 75,
-       "currentHealth": 887,
-       "maxHealth": 1070
+       "assists": 7,
+       "creepScore": 429,
+       "currentHealth": 2720,
+       "maxHealth": 2793
       },
       {
        "participantId": 5,
-       "totalGold": 1611,
-       "level": 5,
-       "kills": 0,
+       "totalGold": 9712,
+       "level": 15,
+       "kills": 1,
        "deaths": 0,
-       "assists": 0,
-       "creepScore": 5,
-       "currentHealth": 919,
-       "maxHealth": 974
+       "assists": 11,
+       "creepScore": 26,
+       "currentHealth": 2442,
+       "maxHealth": 2442
       }
      ]
     },
     "redTeam": {
-     "totalGold": 12249,
+     "totalGold": 64251,
      "inhibitors": 0,
-     "towers": 0,
+     "towers": 3,
      "barons": 0,
-     "totalKills": 0,
+     "totalKills": 4,
      "dragons": [
-      "ocean"
+      "ocean",
+      "chemtech",
+      "hextech",
+      "hextech",
+      "elder"
      ],
      "participants": [
       {
        "participantId": 6,
-       "totalGold": 2536,
-       "level": 7,
+       "totalGold": 12100,
+       "level": 19,
        "kills": 0,
-       "deaths": 0,
-       "assists": 0,
-       "creepScore": 67,
-       "currentHealth": 1275,
-       "maxHealth": 1401
+       "deaths": 3,
+       "assists": 1,
+       "creepScore": 306,
+       "currentHealth": 3912,
+       "maxHealth": 3912
       },
       {
        "participantId": 7,
-       "totalGold": 2682,
-       "level": 6,
-       "kills": 0,
-       "deaths": 0,
-       "assists": 0,
-       "creepScore": 62,
-       "currentHealth": 1415,
-       "maxHealth": 1415
+       "totalGold": 12711,
+       "level": 16,
+       "kills": 1,
+       "deaths": 3,
+       "assists": 3,
+       "creepScore": 266,
+       "currentHealth": 2760,
+       "maxHealth": 2760
       },
       {
        "participantId": 8,
-       "totalGold": 2761,
-       "level": 7,
-       "kills": 0,
-       "deaths": 0,
-       "assists": 0,
-       "creepScore": 73,
-       "currentHealth": 995,
-       "maxHealth": 1353
+       "totalGold": 15178,
+       "level": 18,
+       "kills": 2,
+       "deaths": 1,
+       "assists": 1,
+       "creepScore": 371,
+       "currentHealth": 2538,
+       "maxHealth": 2538
       },
       {
        "participantId": 9,
-       "totalGold": 2567,
-       "level": 6,
-       "kills": 0,
-       "deaths": 0,
-       "assists": 0,
-       "creepScore": 70,
-       "currentHealth": 961,
-       "maxHealth": 1102
+       "totalGold": 15576,
+       "level": 16,
+       "kills": 1,
+       "deaths": 4,
+       "assists": 3,
+       "creepScore": 398,
+       "currentHealth": 2878,
+       "maxHealth": 2878
       },
       {
        "participantId": 10,
-       "totalGold": 1703,
-       "level": 5,
+       "totalGold": 8686,
+       "level": 14,
        "kills": 0,
-       "deaths": 0,
-       "assists": 0,
-       "creepScore": 7,
-       "currentHealth": 1100,
-       "maxHealth": 1100
+       "deaths": 3,
+       "assists": 4,
+       "creepScore": 39,
+       "currentHealth": 2546,
+       "maxHealth": 2546
       }
      ]
     }
