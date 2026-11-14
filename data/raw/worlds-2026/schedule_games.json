@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-14T23:02:58Z",
+ "fetched_at": "2026-11-14T23:32:58Z",
  "rows": [
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_1",
@@ -25,8 +25,8 @@
   {
    "GameId": "2026 Season World Championship/Main Event_Finals_1_4",
    "MatchId": "2026 Season World Championship/Main Event_Finals_1",
-   "Blue": "",
-   "Red": "",
+   "Blue": "Bilibili Gaming",
+   "Red": "Gen.G",
    "Winner": ""
   },
   {
