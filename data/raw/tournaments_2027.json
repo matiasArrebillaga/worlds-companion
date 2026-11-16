@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-16T06:43:35Z",
+ "fetched_at": "2026-11-16T22:15:16Z",
  "rows": [
   {
    "Name": "First Stand: All In 2027",
@@ -39,6 +39,19 @@
    "IsQualifier": "1",
    "DateStart__precision": "1",
    "Date__precision": "1"
+  },
+  {
+   "Name": "LEC 2027 Winter",
+   "OverviewPage": "LEC/2027 Season/Winter Season",
+   "League": "LoL EMEA Championship",
+   "Year": "2027",
+   "DateStart": "2027-01-15",
+   "Date": "",
+   "IsPlayoffs": "0",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "DateStart__precision": "1",
+   "Date__precision": ""
   }
  ]
 }
