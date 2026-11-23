@@ -1,5 +1,5 @@
 {
- "fetched_at": "2026-11-23T07:50:11Z",
+ "fetched_at": "2026-11-23T23:59:48Z",
  "rows": [
   {
    "Name": "First Stand: All In 2027",
@@ -28,9 +28,22 @@
    "Date__precision": ""
   },
   {
-   "Name": "LCK Cup 2027",
-   "OverviewPage": "LCK/2027 Season/Cup",
-   "League": "LoL Champions Korea",
+   "Name": "LEC 2027 Spring Playoffs",
+   "OverviewPage": "LEC/2027 Season/Spring Playoffs",
+   "League": "LoL EMEA Championship",
+   "Year": "2027",
+   "DateStart": "",
+   "Date": "",
+   "IsPlayoffs": "1",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "DateStart__precision": "",
+   "Date__precision": ""
+  },
+  {
+   "Name": "LEC 2027 Spring",
+   "OverviewPage": "LEC/2027 Season/Spring Season",
+   "League": "LoL EMEA Championship",
    "Year": "2027",
    "DateStart": "",
    "Date": "",
@@ -41,13 +54,39 @@
    "Date__precision": ""
   },
   {
-   "Name": "LCS 2027 Lock-In",
-   "OverviewPage": "LCS/2027 Season/Lock-In",
-   "League": "League of Legends Championship Series",
+   "Name": "LEC 2027 Summer Playoffs",
+   "OverviewPage": "LEC/2027 Season/Summer Playoffs",
+   "League": "LoL EMEA Championship",
+   "Year": "2027",
+   "DateStart": "",
+   "Date": "",
+   "IsPlayoffs": "1",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "DateStart__precision": "",
+   "Date__precision": ""
+  },
+  {
+   "Name": "LEC 2027 Summer",
+   "OverviewPage": "LEC/2027 Season/Summer Season",
+   "League": "LoL EMEA Championship",
    "Year": "2027",
    "DateStart": "",
    "Date": "",
    "IsPlayoffs": "0",
+   "TournamentLevel": "Primary",
+   "IsQualifier": "0",
+   "DateStart__precision": "",
+   "Date__precision": ""
+  },
+  {
+   "Name": "LEC 2027 Winter Playoffs",
+   "OverviewPage": "LEC/2027 Season/Winter Playoffs",
+   "League": "LoL EMEA Championship",
+   "Year": "2027",
+   "DateStart": "",
+   "Date": "",
+   "IsPlayoffs": "1",
    "TournamentLevel": "Primary",
    "IsQualifier": "0",
    "DateStart__precision": "",
